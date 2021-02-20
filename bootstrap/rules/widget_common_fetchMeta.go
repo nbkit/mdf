@@ -1,0 +1,20 @@
+package rules
+
+import (
+	"github.com/ggoop/mdf/framework/md"
+	"github.com/ggoop/mdf/utils"
+)
+
+type commonFetchMeta struct {
+}
+
+func newCommonFetchMeta() *commonFetchMeta {
+	return &commonFetchMeta{}
+}
+func (s *commonFetchMeta) Register() md.RuleRegister {
+	return md.RuleRegister{Code: "fetchMeta", OwnerType: md.RuleType_Widget, OwnerCode: "common"}
+}
+func (s *commonFetchMeta) Exec(token *utils.TokenContext, req *utils.ReqContext, res *utils.ResContext) {
+
+	res.Set("aaa", req.Action)
+}
