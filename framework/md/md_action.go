@@ -1,6 +1,6 @@
 package md
 
-import "github.com/ggoop/mdf/utils"
+import "github.com/nbkit/mdf/utils"
 
 type MDActionCommand struct {
 	ID         string      `gorm:"primary_key;size:36" json:"id"`

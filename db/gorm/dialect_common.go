@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ggoop/mdf/utils"
+	"github.com/nbkit/mdf/utils"
 )
 
 var keyNameRegex = regexp.MustCompile("[^a-zA-Z0-9]+")

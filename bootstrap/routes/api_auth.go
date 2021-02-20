@@ -1,6 +1,6 @@
 package routes
 
-import "github.com/ggoop/mdf/gin"
+import "github.com/nbkit/mdf/gin"
 
 func apiAuth(r *gin.RouterGroup) {
 }

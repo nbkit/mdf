@@ -1,8 +1,8 @@
 package db
 
 import (
-	"github.com/ggoop/mdf/db/gorm"
-	"github.com/ggoop/mdf/utils"
+	"github.com/nbkit/mdf/db/gorm"
+	"github.com/nbkit/mdf/utils"
 )
 
 func Paginate(db *gorm.DB, out interface{}, page int, pageSize int) (*utils.Pager, error) {

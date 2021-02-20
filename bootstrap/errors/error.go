@@ -2,7 +2,7 @@ package errors
 
 import (
 	"fmt"
-	"github.com/ggoop/mdf/utils"
+	"github.com/nbkit/mdf/utils"
 )
 
 //xx xx xxx

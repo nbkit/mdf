@@ -10,8 +10,8 @@ import (
 	"html/template"
 	"net/http"
 
-	"github.com/ggoop/mdf/gin/internal/bytesconv"
-	"github.com/ggoop/mdf/gin/internal/json"
+	"github.com/nbkit/mdf/gin/internal/bytesconv"
+	"github.com/nbkit/mdf/gin/internal/json"
 )
 
 // JSON contains the given interface object.

@@ -4,16 +4,16 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"github.com/ggoop/mdf/gin"
 	"github.com/go-sql-driver/mysql"
+	"github.com/nbkit/mdf/gin"
 	"net/http"
 	"net/url"
 	"strings"
 	"time"
 
 	_ "github.com/denisenkom/go-mssqldb"
-	"github.com/ggoop/mdf/framework/glog"
-	"github.com/ggoop/mdf/utils"
+	"github.com/nbkit/mdf/framework/glog"
+	"github.com/nbkit/mdf/utils"
 )
 
 type ParamValue struct {

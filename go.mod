@@ -1,4 +1,4 @@
-module github.com/ggoop/mdf
+module github.com/nbkit/mdf
 
 go 1.15
 

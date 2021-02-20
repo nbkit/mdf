@@ -1,6 +1,6 @@
 package md
 
-import "github.com/ggoop/mdf/utils"
+import "github.com/nbkit/mdf/utils"
 
 type Model struct {
 	ID        string     `gorm:"primary_key;size:50" json:"id"`

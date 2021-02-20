@@ -7,7 +7,7 @@ package gin
 import (
 	"log"
 
-	"github.com/ggoop/mdf/gin/binding"
+	"github.com/nbkit/mdf/gin/binding"
 )
 
 // BindWith binds the passed struct pointer using the specified binding engine.

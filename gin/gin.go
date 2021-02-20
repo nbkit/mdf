@@ -13,8 +13,8 @@ import (
 	"path"
 	"sync"
 
-	"github.com/ggoop/mdf/gin/internal/bytesconv"
-	"github.com/ggoop/mdf/gin/render"
+	"github.com/nbkit/mdf/gin/internal/bytesconv"
+	"github.com/nbkit/mdf/gin/render"
 )
 
 const defaultMultipartMemory = 32 << 20 // 32 MB

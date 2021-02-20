@@ -1,7 +1,7 @@
 package services
 
 import (
-	"github.com/ggoop/mdf/gmap"
+	"github.com/nbkit/mdf/gmap"
 	"strings"
 )
 

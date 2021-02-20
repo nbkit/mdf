@@ -1,6 +1,6 @@
 package main
 
-import "github.com/ggoop/mdf/bootstrap"
+import "github.com/nbkit/mdf/bootstrap"
 
 func main() {
 	bootstrap.Start()

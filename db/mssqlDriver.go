@@ -1,5 +1,5 @@
 package db
 
 import (
-	_ "github.com/ggoop/mdf/db/gorm/dialects/mssql"
+	_ "github.com/nbkit/mdf/db/gorm/dialects/mssql"
 )

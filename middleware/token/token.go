@@ -1,8 +1,8 @@
 package token
 
 import (
-	"github.com/ggoop/mdf/gin"
-	"github.com/ggoop/mdf/utils"
+	"github.com/nbkit/mdf/gin"
+	"github.com/nbkit/mdf/utils"
 )
 
 const (

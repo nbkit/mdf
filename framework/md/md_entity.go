@@ -5,8 +5,8 @@ import (
 	"github.com/shopspring/decimal"
 	"strings"
 
-	"github.com/ggoop/mdf/framework/glog"
-	"github.com/ggoop/mdf/utils"
+	"github.com/nbkit/mdf/framework/glog"
+	"github.com/nbkit/mdf/utils"
 )
 
 const (

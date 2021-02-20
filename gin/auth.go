@@ -10,7 +10,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/ggoop/mdf/gin/internal/bytesconv"
+	"github.com/nbkit/mdf/gin/internal/bytesconv"
 )
 
 // AuthUserKey is the cookie name for user credential in basic auth.

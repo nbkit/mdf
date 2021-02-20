@@ -1,10 +1,10 @@
 package services
 
 import (
-	"github.com/ggoop/mdf/bootstrap/errors"
-	"github.com/ggoop/mdf/bootstrap/model"
-	"github.com/ggoop/mdf/db"
-	"github.com/ggoop/mdf/utils"
+	"github.com/nbkit/mdf/bootstrap/errors"
+	"github.com/nbkit/mdf/bootstrap/model"
+	"github.com/nbkit/mdf/db"
+	"github.com/nbkit/mdf/utils"
 )
 
 type IProfileSv interface {

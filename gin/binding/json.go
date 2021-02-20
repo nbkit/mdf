@@ -10,7 +10,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/ggoop/mdf/gin/internal/json"
+	"github.com/nbkit/mdf/gin/internal/json"
 )
 
 // EnableDecoderUseNumber is used to call the UseNumber method on the JSON

@@ -3,7 +3,7 @@ package reg
 import (
 	"strings"
 
-	"github.com/ggoop/mdf/utils"
+	"github.com/nbkit/mdf/utils"
 )
 
 type RegObject struct {

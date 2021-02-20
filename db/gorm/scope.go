@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/ggoop/mdf/utils"
+	"github.com/nbkit/mdf/utils"
 )
 
 // Scope contain current operation's information when you perform any operation on the database

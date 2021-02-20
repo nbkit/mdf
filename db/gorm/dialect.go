@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/ggoop/mdf/utils"
+	"github.com/nbkit/mdf/utils"
 )
 
 // Dialect interface contains behaviors that differ across SQL database

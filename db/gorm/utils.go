@@ -9,7 +9,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/ggoop/mdf/utils"
+	"github.com/nbkit/mdf/utils"
 )
 
 // NowFunc returns current time, this function is exported in order to be able

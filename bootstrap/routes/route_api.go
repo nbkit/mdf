@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"github.com/ggoop/mdf/gin"
+	"github.com/nbkit/mdf/gin"
 )
 
 func routeApi(engine *gin.Engine) {

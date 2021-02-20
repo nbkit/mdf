@@ -2,10 +2,10 @@ package md
 
 import (
 	"fmt"
-	"github.com/ggoop/mdf/db"
-	"github.com/ggoop/mdf/framework/glog"
+	"github.com/nbkit/mdf/db"
+	"github.com/nbkit/mdf/framework/glog"
 
-	"github.com/ggoop/mdf/utils"
+	"github.com/nbkit/mdf/utils"
 )
 
 func (s *mdSvImpl) UpdateEntity(item MDEntity) error {

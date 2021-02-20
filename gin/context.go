@@ -19,9 +19,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ggoop/mdf/gin/binding"
-	"github.com/ggoop/mdf/gin/render"
-	"github.com/ggoop/mdf/middleware/sse"
+	"github.com/nbkit/mdf/gin/binding"
+	"github.com/nbkit/mdf/gin/render"
+	"github.com/nbkit/mdf/middleware/sse"
 )
 
 // Content-Type MIME of the most common data formats.

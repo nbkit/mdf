@@ -10,7 +10,7 @@ package utils
 import (
 	"encoding/json"
 
-	"github.com/ggoop/mdf/framework/glog"
+	"github.com/nbkit/mdf/framework/glog"
 )
 
 /**

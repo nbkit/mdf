@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/ggoop/mdf/utils"
+	"github.com/nbkit/mdf/utils"
 	"github.com/robfig/cron"
 	"io"
 	"strings"
@@ -14,7 +14,7 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/ggoop/mdf/framework/glog"
+	"github.com/nbkit/mdf/framework/glog"
 )
 
 //code 到 RegObject 的缓存

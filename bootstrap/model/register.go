@@ -1,7 +1,7 @@
 package model
 
 import (
-	"github.com/ggoop/mdf/framework/md"
+	"github.com/nbkit/mdf/framework/md"
 )
 
 // 注册数据模型,提供数据层，按模块注册数据模型

@@ -1,16 +1,16 @@
 package md
 
 import (
-	"github.com/ggoop/mdf/db"
+	"github.com/nbkit/mdf/db"
 	"github.com/shopspring/decimal"
 	"reflect"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/ggoop/mdf/db/gorm"
-	"github.com/ggoop/mdf/framework/glog"
-	"github.com/ggoop/mdf/utils"
+	"github.com/nbkit/mdf/db/gorm"
+	"github.com/nbkit/mdf/framework/glog"
+	"github.com/nbkit/mdf/utils"
 )
 
 //字段关联关系

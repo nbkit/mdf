@@ -12,8 +12,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ggoop/mdf/gin/internal/bytesconv"
-	"github.com/ggoop/mdf/gin/internal/json"
+	"github.com/nbkit/mdf/gin/internal/bytesconv"
+	"github.com/nbkit/mdf/gin/internal/json"
 )
 
 var errUnknownType = errors.New("unknown type")

@@ -1,8 +1,8 @@
 package routes
 
 import (
-	"github.com/ggoop/mdf/bootstrap/dti"
-	"github.com/ggoop/mdf/gin"
+	"github.com/nbkit/mdf/bootstrap/dti"
+	"github.com/nbkit/mdf/gin"
 )
 
 func routeDti(engine *gin.Engine) {

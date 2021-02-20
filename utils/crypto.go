@@ -10,7 +10,7 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 
-	"github.com/ggoop/mdf/framework/glog"
+	"github.com/nbkit/mdf/framework/glog"
 )
 
 func getKey(key string) []byte {

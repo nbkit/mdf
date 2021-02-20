@@ -1,7 +1,7 @@
 package md
 
 import (
-	"github.com/ggoop/mdf/utils"
+	"github.com/nbkit/mdf/utils"
 )
 
 func initData() {

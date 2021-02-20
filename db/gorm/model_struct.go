@@ -9,7 +9,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ggoop/mdf/inflection"
+	"github.com/nbkit/mdf/inflection"
 )
 
 // DefaultTableNameHandler default table name handler

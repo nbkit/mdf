@@ -1,7 +1,7 @@
 package rules
 
 import (
-	"github.com/ggoop/mdf/framework/md"
+	"github.com/nbkit/mdf/framework/md"
 )
 
 func Register() {

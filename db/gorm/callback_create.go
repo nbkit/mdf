@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/ggoop/mdf/utils"
+	"github.com/nbkit/mdf/utils"
 )
 
 // Define callbacks for creating

@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ggoop/mdf/gin"
+	"github.com/nbkit/mdf/gin"
 )
 
 // Config represents all available options for the middleware.

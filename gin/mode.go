@@ -8,7 +8,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/ggoop/mdf/gin/binding"
+	"github.com/nbkit/mdf/gin/binding"
 )
 
 // EnvGinMode indicates environment name for gin mode.

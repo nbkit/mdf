@@ -8,10 +8,10 @@ import (
 
 	"github.com/go-sql-driver/mysql"
 
-	"github.com/ggoop/mdf/framework/glog"
-	"github.com/ggoop/mdf/utils"
+	"github.com/nbkit/mdf/framework/glog"
+	"github.com/nbkit/mdf/utils"
 
-	"github.com/ggoop/mdf/db/gorm"
+	"github.com/nbkit/mdf/db/gorm"
 )
 
 type Repo struct {

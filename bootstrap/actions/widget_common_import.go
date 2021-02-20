@@ -1,9 +1,9 @@
 package actions
 
 import (
-	"github.com/ggoop/mdf/framework/files"
-	"github.com/ggoop/mdf/framework/md"
-	"github.com/ggoop/mdf/utils"
+	"github.com/nbkit/mdf/framework/files"
+	"github.com/nbkit/mdf/framework/md"
+	"github.com/nbkit/mdf/utils"
 )
 
 type commonImport struct {

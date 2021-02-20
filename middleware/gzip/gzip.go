@@ -3,7 +3,7 @@ package gzip
 import (
 	"compress/gzip"
 
-	"github.com/ggoop/mdf/gin"
+	"github.com/nbkit/mdf/gin"
 )
 
 const (

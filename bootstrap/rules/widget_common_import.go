@@ -2,14 +2,14 @@ package rules
 
 import (
 	"fmt"
-	"github.com/ggoop/mdf/bootstrap/services"
-	"github.com/ggoop/mdf/db"
+	"github.com/nbkit/mdf/bootstrap/services"
+	"github.com/nbkit/mdf/db"
 	"strings"
 
-	"github.com/ggoop/mdf/bootstrap/model"
-	"github.com/ggoop/mdf/framework/files"
-	"github.com/ggoop/mdf/framework/md"
-	"github.com/ggoop/mdf/utils"
+	"github.com/nbkit/mdf/bootstrap/model"
+	"github.com/nbkit/mdf/framework/files"
+	"github.com/nbkit/mdf/framework/md"
+	"github.com/nbkit/mdf/utils"
 )
 
 type commonImport struct {

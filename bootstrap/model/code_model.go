@@ -1,6 +1,6 @@
 package model
 
-import "github.com/ggoop/mdf/framework/md"
+import "github.com/nbkit/mdf/framework/md"
 
 type CodeRule struct {
 	md.Model

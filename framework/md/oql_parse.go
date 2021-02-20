@@ -6,8 +6,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/ggoop/mdf/framework/glog"
-	"github.com/ggoop/mdf/utils"
+	"github.com/nbkit/mdf/framework/glog"
+	"github.com/nbkit/mdf/utils"
 )
 
 func (s *oqlImpl) parse() error {

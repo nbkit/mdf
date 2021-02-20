@@ -9,7 +9,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/ggoop/mdf/gin/internal/json"
+	"github.com/nbkit/mdf/gin/internal/json"
 )
 
 // ErrorType is an unsigned 64-bit error code as defined in the gin spec.

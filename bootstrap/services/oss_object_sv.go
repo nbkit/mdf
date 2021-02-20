@@ -2,7 +2,7 @@ package services
 
 import (
 	"fmt"
-	"github.com/ggoop/mdf/db"
+	"github.com/nbkit/mdf/db"
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
@@ -11,10 +11,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/ggoop/mdf/bootstrap/errors"
-	"github.com/ggoop/mdf/bootstrap/model"
-	"github.com/ggoop/mdf/framework/glog"
-	"github.com/ggoop/mdf/utils"
+	"github.com/nbkit/mdf/bootstrap/errors"
+	"github.com/nbkit/mdf/bootstrap/model"
+	"github.com/nbkit/mdf/framework/glog"
+	"github.com/nbkit/mdf/utils"
 )
 
 //上传

@@ -11,7 +11,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"github.com/ggoop/mdf/gin/internal/bytesconv"
+	"github.com/nbkit/mdf/gin/internal/bytesconv"
 )
 
 var (

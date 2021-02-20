@@ -8,8 +8,8 @@ import (
 	"path"
 	"strings"
 
-	"github.com/ggoop/mdf/framework/glog"
-	"github.com/ggoop/mdf/gmap"
+	"github.com/nbkit/mdf/framework/glog"
+	"github.com/nbkit/mdf/gmap"
 )
 
 type AppConfig struct {

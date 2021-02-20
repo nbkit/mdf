@@ -2,16 +2,16 @@ package bootstrap
 
 import (
 	"fmt"
-	"github.com/ggoop/mdf/bootstrap/actions"
-	"github.com/ggoop/mdf/bootstrap/model"
-	"github.com/ggoop/mdf/bootstrap/routes"
-	"github.com/ggoop/mdf/bootstrap/rules"
-	"github.com/ggoop/mdf/bootstrap/seeds"
-	"github.com/ggoop/mdf/db"
-	"github.com/ggoop/mdf/framework/reg"
-	"github.com/ggoop/mdf/gin"
-	"github.com/ggoop/mdf/middleware/token"
-	"github.com/ggoop/mdf/utils"
+	"github.com/nbkit/mdf/bootstrap/actions"
+	"github.com/nbkit/mdf/bootstrap/model"
+	"github.com/nbkit/mdf/bootstrap/routes"
+	"github.com/nbkit/mdf/bootstrap/rules"
+	"github.com/nbkit/mdf/bootstrap/seeds"
+	"github.com/nbkit/mdf/db"
+	"github.com/nbkit/mdf/framework/reg"
+	"github.com/nbkit/mdf/gin"
+	"github.com/nbkit/mdf/middleware/token"
+	"github.com/nbkit/mdf/utils"
 	"os"
 )
 

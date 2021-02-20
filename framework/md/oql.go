@@ -1,6 +1,6 @@
 package md
 
-import "github.com/ggoop/mdf/utils"
+import "github.com/nbkit/mdf/utils"
 
 const (
 	regexp_OQL_FROM    = "([\\S]+)(?i:(?:as|[\\s])+)([\\S]+)|([\\S]+)"

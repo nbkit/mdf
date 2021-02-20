@@ -9,7 +9,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/ggoop/mdf/gin"
+	"github.com/nbkit/mdf/gin"
 )
 
 type gzipHandler struct {

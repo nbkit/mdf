@@ -1,10 +1,10 @@
 package routes
 
 import (
-	"github.com/ggoop/mdf/framework/md"
-	"github.com/ggoop/mdf/gin"
-	"github.com/ggoop/mdf/middleware/token"
-	"github.com/ggoop/mdf/utils"
+	"github.com/nbkit/mdf/framework/md"
+	"github.com/nbkit/mdf/gin"
+	"github.com/nbkit/mdf/middleware/token"
+	"github.com/nbkit/mdf/utils"
 	"net/http"
 )
 

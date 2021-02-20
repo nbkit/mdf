@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/ggoop/mdf/gin/internal/bytesconv"
+	"github.com/nbkit/mdf/gin/internal/bytesconv"
 )
 
 // String contains the given interface object slice and its format.

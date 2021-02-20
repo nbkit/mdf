@@ -2,9 +2,9 @@ package rules
 
 import (
 	"fmt"
-	"github.com/ggoop/mdf/framework/glog"
-	"github.com/ggoop/mdf/framework/md"
-	"github.com/ggoop/mdf/utils"
+	"github.com/nbkit/mdf/framework/glog"
+	"github.com/nbkit/mdf/framework/md"
+	"github.com/nbkit/mdf/utils"
 )
 
 type commonQuery struct {

@@ -1,10 +1,10 @@
 package seeds
 
 import (
-	"github.com/ggoop/mdf/db"
-	"github.com/ggoop/mdf/framework/glog"
-	"github.com/ggoop/mdf/framework/md"
-	"github.com/ggoop/mdf/utils"
+	"github.com/nbkit/mdf/db"
+	"github.com/nbkit/mdf/framework/glog"
+	"github.com/nbkit/mdf/framework/md"
+	"github.com/nbkit/mdf/utils"
 )
 
 func seedAction() {

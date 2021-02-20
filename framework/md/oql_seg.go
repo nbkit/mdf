@@ -2,7 +2,7 @@ package md
 
 import (
 	"fmt"
-	"github.com/ggoop/mdf/utils"
+	"github.com/nbkit/mdf/utils"
 	"regexp"
 	"strings"
 )

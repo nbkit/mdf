@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/ggoop/mdf/gin"
+	"github.com/nbkit/mdf/gin"
 )
 
 type cors struct {
