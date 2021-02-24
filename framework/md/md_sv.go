@@ -3,8 +3,6 @@ package md
 import (
 	"fmt"
 	"github.com/nbkit/mdf/db"
-	"github.com/nbkit/mdf/framework/files"
-	"sort"
 	"strings"
 	"sync"
 
@@ -14,10 +12,9 @@ import (
 
 type IMDSv interface {
 	Migrate(values ...interface{})
-	AddMDEntities(items []MDEntity) error
-	BatchImport(datas []files.ImportData) error
-	GetEntity(id string) *MDEntity
+	AddEntities(items []MDEntity) error
 
+	GetEntity(id string) *MDEntity
 	GetEnum(typeId string, values ...string) *MDEnum
 
 	TakeDataByQ(token *utils.TokenContext, req *utils.ReqContext) (map[string]interface{}, error)
@@ -25,11 +22,13 @@ type IMDSv interface {
 	UpdateEnumType(enumType MDEnumType) error
 
 	QuotedBy(m MD, ids []string, excludes ...MD) ([]MDEntity, []string)
+
+	Cache()
 }
 
 type mdSvImpl struct {
 	*sync.Mutex
-	mdCache         map[string]*MDEntity
+	entityCache     map[string]*MDEntity
 	enumCache       map[string]*MDEnum
 	initMDCompleted bool
 }
@@ -42,28 +41,37 @@ var mdSv IMDSv = newMDSv()
 
 func newMDSv() *mdSvImpl {
 	return &mdSvImpl{
-		Mutex:     &sync.Mutex{},
-		mdCache:   make(map[string]*MDEntity),
-		enumCache: make(map[string]*MDEnum),
+		Mutex:       &sync.Mutex{},
+		entityCache: make(map[string]*MDEntity),
+		enumCache:   make(map[string]*MDEnum),
 	}
 }
 
-func (s *mdSvImpl) InitCache() {
+func (s *mdSvImpl) Cache() {
+	s.cacheEnums()
+	s.cacheEntities()
+}
+
+func (s *mdSvImpl) cacheEnums() {
 	s.enumCache = make(map[string]*MDEnum)
 	items, _ := s.GetEnums()
 	for i, _ := range items {
-		v := items[i]
-		s.enumCache[strings.ToLower(v.EntityID+":"+v.ID)] = &v
-		s.enumCache[strings.ToLower(v.EntityID+":"+v.Name)] = &v
+		s.cacheEnum(items[i])
 	}
 }
-
-func (s *mdSvImpl) GetEnums() ([]MDEnum, error) {
-	items := make([]MDEnum, 0)
-	if err := db.Default().Model(&MDEnum{}).Where("entity_id in (?)", db.Default().Model(MDEntity{}).Select("id").Where("type=?", "enum").SubQuery()).Order("entity_id").Order("sequence").Find(&items).Error; err != nil {
-		return nil, err
+func (s *mdSvImpl) cacheEnum(item MDEnum) {
+	s.enumCache[strings.ToLower(item.EntityID+":"+item.ID)] = &item
+	s.enumCache[strings.ToLower(item.EntityID+":"+item.Name)] = &item
+}
+func (s *mdSvImpl) cacheEntities() {
+	s.entityCache = make(map[string]*MDEntity)
+	items, _ := s.GetEntities()
+	for i, _ := range items {
+		s.cacheEntity(items[i])
 	}
-	return items, nil
+}
+func (s *mdSvImpl) cacheEntity(item MDEntity) {
+	s.entityCache[strings.ToLower(item.ID)] = &item
 }
 
 func (s *mdSvImpl) Migrate(values ...interface{}) {
@@ -108,9 +116,6 @@ func (s *mdSvImpl) Migrate(values ...interface{}) {
 		}
 	}
 
-}
-func (s *mdSvImpl) ImportUIMeta(entityID string) {
-	return
 }
 func (s *mdSvImpl) entityToTables(items []MDEntity, oldItems []MDEntity) error {
 	if items == nil || len(items) == 0 {
@@ -214,7 +219,8 @@ func (s *mdSvImpl) buildColumnNameString(item MDField) string {
 		return s.buildColumnNameString4Mysql(item)
 	}
 }
-func (s *mdSvImpl) AddMDEntities(items []MDEntity) error {
+
+func (s *mdSvImpl) AddEntities(items []MDEntity) error {
 	entityIds := make([]string, 0)
 	oldEntities := make([]MDEntity, 0)
 	for i, _ := range items {
@@ -405,131 +411,6 @@ func (s *mdSvImpl) AddMDEntities(items []MDEntity) error {
 		return s.entityToTables(toTables, oldEntities)
 	}
 	//缓存
-	s.InitCache()
+	s.Cache()
 	return nil
-}
-
-func (s *mdSvImpl) BatchImport(datas []files.ImportData) error {
-	if len(datas) > 0 {
-		nameList := make(map[string]int)
-		nameList["Entity"] = 1
-		nameList["Props"] = 2
-		nameList["Page"] = 3
-		nameList["Widgets"] = 4
-		nameList["ActionCommand"] = 5
-		nameList["ActionRule"] = 6
-
-		sort.Slice(datas, func(i, j int) bool { return nameList[datas[i].SheetName] < nameList[datas[j].SheetName] })
-
-		entities := make([]MDEntity, 0)
-		fields := make([]MDField, 0)
-		for _, item := range datas {
-			if item.SheetName == "Entity" {
-				if d, err := s.toEntities(item); err != nil {
-					return err
-				} else if len(d) > 0 {
-					entities = append(entities, d...)
-				}
-			}
-			if item.SheetName == "Props" {
-				if d, err := s.toFields(item); err != nil {
-					return err
-				} else if len(d) > 0 {
-					fields = append(fields, d...)
-				}
-			}
-		}
-		if len(entities) > 0 {
-			for i, entity := range entities {
-				for _, field := range fields {
-					if entity.ID == field.EntityID {
-						if entities[i].Fields == nil {
-							entities[i].Fields = make([]MDField, 0)
-						}
-						entities[i].Fields = append(entities[i].Fields, field)
-					}
-				}
-			}
-			s.AddMDEntities(entities)
-		}
-	}
-	return nil
-}
-func (s *mdSvImpl) toEntities(data files.ImportData) ([]MDEntity, error) {
-	if len(data.Data) == 0 {
-		return nil, nil
-	}
-	items := make([]MDEntity, 0)
-	for _, row := range data.Data {
-		item := MDEntity{}
-		item.ID = files.GetCellValue("ID", row)
-		item.Name = files.GetCellValue("Name", row)
-		item.Type = files.GetCellValue("Type", row)
-		item.TableName = files.GetCellValue("TableName", row)
-		item.Domain = files.GetCellValue("Domain", row)
-		item.System = utils.ToSBool(files.GetCellValue("System", row))
-		items = append(items, item)
-	}
-	return items, nil
-}
-func (s *mdSvImpl) toFields(data files.ImportData) ([]MDField, error) {
-	if len(data.Data) == 0 {
-		return nil, nil
-	}
-	items := make([]MDField, 0)
-	for _, row := range data.Data {
-		item := MDField{}
-		if cValue := files.GetCellValue("EntityID", row); cValue != "" {
-			item.EntityID = cValue
-		}
-		if cValue := files.GetCellValue("Name", row); cValue != "" {
-			item.Name = cValue
-		}
-		if cValue := files.GetCellValue("Code", row); cValue != "" {
-			item.Code = cValue
-		}
-		if cValue := files.GetCellValue("TypeID", row); cValue != "" {
-			item.TypeID = cValue
-		}
-		if cValue := files.GetCellValue("Kind", row); cValue != "" {
-			item.Kind = cValue
-		}
-		if cValue := files.GetCellValue("ForeignKey", row); cValue != "" {
-			item.ForeignKey = cValue
-		}
-		if cValue := files.GetCellValue("AssociationKey", row); cValue != "" {
-			item.AssociationKey = cValue
-		}
-		if cValue := files.GetCellValue("DbName", row); cValue != "" {
-			item.DbName = cValue
-		}
-		if cValue := files.GetCellValue("DbName", row); cValue != "" {
-			item.DbName = cValue
-		}
-		if cValue := utils.ToInt(files.GetCellValue("Length", row)); cValue >= 0 {
-			item.Length = cValue
-		}
-		if cValue := utils.ToInt(files.GetCellValue("Precision", row)); cValue >= 0 {
-			item.Precision = cValue
-		}
-		if cValue := files.GetCellValue("DefaultValue", row); cValue != "" {
-			item.DefaultValue = cValue
-		}
-		if cValue := files.GetCellValue("MaxValue", row); cValue != "" {
-			item.MaxValue = cValue
-		}
-		if cValue := files.GetCellValue("MinValue", row); cValue != "" {
-			item.MinValue = cValue
-		}
-		if cValue := files.GetCellValue("Tags", row); cValue != "" {
-			item.Tags = cValue
-		}
-		if cValue := files.GetCellValue("Limit", row); cValue != "" {
-			item.Limit = cValue
-		}
-		item.Nullable = utils.ToSBool(files.GetCellValue("Nullable", row))
-		item.IsPrimaryKey = utils.ToSBool(files.GetCellValue("IsPrimaryKey", row))
-		items = append(items, item)
-	}
-	return items, nil
 }

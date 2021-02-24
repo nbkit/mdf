@@ -5,6 +5,7 @@ import (
 	"github.com/nbkit/mdf/db"
 	"github.com/nbkit/mdf/framework/glog"
 	"github.com/nbkit/mdf/utils"
+	"sort"
 )
 
 const (
@@ -35,21 +36,30 @@ type IActionSv interface {
 	DoAction(token *utils.TokenContext, req *utils.ReqContext) *utils.ResContext
 	RegisterRule(rules ...IActionRule)
 	RegisterAction(rules ...IActionRule)
+	Cache()
 }
 
 func ActionSv() IActionSv {
 	return actionSv
 }
 
+var mdCommonTag string = "common"
+
 type actionSvImpl struct {
 	rules   map[string]IActionRule
 	actions map[string]IActionRule
+
+	mdRules map[string]*MDActionRule
 }
 
 var actionSv IActionSv = newActionSvImpl()
 
 func newActionSvImpl() *actionSvImpl {
-	return &actionSvImpl{rules: make(map[string]IActionRule), actions: make(map[string]IActionRule)}
+	return &actionSvImpl{
+		rules:   make(map[string]IActionRule),
+		actions: make(map[string]IActionRule),
+		mdRules: make(map[string]*MDActionRule),
+	}
 }
 func (s actionSvImpl) GetRule(reg RuleRegister) (IActionRule, bool) {
 	if r, ok := s.rules[reg.GetKey()]; ok {
@@ -65,17 +75,38 @@ func (s actionSvImpl) GetAction(reg RuleRegister) (IActionRule, bool) {
 	return nil, false
 }
 
+func (s *actionSvImpl) Cache() {
+	s.mdRules = make(map[string]*MDActionRule)
+	ruleDatas := make([]MDActionRule, 0)
+	db.Default().Where("enabled=1").Find(&ruleDatas)
+	for i, _ := range ruleDatas {
+		rule := ruleDatas[i]
+		s.mdRules[fmt.Sprintf("%s:%s:%s:%s", rule.OwnerType, rule.OwnerCode, rule.Action, rule.Code)] = &rule
+	}
+}
+func (s *actionSvImpl) getActionRule(token *utils.TokenContext, req *utils.ReqContext) []MDActionRule {
+	ruleList := make([]MDActionRule, 0)
+	for _, r := range s.mdRules {
+		if r.OwnerType == req.OwnerType && r.Action == req.Action && (r.OwnerCode == mdCommonTag || r.OwnerCode == req.OwnerCode) {
+			ruleList = append(ruleList, *r)
+		}
+	}
+	sort.Slice(ruleList, func(i, j int) bool {
+		return ruleList[i].Sequence < ruleList[i].Sequence
+	})
+	return ruleList
+}
+
 //执行命令
 func (s actionSvImpl) DoAction(token *utils.TokenContext, req *utils.ReqContext) *utils.ResContext {
 	res := &utils.ResContext{}
-	commonId := "common"
 	// 查找动作执行
 	var action IActionRule
 	if a, ok := s.GetAction(RuleRegister{OwnerType: req.OwnerType, OwnerCode: req.OwnerCode, Code: req.Action}); ok {
 		action = a
 	}
 	if action == nil {
-		if a, ok := s.GetAction(RuleRegister{OwnerType: req.OwnerType, OwnerCode: commonId, Code: req.Action}); ok {
+		if a, ok := s.GetAction(RuleRegister{OwnerType: req.OwnerType, OwnerCode: mdCommonTag, Code: req.Action}); ok {
 			action = a
 		}
 	}
@@ -86,12 +117,7 @@ func (s actionSvImpl) DoAction(token *utils.TokenContext, req *utils.ReqContext)
 	}
 	//执行规则集合
 	rules := make([]IActionRule, 0)
-	ownerIds := []string{commonId, req.OwnerCode}
-	ruleDatas := make([]MDActionRule, 0)
-	//查询拥有者规则
-	db.Default().Order("sequence,code").
-		Where("owner_type=? and owner_code in (?) and action=? and enabled=1", req.OwnerType, ownerIds, req.Action).
-		Find(&ruleDatas)
+	ruleDatas := s.getActionRule(token, req)
 
 	if len(ruleDatas) > 0 {
 		replacedList := make(map[string]MDActionRule)
@@ -117,6 +143,10 @@ func (s actionSvImpl) DoAction(token *utils.TokenContext, req *utils.ReqContext)
 	} else {
 		for _, rule := range rules {
 			if rule.Exec(token, req, res); res.Error() != nil {
+				return res
+			}
+			if req.Canceled() {
+				glog.Errorf("请求已被规则%s终止！", rule.Register().Code)
 				return res
 			}
 		}

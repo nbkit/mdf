@@ -8,16 +8,16 @@ import (
 	"github.com/nbkit/mdf/utils"
 )
 
-type mdImportPre struct {
+type uiImportPre struct {
 }
 
-func newMdImportPre() *mdImportPre {
-	return &mdImportPre{}
+func newUiImportPre() *uiImportPre {
+	return &uiImportPre{}
 }
-func (s *mdImportPre) Register() md.RuleRegister {
+func (s *uiImportPre) Register() md.RuleRegister {
 	return md.RuleRegister{Code: "importPre", OwnerType: md.RuleType_Widget, OwnerCode: "md"}
 }
-func (s *mdImportPre) Exec(token *utils.TokenContext, req *utils.ReqContext, res *utils.ResContext) {
+func (s *uiImportPre) Exec(token *utils.TokenContext, req *utils.ReqContext, res *utils.ResContext) {
 	if req.Data == nil {
 		res.SetError("没有要导入的数据")
 		return
@@ -30,7 +30,7 @@ func (s *mdImportPre) Exec(token *utils.TokenContext, req *utils.ReqContext, res
 		s.doProcess(token, req, res, items)
 	}
 }
-func (s *mdImportPre) deleteData(token *utils.TokenContext, req *utils.ReqContext, res *utils.ResContext, data []files.ImportData) {
+func (s *uiImportPre) deleteData(token *utils.TokenContext, req *utils.ReqContext, res *utils.ResContext, data []files.ImportData) {
 	widgetCodes := make([]string, 0)
 	filterCodes := make([]string, 0)
 	for i, _ := range data {
@@ -124,6 +124,6 @@ func (s *mdImportPre) deleteData(token *utils.TokenContext, req *utils.ReqContex
 
 }
 
-func (s *mdImportPre) doProcess(token *utils.TokenContext, req *utils.ReqContext, res *utils.ResContext, data []files.ImportData) {
+func (s *uiImportPre) doProcess(token *utils.TokenContext, req *utils.ReqContext, res *utils.ResContext, data []files.ImportData) {
 
 }

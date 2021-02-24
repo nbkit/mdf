@@ -8,6 +8,7 @@ import (
 	"github.com/nbkit/mdf/bootstrap/rules"
 	"github.com/nbkit/mdf/bootstrap/seeds"
 	"github.com/nbkit/mdf/db"
+	"github.com/nbkit/mdf/framework/md"
 	"github.com/nbkit/mdf/framework/reg"
 	"github.com/nbkit/mdf/gin"
 	"github.com/nbkit/mdf/middleware/token"
@@ -18,15 +19,15 @@ import (
 func Start() {
 
 	engine := gin.New()
-
-	initContext(engine)
 	runArg := ""
 	if os.Args != nil && len(os.Args) > 0 {
 		if len(os.Args) > 1 {
 			runArg = os.Args[1]
 		}
 	}
-	if runArg == "upgrade" || runArg == "init" || runArg == "debug" {
+
+	initContext(engine)
+	if runArg == "upgrade" || runArg == "init" {
 		model.Register()
 		seeds.Register()
 	}
@@ -35,16 +36,21 @@ func Start() {
 	//规则注册
 	rules.Register()
 
-	engine.Use(token.Default())
+	//初始化缓存
+	md.ActionSv().Cache()
+	md.MDSv().Cache()
 
+	//使用token中间件
+	engine.Use(token.Default())
+	//设置模板
 	utils.CreatePath("dist")
 	engine.LoadHTMLGlob("dist/*.html")
 	//注册路由
 	routes.Register(engine)
-
-	//启动注册服务
+	//注册中心
 	reg.StartServer()
 
+	//启动引擎
 	engine.Run(fmt.Sprintf(":%s", utils.DefaultConfig.App.Port))
 }
 func initContext(engine *gin.Engine) {

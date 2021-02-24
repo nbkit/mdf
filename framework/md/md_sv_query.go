@@ -7,6 +7,21 @@ import (
 	"strings"
 )
 
+func (s *mdSvImpl) GetEnums() ([]MDEnum, error) {
+	items := make([]MDEnum, 0)
+	if err := db.Default().Model(&MDEnum{}).Where("entity_id in (?)", db.Default().Model(MDEntity{}).Select("id").Where("type=?", "enum").SubQuery()).Order("entity_id").Order("sequence").Find(&items).Error; err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+func (s *mdSvImpl) GetEntities() ([]MDEntity, error) {
+	items := make([]MDEntity, 0)
+	if err := db.Default().Model(&MDEntity{}).Preload("Fields").Order("id").Find(&items).Error; err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 func (s *mdSvImpl) GetEnum(typeId string, values ...string) *MDEnum {
 	if s.enumCache == nil || typeId == "" || values == nil || len(values) == 0 {
 		return nil
@@ -18,7 +33,6 @@ func (s *mdSvImpl) GetEnum(typeId string, values ...string) *MDEnum {
 	}
 	return nil
 }
-
 func (s *mdSvImpl) GetEnumBy(typeId string) ([]MDEnum, error) {
 	items := make([]MDEnum, 0)
 	if err := db.Default().Model(&MDEnum{}).Where("entity_id=?", typeId).Order("sequence,id").Find(&items).Error; err != nil {
@@ -27,20 +41,14 @@ func (s *mdSvImpl) GetEnumBy(typeId string) ([]MDEnum, error) {
 	return items, nil
 }
 func (s *mdSvImpl) GetEntity(id string) *MDEntity {
-	if s.mdCache == nil {
-		s.mdCache = make(map[string]*MDEntity)
-	}
-	if v, ok := s.mdCache[strings.ToLower(id)]; ok {
+	if v, ok := s.entityCache[strings.ToLower(id)]; ok {
 		return v
 	}
-	item := &MDEntity{}
-	db.Default().Preload("Fields").Order("id").Take(item, "id=?", id)
+	item := MDEntity{}
+	db.Default().Preload("Fields").Order("id").Take(&item, "id=?", id)
 	if item.ID != "" {
-		s.mdCache[strings.ToLower(item.ID)] = item
-		if item.TableName != "" {
-			s.mdCache[strings.ToLower(item.TableName)] = item
-		}
-		return item
+		s.cacheEntity(item)
+		return &item
 	}
 	return nil
 }

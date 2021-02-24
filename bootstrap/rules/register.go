@@ -16,6 +16,7 @@ func Register() {
 		newCommonFetchMeta(),
 
 		//md
-		newMdImportPre(),
+		newEntityImportPre(),
+		newUiImportPre(),
 	)
 }

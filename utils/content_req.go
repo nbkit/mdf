@@ -23,6 +23,7 @@ type ReqContext struct {
 	Data      interface{}             `json:"data" form:"data"` //数据
 	Tag       string                  `json:"tag" form:"tag"`
 	Files     []*multipart.FileHeader `json:"-" form:"files"`
+	canceled  bool                    `json:"-" form:"-"`
 }
 
 func NewReqContext() *ReqContext {
@@ -38,6 +39,14 @@ func (s *ReqContext) Bind(c *gin.Context) *ReqContext {
 		s.Files = form.File["files"]
 	}
 	return s
+}
+
+func (s *ReqContext) SetCancel(isCanceled bool) *ReqContext {
+	s.canceled = isCanceled
+	return s
+}
+func (s *ReqContext) Canceled() bool {
+	return s.canceled
 }
 func (s *ReqContext) Adjust(fn func(req *ReqContext)) *ReqContext {
 	fn(s)
