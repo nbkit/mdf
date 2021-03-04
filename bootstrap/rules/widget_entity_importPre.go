@@ -16,17 +16,17 @@ func newEntityImportPre() *entityImportPre {
 func (s *entityImportPre) Register() md.RuleRegister {
 	return md.RuleRegister{Code: "importPre", OwnerType: md.RuleType_Widget, OwnerCode: "md"}
 }
-func (s *entityImportPre) Exec(token *utils.TokenContext, req *utils.ReqContext, res *utils.ResContext) {
-	if req.Data == nil {
-		res.SetError("没有要导入的数据")
+func (s *entityImportPre) Exec(flow *utils.FlowContext) {
+	if flow.Request.Data == nil {
+		flow.Error("没有要导入的数据")
 		return
 	}
-	if items, ok := req.Data.([]files.ImportData); !ok {
-		res.SetError("导入的数据非法！")
+	if items, ok := flow.Request.Data.([]files.ImportData); !ok {
+		flow.Error("导入的数据非法！")
 		return
 	} else {
 		if err := s.batchImport(items); err != nil {
-			res.SetError(err)
+			flow.Error(err)
 			return
 		}
 	}

@@ -21,38 +21,38 @@ func newCommonImport() *commonImport {
 func (s *commonImport) Register() md.RuleRegister {
 	return md.RuleRegister{Code: "import", OwnerType: md.RuleType_Widget, OwnerCode: "common"}
 }
-func (s *commonImport) Exec(token *utils.TokenContext, req *utils.ReqContext, res *utils.ResContext) {
-	logData := model.Log{EntID: token.EntID(), UserID: token.UserID(), NodeType: req.OwnerType, NodeID: req.OwnerCode, DataID: req.Entity}
+func (s *commonImport) Exec(flow *utils.FlowContext) {
+	logData := model.Log{EntID: flow.EntID(), UserID: flow.UserID(), NodeType: flow.Request.OwnerType, NodeID: flow.Request.OwnerCode, DataID: flow.Request.Entity}
 	services.LogSv().CreateLog(logData.Clone().SetMsg("导入开始======begin======"))
 
 	defer func() {
 		services.LogSv().CreateLog(logData.Clone().SetMsg("导入结束"))
 	}()
-	if req.Data == nil {
-		err := res.Error("没有要导入的数据")
+	if flow.Request.Data == nil {
+		err := flow.Error("没有要导入的数据")
 		services.LogSv().CreateLog(logData.Clone().SetMsg(err))
 		return
 	}
-	data := req.Data
+	data := flow.Request.Data
 	if items, ok := data.([]files.ImportData); ok {
 		for _, data := range items {
-			s.importMapData(token, req, res, data)
+			s.importMapData(flow, data)
 		}
 	} else if items, ok := data.(files.ImportData); ok {
-		s.importMapData(token, req, res, items)
+		s.importMapData(flow, items)
 	}
 }
-func (s *commonImport) importMapData(token *utils.TokenContext, req *utils.ReqContext, res *utils.ResContext, data files.ImportData) {
+func (s *commonImport) importMapData(flow *utils.FlowContext, data files.ImportData) {
 	log := services.LogSv()
-	logData := model.Log{EntID: token.EntID(), UserID: token.UserID(), NodeType: req.OwnerType, NodeID: req.OwnerCode, DataID: req.Entity}
-	log.CreateLog(logData.Clone().SetMsg(fmt.Sprintf("接收到需要导入的数据-%s：%v条", req.Entity, len(data.Data))))
+	logData := model.Log{EntID: flow.EntID(), UserID: flow.UserID(), NodeType: flow.Request.OwnerType, NodeID: flow.Request.OwnerCode, DataID: flow.Request.Entity}
+	log.CreateLog(logData.Clone().SetMsg(fmt.Sprintf("接收到需要导入的数据-%s：%v条", flow.Request.Entity, len(data.Data))))
 
 	entity := md.MDSv().GetEntity(data.EntityCode)
 	if entity == nil {
-		entity = md.MDSv().GetEntity(req.Entity)
+		entity = md.MDSv().GetEntity(flow.Request.Entity)
 	}
 	if entity == nil {
-		res.Error("没有配置导入实体")
+		flow.Error("没有配置导入实体")
 		return
 	}
 	dbDatas := make([]map[string]interface{}, 0)
@@ -71,17 +71,18 @@ func (s *commonImport) importMapData(token *utils.TokenContext, req *utils.ReqCo
 			fieldName := ""
 			if field.TypeType == utils.TYPE_ENTITY {
 				fieldName = field.DbName + "_id"
-				qreq := utils.ReqContext{Entity: field.TypeID, Q: kv, Data: item}
-				if obj, err := md.MDSv().TakeDataByQ(token, &qreq); err != nil {
-					log.CreateLog(logData.Clone().SetMsg(fmt.Sprintf("数据[%s]=[%s],查询失败：%v", qreq.Entity, qreq.Q, err.Error())))
-				} else if len(obj) > 0 && obj["id"] != nil {
-					dbItem[fieldName] = obj["id"]
-					quotedMap[fieldName] = fieldName
-				} else if len(obj) > 0 && obj["ID"] != nil {
-					dbItem[fieldName] = obj["ID"]
+
+				qreq := flow.Copy()
+				qreq.Request.Entity = field.TypeID
+				qreq.Request.Q = kv
+				qreq.Request.Data = item
+				if md.MDSv().TakeDataByQ(flow); flow.Error() != nil {
+					log.CreateLog(logData.Clone().SetMsg(fmt.Sprintf("数据[%s]=[%s],查询失败：%v", qreq.Request.Entity, qreq.Request.Q, flow.Error())))
+				} else if v := flow.Response.Get("id"); v != nil {
+					dbItem[fieldName] = v
 					quotedMap[fieldName] = fieldName
 				} else {
-					log.CreateLog(logData.Clone().SetMsg(fmt.Sprintf("关联对象[%s],找不到[%s]对应数据!", qreq.Entity, qreq.Q)))
+					log.CreateLog(logData.Clone().SetMsg(fmt.Sprintf("关联对象[%s],找不到[%s]对应数据!", qreq.Request.Entity, qreq.Request.Q)))
 				}
 			} else if field.TypeType == utils.TYPE_ENUM {
 				fieldName = field.DbName + "_id"
@@ -118,14 +119,14 @@ func (s *commonImport) importMapData(token *utils.TokenContext, req *utils.ReqCo
 		if field := entity.GetField("EntID"); field != nil && field.DbName != "" {
 			fieldName := field.DbName
 			if _, ok := dbItem[fieldName]; !ok {
-				dbItem[fieldName] = token.EntID()
+				dbItem[fieldName] = flow.EntID()
 			}
 			quotedMap[fieldName] = fieldName
 		}
 		if field := entity.GetField("CreatedBy"); field != nil && field.DbName != "" {
 			fieldName := field.DbName
 			if _, ok := dbItem[fieldName]; !ok {
-				dbItem[fieldName] = token.UserID()
+				dbItem[fieldName] = flow.UserID()
 			}
 			quotedMap[fieldName] = fieldName
 		}
@@ -166,7 +167,7 @@ func (s *commonImport) importMapData(token *utils.TokenContext, req *utils.ReqCo
 		if itemCount >= MaxBatchs {
 			if err := s.batchInsertSave(entity, quoted, placeholdersArr, valueVars...); err != nil {
 				log.CreateLog(logData.Clone().SetMsg(fmt.Sprintf("数据库存储[%v]条记录出错了:%s!", itemCount, err.Error())))
-				res.Error(err)
+				flow.Error(err)
 				return
 			}
 			itemCount = 0
@@ -177,7 +178,7 @@ func (s *commonImport) importMapData(token *utils.TokenContext, req *utils.ReqCo
 	if itemCount > 0 {
 		if err := s.batchInsertSave(entity, quoted, placeholdersArr, valueVars...); err != nil {
 			log.CreateLog(logData.Clone().SetMsg(fmt.Sprintf("数据库存储[%v]条记录出错了:%s!", itemCount, err.Error())))
-			res.Error(err)
+			flow.Error(err)
 			return
 		}
 	}

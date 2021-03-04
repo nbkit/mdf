@@ -15,6 +15,6 @@ func newCommonDisable() *commonDisable {
 func (s commonDisable) Register() md.RuleRegister {
 	return md.RuleRegister{Code: "disable", OwnerType: md.RuleType_Widget, OwnerCode: "common"}
 }
-func (s commonDisable) Exec(token *utils.TokenContext, req *utils.ReqContext, res *utils.ResContext) {
+func (s commonDisable) Exec(flow *utils.FlowContext) {
 
 }

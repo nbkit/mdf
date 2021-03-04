@@ -5,7 +5,6 @@ import (
 	"github.com/nbkit/mdf/db"
 	"strings"
 
-	"github.com/nbkit/mdf/bootstrap/errors"
 	"github.com/nbkit/mdf/bootstrap/model"
 	"github.com/nbkit/mdf/utils"
 )
@@ -68,35 +67,6 @@ func (s *ossSvImpl) SaveObject(item *model.OssObject) (*model.OssObject, error) 
 	}
 	return item, nil
 }
-
-// Directory
-func (s *ossSvImpl) SaveDirectory(entID string, item model.OssObject) (*model.OssObject, error) {
-	if item.Name == "" {
-		return nil, errors.ParamsRequired("名称")
-	}
-	if item.ID != "" {
-		old, err := s.GetObjectBy(item.ID)
-		if err != nil {
-			return nil, err
-		}
-		//如果修改名称，则需要校验名称是否已存在
-		if old.Name != item.Name {
-			if s.ObjectNameIsExists(entID, old.DirectoryID, item.Name) {
-				return nil, errors.ExistError("名称", item.Name)
-			}
-		}
-		db.Default().Model(&old).Updates(map[string]interface{}{"Name": item.Name, "Tag": item.Tag})
-	} else {
-		if s.ObjectNameIsExists(entID, item.DirectoryID, item.Name) {
-			return nil, errors.ExistError("名称", item.Name)
-		}
-		item.Type = "dir"
-		item.EntID = entID
-		s.SaveObject(&item)
-	}
-	return s.GetObjectBy(item.ID)
-}
-
 func (s *ossSvImpl) GetConfig(id string) (*model.Oss, error) {
 	old := model.Oss{}
 	if err := db.Default().Take(&old, "id=?", id).Error; err != nil {

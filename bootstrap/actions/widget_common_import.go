@@ -15,22 +15,22 @@ func newCommonImport() *commonImport {
 func (s *commonImport) Register() md.RuleRegister {
 	return md.RuleRegister{Code: "import", OwnerType: md.RuleType_Widget, OwnerCode: "common"}
 }
-func (s *commonImport) Exec(token *utils.TokenContext, req *utils.ReqContext, res *utils.ResContext) {
-	if len(req.Files) > 0 {
+func (s *commonImport) Exec(flow *utils.FlowContext) {
+	if len(flow.Request.Files) > 0 {
 		datas := make([]files.ImportData, 0)
-		for _, file := range req.Files {
+		for _, file := range flow.Request.Files {
 			if f, err := file.Open(); err != nil {
-				res.SetError(err)
+				flow.Error(err)
 				return
 			} else {
 				if ds, err := files.NewExcelSv().GetExcelDatasByReader(f); err != nil {
-					res.SetError(err)
+					flow.Error(err)
 					return
 				} else if len(ds) > 0 {
 					datas = append(datas, ds...)
 				}
 			}
 		}
-		req.Data = datas
+		flow.Request.Data = datas
 	}
 }

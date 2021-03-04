@@ -52,8 +52,8 @@ func (s *ReqContext) Adjust(fn func(req *ReqContext)) *ReqContext {
 	fn(s)
 	return s
 }
-func (s ReqContext) Copy() ReqContext {
-	return ReqContext{
+func (s *ReqContext) Copy() *ReqContext {
+	return &ReqContext{
 		OwnerType: s.OwnerType, OwnerCode: s.OwnerCode, Domain: s.Domain,
 		ID: s.ID, IDS: s.IDS,
 		Page: s.Page, PageSize: s.PageSize, Q: s.Q,

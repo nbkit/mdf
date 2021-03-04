@@ -10,7 +10,7 @@ func Register() {
 	md.MDSv().Migrate(&Log{}, &Client{}, &AuthToken{}, &CodeRule{}, &CodeValue{})
 	md.MDSv().Migrate(&Profile{})
 	//product
-	md.MDSv().Migrate(&Product{}, &ProductModule{}, &ProductHost{}, &ProductService{})
+	md.MDSv().Migrate(&Product{}, &ProductModule{}, &ProductService{})
 	//user
 	md.MDSv().Migrate(&User{}, &UserFavorite{})
 	//ent
@@ -18,10 +18,10 @@ func Register() {
 	//role
 	md.MDSv().Migrate(&AuthRole{}, &AuthPermit{}, &AuthToken{}, &AuthRoleUser{}, &AuthRolePermit{}, &AuthRoleEntity{})
 	//cron
-	md.MDSv().Migrate(&Cron{}, &CronLog{})
+	md.MDSv().Migrate(&CronEndpoint{}, &CronParam{}, &CronTask{}, &CronLog{})
 	//oss
 	md.MDSv().Migrate(&Oss{}, &OssObject{})
 	//dti
-	md.MDSv().Migrate(&DtiLocal{}, &DtiLocalParam{}, &DtiNode{}, &DtiParam{}, &DtiRemote{})
+	md.MDSv().Migrate(&DtiHook{})
 
 }

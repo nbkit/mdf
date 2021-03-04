@@ -17,15 +17,15 @@ func (s *commonQuery) Register() md.RuleRegister {
 	return md.RuleRegister{Code: "query", OwnerType: md.RuleType_Widget, OwnerCode: "common"}
 }
 
-func (s commonQuery) Exec(token *utils.TokenContext, req *utils.ReqContext, res *utils.ResContext) {
-	if req.Entity == "" {
-		res.SetError("缺少 MainEntity 参数！")
+func (s commonQuery) Exec(flow *utils.FlowContext) {
+	if flow.Request.Entity == "" {
+		flow.Error("缺少 MainEntity 参数！")
 		return
 	}
 	//查找实体信息
-	entity := md.MDSv().GetEntity(req.Entity)
+	entity := md.MDSv().GetEntity(flow.Request.Entity)
 	if entity == nil {
-		res.SetError("找不到实体！")
+		flow.Error("找不到实体！")
 		return
 	}
 	exector := md.NewOQL().From(entity.TableName)
@@ -34,26 +34,26 @@ func (s commonQuery) Exec(token *utils.TokenContext, req *utils.ReqContext, res 
 			exector.Select(fmt.Sprintf("$$%s as \"%s\"", f.Code, f.DbName))
 		}
 	}
-	if req.ID != "" {
-		exector.Where("id=?", req.ID)
+	if flow.Request.ID != "" {
+		exector.Where("id=?", flow.Request.ID)
 	}
-	if sysField := entity.GetField("EntID"); sysField != nil && token.EntID() != "" {
-		exector.Where(sysField.Code+" = ?", token.EntID())
+	if sysField := entity.GetField("EntID"); sysField != nil && flow.EntID() != "" {
+		exector.Where(sysField.Code+" = ?", flow.EntID())
 	}
 	count := 0
 	if err := exector.Count(&count).Error(); err != nil {
-		res.SetError(err)
+		flow.Error(err)
 		return
 	}
 	datas := make([]map[string]interface{}, 0)
 	if err := exector.Find(datas).Error(); err != nil {
-		res.SetError(err)
+		flow.Error(err)
 		return
 	} else if len(datas) > 0 {
 		s.loadEnums(datas, entity)
 		s.loadEntities(datas, entity)
-		res.Set("data", datas)
-		res.Set("pager", utils.Pager{Total: count, PageSize: req.PageSize, Page: req.Page})
+		flow.Set("data", datas)
+		flow.Set("pager", utils.Pager{Total: count, PageSize: flow.Request.PageSize, Page: flow.Request.Page})
 	}
 }
 func (s commonQuery) loadEnums(datas []map[string]interface{}, entity *md.MDEntity) error {

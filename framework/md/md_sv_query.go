@@ -53,10 +53,10 @@ func (s *mdSvImpl) GetEntity(id string) *MDEntity {
 	return nil
 }
 
-func (s *mdSvImpl) TakeDataByQ(token *utils.TokenContext, req *utils.ReqContext) (map[string]interface{}, error) {
-	entity := s.GetEntity(req.Entity)
+func (s *mdSvImpl) TakeDataByQ(flow *utils.FlowContext) {
+	entity := s.GetEntity(flow.Request.Entity)
 	if entity == nil {
-		return nil, nil
+		return
 	}
 	oql := NewOQL()
 	oql.From(entity.TableName)
@@ -81,7 +81,7 @@ func (s *mdSvImpl) TakeDataByQ(token *utils.TokenContext, req *utils.ReqContext)
 		entField = entity.GetField("EntID")
 	}
 	if entField != nil && entField.Code != "" {
-		oql.Where(fmt.Sprintf("%s=?", entField.DbName), token.EntID)
+		oql.Where(fmt.Sprintf("%s=?", entField.DbName), flow.EntID())
 	}
 
 	if codeField == nil || codeField.Code == "" {
@@ -89,21 +89,22 @@ func (s *mdSvImpl) TakeDataByQ(token *utils.TokenContext, req *utils.ReqContext)
 	}
 	qwhere := oql.Or()
 	if codeField != nil && codeField.Code != "" {
-		qwhere.Where(codeField.Code+" = ?", req.Q)
+		qwhere.Where(codeField.Code+" = ?", flow.Request.Q)
 	}
 	if nameField == nil || nameField.Code == "" {
 		nameField = entity.GetField("Name")
 	}
 	if nameField != nil && nameField.Code != "" {
-		qwhere.Where(nameField.Code+" = ?", req.Q)
+		qwhere.Where(nameField.Code+" = ?", flow.Request.Q)
 	}
 	var data map[string]interface{}
 	if err := oql.Take(&data).Error(); err != nil {
-		return nil, err
+		flow.Error(err)
+		return
 	} else if len(data) > 0 {
-		return data, nil
+		flow.SetData(data)
+		return
 	}
-	return nil, nil
 }
 
 func (s *mdSvImpl) QuotedBy(m MD, ids []string, excludes ...MD) ([]MDEntity, []string) {

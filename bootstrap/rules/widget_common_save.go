@@ -21,33 +21,33 @@ func (s *commonSave) Register() md.RuleRegister {
 	return md.RuleRegister{Code: "save", OwnerType: md.RuleType_Widget, OwnerCode: "common"}
 }
 
-func (s *commonSave) Exec(token *utils.TokenContext, req *utils.ReqContext, res *utils.ResContext) {
+func (s *commonSave) Exec(flow *utils.FlowContext) {
 	reqData := make(map[string]interface{})
-	if data, ok := req.Data.(map[string]interface{}); !ok {
-		res.SetError("data数据格式不正确")
+	if data, ok := flow.Request.Data.(map[string]interface{}); !ok {
+		flow.Error("data数据格式不正确")
 		return
 	} else {
 		reqData = data
 	}
 	if reqData == nil {
-		res.SetError("没有要保存的数据！")
+		flow.Error("没有要保存的数据！")
 		return
 	}
 	//查找实体信息
-	entity := md.MDSv().GetEntity(req.Entity)
+	entity := md.MDSv().GetEntity(flow.Request.Entity)
 	if entity == nil {
-		res.SetError("找不到实体！")
+		flow.Error("找不到实体！")
 		return
 	}
 	state := ""
 	if s, ok := reqData[utils.STATE_FIELD]; ok && s != nil {
 		state = s.(string)
 	}
-	if state == utils.STATE_UPDATED && req.ID == "" {
+	if state == utils.STATE_UPDATED && flow.Request.ID == "" {
 
 	}
 	//如果有ID，则为修改保存
-	if req.ID != "" {
+	if flow.Request.ID != "" {
 		oldData := make(map[string]interface{})
 		exector := md.NewOQL().From(entity.TableName)
 		for _, f := range entity.Fields {
@@ -55,21 +55,21 @@ func (s *commonSave) Exec(token *utils.TokenContext, req *utils.ReqContext, res 
 				exector.Select(f.Code)
 			}
 		}
-		exector.Where("id=?", req.ID)
+		exector.Where("id=?", flow.Request.ID)
 		datas := make([]map[string]interface{}, 0)
 		if err := exector.Find(&datas).Error(); err != nil {
-			res.SetError(err)
+			flow.Error(err)
 			return
 		} else if len(datas) > 0 {
 			oldData = datas[0]
 		}
 		if len(oldData) == 0 {
-			res.SetError("找不到要修改的数据！")
+			flow.Error("找不到要修改的数据！")
 			return
 		}
-		s.doActionUpdate(token, req, res, entity, reqData, oldData)
+		s.doActionUpdate(flow, entity, reqData, oldData)
 	} else {
-		s.doActionCreate(token, req, res, entity, reqData)
+		s.doActionCreate(flow, entity, reqData)
 	}
 }
 
@@ -119,13 +119,13 @@ func (s *commonSave) dataToEntityData(entity *md.MDEntity, data map[string]inter
 	}
 	return changeData
 }
-func (s *commonSave) doActionCreate(token *utils.TokenContext, req *utils.ReqContext, res *utils.ResContext, entity *md.MDEntity, reqData map[string]interface{}) error {
+func (s *commonSave) doActionCreate(flow *utils.FlowContext, entity *md.MDEntity, reqData map[string]interface{}) {
 	reqData["id"] = utils.GUID()
-	if sysField := entity.GetField("EntID"); sysField != nil && token.EntID() != "" {
-		reqData[sysField.DbName] = token.EntID()
+	if sysField := entity.GetField("EntID"); sysField != nil && flow.EntID() != "" {
+		reqData[sysField.DbName] = flow.EntID()
 	}
-	if sysField := entity.GetField("CreatedBy"); sysField != nil && token.UserID() != "" {
-		reqData[sysField.DbName] = token.UserID
+	if sysField := entity.GetField("CreatedBy"); sysField != nil && flow.UserID() != "" {
+		reqData[sysField.DbName] = flow.UserID()
 	}
 	fieldCreated := entity.GetField("CreatedAt")
 	if fieldCreated != nil && fieldCreated.DbName != "" {
@@ -140,11 +140,13 @@ func (s *commonSave) doActionCreate(token *utils.TokenContext, req *utils.ReqCon
 	//配置默认值
 	changeData = s.fillEntityDefaultValue(entity, changeData)
 	if len(changeData) == 0 {
-		return glog.Error("没有要保存的数据！")
+		flow.Error("没有要保存的数据")
+		return
 	}
 	//数据校验
-	if err := s.dataCheck(req, res, entity, changeData); err != nil {
-		return err
+	if err := s.dataCheck(flow, entity, changeData); err != nil {
+		flow.Error(err)
+		return
 	}
 	//树规则
 	isTree := false
@@ -155,7 +157,8 @@ func (s *commonSave) doActionCreate(token *utils.TokenContext, req *utils.ReqCon
 	isLeafField := entity.GetField("IsLeaf")
 	if isTree {
 		if changeData["id"] != "" && changeData["id"] == changeData[fieldParent.DbName] {
-			return glog.Error("树结构，父节点不能等于当前节点!")
+			flow.Error("树结构，父节点不能等于当前节点!")
+			return
 		}
 		if isLeafField != nil && isLeafField.DbName != "" {
 			changeData[isLeafField.DbName] = 1
@@ -179,7 +182,8 @@ func (s *commonSave) doActionCreate(token *utils.TokenContext, req *utils.ReqCon
 	}
 	sql := fmt.Sprintf("insert into %s (%s) values (%s)", db.Default().Dialect().Quote(entity.TableName), strings.Join(fields, ","), strings.Join(placeholders, ","))
 	if err := db.Default().Table(entity.TableName).Exec(sql, values...).Error; err != nil {
-		return err
+		flow.Error(err)
+		return
 	}
 	//处理树节点标识
 	if isTree {
@@ -191,24 +195,24 @@ func (s *commonSave) doActionCreate(token *utils.TokenContext, req *utils.ReqCon
 				updates[fieldUpdatedAt.DbName] = utils.TimeNow()
 			}
 			if err := db.Default().Table(entity.TableName).Where("id=?", parentID).Updates(updates).Error; err != nil {
-				return err
+				flow.Error(err)
+				return
 			}
 		}
 	}
 	//保存关联实体
-	if err := s.saveRelationData(token, req, res, entity, reqData); err != nil {
-		return err
+	if s.saveRelationData(flow, entity, reqData); flow.Error() != nil {
+		return
 	}
-	res.Set("data", changeData)
-	return nil
+	flow.Set("data", changeData)
 }
-func (s *commonSave) doActionUpdate(token *utils.TokenContext, req *utils.ReqContext, res *utils.ResContext, entity *md.MDEntity, reqData map[string]interface{}, oldData map[string]interface{}) error {
+func (s *commonSave) doActionUpdate(flow *utils.FlowContext, entity *md.MDEntity, reqData map[string]interface{}, oldData map[string]interface{}) {
 	fieldUpdatedAt := entity.GetField("UpdatedAt")
 	if fieldUpdatedAt != nil && fieldUpdatedAt.DbName != "" {
 		reqData[fieldUpdatedAt.DbName] = utils.TimeNow()
 	}
-	if sysField := entity.GetField("ID"); sysField != nil && req.ID != "" {
-		reqData[sysField.DbName] = req.ID
+	if sysField := entity.GetField("ID"); sysField != nil && flow.Request.ID != "" {
+		reqData[sysField.DbName] = flow.Request.ID
 	}
 	data := s.dataToEntityData(entity, reqData)
 
@@ -248,23 +252,26 @@ func (s *commonSave) doActionUpdate(token *utils.TokenContext, req *utils.ReqCon
 	}
 	isLeafField := entity.GetField("IsLeaf")
 	if isTree {
-		if req.ID == changeData[fieldParent.DbName] {
-			return glog.Error("树结构，父节点不能等于当前节点!")
+		if flow.Request.ID == changeData[fieldParent.DbName] {
+			flow.Error("树结构，父节点不能等于当前节点!")
+			return
 		}
 	}
 	//数据校验
-	if err := s.dataCheck(req, res, entity, changeData); err != nil {
-		return err
+	if err := s.dataCheck(flow, entity, changeData); err != nil {
+		flow.Error(err)
+		return
 	}
 	if len(changeData) > 0 {
 		//开始保存数据
-		if err := db.Default().Table(entity.TableName).Where("id=?", req.ID).Updates(changeData).Error; err != nil {
-			return err
+		if err := db.Default().Table(entity.TableName).Where("id=?", flow.Request.ID).Updates(changeData).Error; err != nil {
+			flow.Error(err)
+			return
 		}
 	}
 	//保存关联实体
-	if err := s.saveRelationData(token, req, res, entity, reqData); err != nil {
-		return err
+	if s.saveRelationData(flow, entity, reqData); flow.Error() != nil {
+		return
 	}
 
 	if len(changeData) > 0 {
@@ -282,7 +289,8 @@ func (s *commonSave) doActionUpdate(token *utils.TokenContext, req *utils.ReqCon
 						updates[fieldUpdatedAt.DbName] = utils.TimeNow()
 					}
 					if err := db.Default().Table(entity.TableName).Where("id=?", newParentID).Updates(updates).Error; err != nil {
-						return err
+						flow.Error(err)
+						return
 					}
 				}
 				if oldParentID != "" { //如果设置父节点为空，则更新父节点叶子节点状态
@@ -297,17 +305,18 @@ func (s *commonSave) doActionUpdate(token *utils.TokenContext, req *utils.ReqCon
 						updates[isLeafField.DbName] = 0
 					}
 					if err := db.Default().Table(entity.TableName).Where("id=?", oldParentID).Updates(updates).Error; err != nil {
-						return err
+						flow.Error(err)
+						return
 					}
 				}
 			}
 		}
-		res.Set("data", changeData)
+		flow.Set("data", changeData)
 	}
-	return nil
+	return
 }
 
-func (s *commonSave) saveRelationData(token *utils.TokenContext, req *utils.ReqContext, res *utils.ResContext, entity *md.MDEntity, reqData map[string]interface{}) error {
+func (s *commonSave) saveRelationData(flow *utils.FlowContext, entity *md.MDEntity, reqData map[string]interface{}) {
 	for _, nv := range entity.Fields {
 		if nv.Kind == md.KIND_TYPE_HAS_MANT {
 			if do, ok := reqData[nv.DbName].([]interface{}); ok && len(do) > 0 {
@@ -322,10 +331,7 @@ func (s *commonSave) saveRelationData(token *utils.TokenContext, req *utils.ReqC
 							glog.Error("实体对应状态为空，跳过更新！", glog.String("state", state))
 							continue
 						}
-
-						newReq := utils.NewReqContext()
-						newReq.OwnerType = req.OwnerType
-						newReq.OwnerCode = req.OwnerCode
+						newFlow := flow.Copy()
 						refEntity := md.MDSv().GetEntity(nv.TypeID)
 						if f := refEntity.GetField(nv.ForeignKey); f != nil {
 							ds[f.DbName] = reqData["id"]
@@ -343,15 +349,16 @@ func (s *commonSave) saveRelationData(token *utils.TokenContext, req *utils.ReqC
 						}
 						if state == utils.STATE_UPDATED || state == utils.STATE_DELETED {
 							if id, ok := ds["id"].(string); ok && id != "" {
-								newReq.ID = id
+								newFlow.Request.ID = id
 							}
 						}
-						newReq.Data = ds
-						newReq.Entity = refEntity.ID
-						newReq.Rule = ruleID
+						newFlow.Request.Data = ds
+						newFlow.Request.Entity = refEntity.ID
+						newFlow.Request.Rule = ruleID
 
-						if rtn := md.ActionSv().DoAction(token, newReq); rtn.Error() != nil {
-							return rtn.Error()
+						if md.ActionSv().DoAction(newFlow); newFlow.Error() != nil {
+							flow.Error(newFlow.Error())
+							return
 						}
 					}
 				}
@@ -359,8 +366,7 @@ func (s *commonSave) saveRelationData(token *utils.TokenContext, req *utils.ReqC
 			}
 		}
 	}
-	return nil
 }
-func (s *commonSave) dataCheck(req *utils.ReqContext, res *utils.ResContext, entity *md.MDEntity, data map[string]interface{}) error {
+func (s *commonSave) dataCheck(flow *utils.FlowContext, entity *md.MDEntity, data map[string]interface{}) error {
 	return nil
 }

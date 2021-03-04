@@ -17,6 +17,6 @@ func (s commonEnable) Register() md.RuleRegister {
 	return md.RuleRegister{Code: "enable", OwnerType: md.RuleType_Widget, OwnerCode: "common"}
 }
 
-func (s commonEnable) Exec(token *utils.TokenContext, req *utils.ReqContext, res *utils.ResContext) {
+func (s commonEnable) Exec(flow *utils.FlowContext) {
 
 }

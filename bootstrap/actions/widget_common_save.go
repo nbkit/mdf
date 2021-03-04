@@ -16,6 +16,6 @@ func (s *commonSave) Register() md.RuleRegister {
 	return md.RuleRegister{Code: "save", OwnerType: md.RuleType_Widget, OwnerCode: "common"}
 }
 
-func (s *commonSave) Exec(token *utils.TokenContext, req *utils.ReqContext, res *utils.ResContext) {
+func (s *commonSave) Exec(flow *utils.FlowContext) {
 
 }

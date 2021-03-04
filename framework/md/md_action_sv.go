@@ -29,11 +29,11 @@ func (s RuleRegister) GetKey() string {
 规则通用接口
 */
 type IActionRule interface {
-	Exec(token *utils.TokenContext, req *utils.ReqContext, res *utils.ResContext)
+	Exec(flow *utils.FlowContext)
 	Register() RuleRegister
 }
 type IActionSv interface {
-	DoAction(token *utils.TokenContext, req *utils.ReqContext) *utils.ResContext
+	DoAction(flow *utils.FlowContext) *utils.FlowContext
 	RegisterRule(rules ...IActionRule)
 	RegisterAction(rules ...IActionRule)
 	Cache()
@@ -84,10 +84,10 @@ func (s *actionSvImpl) Cache() {
 		s.mdRules[fmt.Sprintf("%s:%s:%s:%s", rule.OwnerType, rule.OwnerCode, rule.Action, rule.Code)] = &rule
 	}
 }
-func (s *actionSvImpl) getActionRule(token *utils.TokenContext, req *utils.ReqContext) []MDActionRule {
+func (s *actionSvImpl) getActionRule(flow *utils.FlowContext) []MDActionRule {
 	ruleList := make([]MDActionRule, 0)
 	for _, r := range s.mdRules {
-		if r.OwnerType == req.OwnerType && r.Action == req.Action && (r.OwnerCode == mdCommonTag || r.OwnerCode == req.OwnerCode) {
+		if r.OwnerType == flow.Request.OwnerType && r.Action == flow.Request.Action && (r.OwnerCode == mdCommonTag || r.OwnerCode == flow.Request.OwnerCode) {
 			ruleList = append(ruleList, *r)
 		}
 	}
@@ -98,26 +98,25 @@ func (s *actionSvImpl) getActionRule(token *utils.TokenContext, req *utils.ReqCo
 }
 
 //执行命令
-func (s actionSvImpl) DoAction(token *utils.TokenContext, req *utils.ReqContext) *utils.ResContext {
-	res := &utils.ResContext{}
+func (s actionSvImpl) DoAction(flow *utils.FlowContext) *utils.FlowContext {
 	// 查找动作执行
 	var action IActionRule
-	if a, ok := s.GetAction(RuleRegister{OwnerType: req.OwnerType, OwnerCode: req.OwnerCode, Code: req.Action}); ok {
+	if a, ok := s.GetAction(RuleRegister{OwnerType: flow.Request.OwnerType, OwnerCode: flow.Request.OwnerCode, Code: flow.Request.Action}); ok {
 		action = a
 	}
 	if action == nil {
-		if a, ok := s.GetAction(RuleRegister{OwnerType: req.OwnerType, OwnerCode: mdCommonTag, Code: req.Action}); ok {
+		if a, ok := s.GetAction(RuleRegister{OwnerType: flow.Request.OwnerType, OwnerCode: mdCommonTag, Code: flow.Request.Action}); ok {
 			action = a
 		}
 	}
 	if action != nil {
-		if action.Exec(token, req, res); res.Error() != nil {
-			return res
+		if action.Exec(flow); flow.Error() != nil {
+			return flow
 		}
 	}
 	//执行规则集合
 	rules := make([]IActionRule, 0)
-	ruleDatas := s.getActionRule(token, req)
+	ruleDatas := s.getActionRule(flow)
 
 	if len(ruleDatas) > 0 {
 		replacedList := make(map[string]MDActionRule)
@@ -142,16 +141,16 @@ func (s actionSvImpl) DoAction(token *utils.TokenContext, req *utils.ReqContext)
 		glog.Error("没有找到任何规则可执行！")
 	} else {
 		for _, rule := range rules {
-			if rule.Exec(token, req, res); res.Error() != nil {
-				return res
+			if rule.Exec(flow); flow.Error() != nil {
+				return flow
 			}
-			if req.Canceled() {
+			if flow.Canceled() {
 				glog.Errorf("请求已被规则%s终止！", rule.Register().Code)
-				return res
+				return flow
 			}
 		}
 	}
-	return res
+	return flow
 }
 func (s actionSvImpl) RegisterRule(rules ...IActionRule) {
 	if len(rules) > 0 {

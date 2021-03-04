@@ -53,7 +53,6 @@ func (s *ossSvImpl) uploadObjectByLocal(item *model.Oss, fileItem *model.OssObje
 		fileItem.MimeType = s[0]
 	}
 	fileItem.Path = fmt.Sprintf("%s%s%s", s.GetUploadObjectStoreDir(fileItem), fileItem.Code, fileItem.Ext)
-	fileItem.Url = fmt.Sprintf("/api/oss/%s/show", fileItem.ID)
 	outFilePathFull := utils.JoinCurrentPath(path.Join(fileItem.OssBucket, fileItem.Path))
 	if err := utils.CreatePath(filepath.Dir(outFilePathFull)); err != nil {
 		return err
@@ -72,12 +71,6 @@ func (s *ossSvImpl) uploadObjectByLocal(item *model.Oss, fileItem *model.OssObje
 func (s *ossSvImpl) GetUploadObjectStoreDir(fileItem *model.OssObject) string {
 	fileKey := ""
 	tag := false
-	if fileItem.DirectoryID != "" { //指定文件夹时，按指定的文件夹存放
-		if dir, _ := s.GetObjectBy(fileItem.DirectoryID); dir != nil {
-			fileKey = filepath.Join(dir.Code, fileKey)
-			tag = true
-		}
-	}
 	if !tag && fileItem.Folder != "" { //按指定的目录存在
 		fileKey = filepath.Join(fileItem.Folder, fileKey)
 		tag = true

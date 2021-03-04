@@ -17,7 +17,7 @@ type IMDSv interface {
 	GetEntity(id string) *MDEntity
 	GetEnum(typeId string, values ...string) *MDEnum
 
-	TakeDataByQ(token *utils.TokenContext, req *utils.ReqContext) (map[string]interface{}, error)
+	TakeDataByQ(flow *utils.FlowContext)
 	UpdateEntity(item MDEntity) error
 	UpdateEnumType(enumType MDEnumType) error
 

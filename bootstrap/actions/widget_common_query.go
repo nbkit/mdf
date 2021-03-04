@@ -15,6 +15,6 @@ func (s *commonQuery) Register() md.RuleRegister {
 	return md.RuleRegister{Code: "query", OwnerType: md.RuleType_Widget, OwnerCode: "common"}
 }
 
-func (s commonQuery) Exec(token *utils.TokenContext, req *utils.ReqContext, res *utils.ResContext) {
+func (s commonQuery) Exec(flow *utils.FlowContext) {
 
 }

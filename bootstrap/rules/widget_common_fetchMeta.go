@@ -14,7 +14,7 @@ func newCommonFetchMeta() *commonFetchMeta {
 func (s *commonFetchMeta) Register() md.RuleRegister {
 	return md.RuleRegister{Code: "fetchMeta", OwnerType: md.RuleType_Widget, OwnerCode: "common"}
 }
-func (s *commonFetchMeta) Exec(token *utils.TokenContext, req *utils.ReqContext, res *utils.ResContext) {
+func (s *commonFetchMeta) Exec(flow *utils.FlowContext) {
 
-	res.Set("aaa", req.Action)
+	flow.Set("aaa", flow.Request.Action)
 }

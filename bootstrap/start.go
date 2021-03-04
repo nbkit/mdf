@@ -55,5 +55,4 @@ func Start() {
 }
 func initContext(engine *gin.Engine) {
 	db.CreateDB(utils.DefaultConfig.Db.Database)
-
 }

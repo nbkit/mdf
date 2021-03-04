@@ -120,11 +120,12 @@ func DestroyDB(name string) error {
 	defer db.Close()
 	return db.Exec(fmt.Sprintf("Drop Database if exists %s;", name)).Error
 }
-func CreateDB(name string) {
+func CreateDB(name string) error {
 	db, err := gorm.Open(utils.DefaultConfig.Db.Driver, getDsnString(false))
 	if err != nil {
-		glog.Errorf("orm failed to initialized: %v", err)
+		return glog.Errorf("orm failed to initialized: %v", err)
 	}
+	defer db.Close()
 	script := ""
 	if utils.DefaultConfig.Db.Driver == utils.ORM_DRIVER_MSSQL {
 		script = fmt.Sprintf("if not exists (select * from sysdatabases where name='%s') begin create database %s end;", name, name)
@@ -133,8 +134,7 @@ func CreateDB(name string) {
 	}
 	err = db.Exec(script).Error
 	if err != nil {
-		glog.Errorf("create DATABASE err: %v", err)
+		return glog.Errorf("create DATABASE err: %v", err)
 	}
-
-	defer db.Close()
+	return nil
 }

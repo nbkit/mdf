@@ -28,11 +28,23 @@ func (s ResContext) Has(name string) bool {
 	}
 	return false
 }
+
+func (s ResContext) Get(name string) interface{} {
+	if v, ok := s.data[name]; ok {
+		return v
+	}
+	return nil
+}
 func (s *ResContext) Set(name string, value interface{}) *ResContext {
 	if s.data == nil {
 		s.data = Map{}
 	}
 	s.data[name] = value
+	return s
+}
+
+func (s *ResContext) SetData(value Map) *ResContext {
+	s.data = value
 	return s
 }
 
