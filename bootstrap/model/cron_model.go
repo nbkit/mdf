@@ -15,17 +15,22 @@ const (
 
 type CronEndpoint struct {
 	md.Model
-	Code    string      `json:"code"`
-	Name    string      `json:"name"`
-	Memo    string      `json:"memo"`
-	Tag     string      `json:"tag"`
-	Method  string      `gorm:"size:10" json:"method"` //请求类型
-	Path    string      `gorm:"size:50" json:"path"`
-	Header  utils.SJson `gorm:"size:200" json:"header"`
-	Body    utils.SJson `gorm:"size:500" json:"body"`
-	Query   utils.SJson `gorm:"size:200" json:"query"`
-	Enabled utils.SBool `gorm:"default:true" json:"enabled"`
-	System  utils.SBool `gorm:"not null;default:0;name:系统的" json:"system"`
+	Code      string      `gorm:"size:36" json:"code"`
+	Name      string      `gorm:"size:36" json:"name"`
+	Memo      string      `gorm:"size:255" json:"memo"`
+	Type      string      `gorm:"size:36;not null" json:"type"` // 类型：action,http
+	Domain    string      `gorm:"size:36;name:模块" json:"domain"`
+	Action    string      `gorm:"size:36" json:"action"`
+	OwnerType string      `gorm:"size:36;name:拥有者类型" json:"owner_type"`
+	OwnerCode string      `gorm:"size:36;name:拥有者Code" json:"owner_code"`
+	Tag       string      `gorm:"size:255" json:"tag"`
+	Method    string      `gorm:"size:10" json:"method"` //请求类型
+	Path      string      `gorm:"size:50" json:"path"`
+	Header    utils.SJson `gorm:"size:200" json:"header"`
+	Body      string      `gorm:"size:500" json:"body"`
+	Query     utils.SJson `gorm:"size:200" json:"query"`
+	Enabled   utils.SBool `gorm:"default:true" json:"enabled"`
+	System    utils.SBool `gorm:"not null;default:0;name:系统的" json:"system"`
 }
 
 func (s CronEndpoint) TableName() string {
@@ -87,7 +92,7 @@ type CronTask struct {
 	EndpointID   string             `gorm:"size:36" json:"endpoint_id"`
 	Endpoint     *CronEndpoint      `gorm:"association_autoupdate:false;association_autocreate:false;association_save_reference:false"`
 	Header       utils.SJson        `gorm:"size:200" json:"header"`
-	Body         utils.SJson        `gorm:"size:500" json:"body"`
+	Body         string             `gorm:"size:500" json:"body"`
 	Query        utils.SJson        `gorm:"size:200" json:"query"`
 	NumRun       int                //执行次数
 	NumSuccess   int                //成功次数

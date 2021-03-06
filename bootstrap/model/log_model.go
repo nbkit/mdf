@@ -5,11 +5,6 @@ import (
 	"github.com/nbkit/mdf/utils"
 )
 
-const LOG_LEVEL_ERROR = "error"
-const LOG_LEVEL_WARN = "warn"
-const LOG_LEVEL_INFO = "info"
-const LOG_LEVEL_DEBUG = "debug"
-
 type Log struct {
 	md.Model
 	EntID      string `gorm:"size:50;index:idx_ent_type"`

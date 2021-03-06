@@ -5,7 +5,6 @@
 package gin
 
 import (
-	"fmt"
 	"github.com/nbkit/mdf/framework/glog"
 	"html/template"
 	"runtime"
@@ -50,11 +49,7 @@ func debugPrintLoadTemplate(tmpl *template.Template) {
 
 func debugPrint(format string, values ...interface{}) {
 	if IsDebugging() {
-		if !strings.HasSuffix(format, "\n") {
-			format += "\n"
-		}
 		glog.Infof(format, values...)
-		//fmt.Fprintf(DefaultWriter, "[GIN-debug] "+format, values...)
 	}
 }
 
@@ -100,7 +95,6 @@ func debugPrintError(err error) {
 	if err != nil {
 		if IsDebugging() {
 			glog.Print(err)
-			fmt.Fprintf(DefaultErrorWriter, "[GIN-debug] [ERROR] %v\n", err)
 		}
 	}
 }

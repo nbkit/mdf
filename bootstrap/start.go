@@ -7,6 +7,7 @@ import (
 	"github.com/nbkit/mdf/bootstrap/routes"
 	"github.com/nbkit/mdf/bootstrap/rules"
 	"github.com/nbkit/mdf/bootstrap/seeds"
+	"github.com/nbkit/mdf/bootstrap/services"
 	"github.com/nbkit/mdf/db"
 	"github.com/nbkit/mdf/framework/md"
 	"github.com/nbkit/mdf/framework/reg"
@@ -14,6 +15,7 @@ import (
 	"github.com/nbkit/mdf/middleware/token"
 	"github.com/nbkit/mdf/utils"
 	"os"
+	"time"
 )
 
 func Start() {
@@ -47,12 +49,22 @@ func Start() {
 	engine.LoadHTMLGlob("dist/*.html")
 	//注册路由
 	routes.Register(engine)
+
 	//注册中心
-	reg.StartServer()
+	go reg.StartServer()
+
+	//启动 JOB
+	go startCron()
 
 	//启动引擎
 	engine.Run(fmt.Sprintf(":%s", utils.DefaultConfig.App.Port))
 }
 func initContext(engine *gin.Engine) {
 	db.CreateDB(utils.DefaultConfig.Db.Database)
+}
+
+//启动 JOB
+func startCron() {
+	time.Sleep(10 * time.Second)
+	services.CronSv().Start()
 }
