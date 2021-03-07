@@ -8,16 +8,16 @@ import (
 	"github.com/nbkit/mdf/utils"
 )
 
-type uiImportPre struct {
+type uiImportBefore struct {
 }
 
-func newUiImportPre() *uiImportPre {
-	return &uiImportPre{}
+func newUiImportBefore() *uiImportBefore {
+	return &uiImportBefore{}
 }
-func (s *uiImportPre) Register() md.RuleRegister {
-	return md.RuleRegister{Code: "importPre", OwnerType: md.RuleType_Widget, OwnerCode: "md"}
+func (s *uiImportBefore) Register() md.RuleRegister {
+	return md.RuleRegister{Code: "import.before", Widget: "ui"}
 }
-func (s *uiImportPre) Exec(flow *utils.FlowContext) {
+func (s *uiImportBefore) Exec(flow *utils.FlowContext) {
 	if flow.Request.Data == nil {
 		flow.Error("没有要导入的数据")
 		return
@@ -30,7 +30,7 @@ func (s *uiImportPre) Exec(flow *utils.FlowContext) {
 		s.doProcess(flow, items)
 	}
 }
-func (s *uiImportPre) deleteData(flow *utils.FlowContext, data []files.ImportData) {
+func (s *uiImportBefore) deleteData(flow *utils.FlowContext, data []files.ImportData) {
 	widgetCodes := make([]string, 0)
 	filterCodes := make([]string, 0)
 	for i, _ := range data {
@@ -81,18 +81,18 @@ func (s *uiImportPre) deleteData(flow *utils.FlowContext, data []files.ImportDat
 			return
 		}
 
-		sql = "delete from md_action_commands where owner_type ='widget' and owner_code in (?)"
+		sql = "delete from md_action_commands where widget in (?)"
 		if err := db.Default().Exec(sql, widgetCodes).Error; err != nil {
 			glog.Error(flow.Error(err))
 			return
 		}
-		sql = "delete from md_action_rules where owner_type ='widget' and owner_code in (?)"
+		sql = "delete from md_action_rules where widget in (?)"
 		if err := db.Default().Exec(sql, widgetCodes).Error; err != nil {
 			glog.Error(flow.Error(err))
 			return
 		}
 
-		sql = "delete from auth_permits where owner_type ='widget' and owner_code in (?)"
+		sql = "delete from auth_permits where widget in (?)"
 		if err := db.Default().Exec(sql, widgetCodes).Error; err != nil {
 			glog.Error(flow.Error(err))
 			return
@@ -124,6 +124,6 @@ func (s *uiImportPre) deleteData(flow *utils.FlowContext, data []files.ImportDat
 
 }
 
-func (s *uiImportPre) doProcess(flow *utils.FlowContext, data []files.ImportData) {
+func (s *uiImportBefore) doProcess(flow *utils.FlowContext, data []files.ImportData) {
 
 }

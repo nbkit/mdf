@@ -14,7 +14,7 @@ func newCommonQuery() *commonQuery {
 	return &commonQuery{}
 }
 func (s *commonQuery) Register() md.RuleRegister {
-	return md.RuleRegister{Code: "query", OwnerType: md.RuleType_Widget, OwnerCode: "common"}
+	return md.RuleRegister{Code: "query", Widget: "common"}
 }
 
 func (s commonQuery) Exec(flow *utils.FlowContext) {

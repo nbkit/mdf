@@ -21,6 +21,7 @@ type LogConfig struct {
 	Level string `mapstructure:"level"`
 	Path  string `mapstructure:"path"`
 	Stack bool   `mapstructure:"stack"`
+	debug bool   `mapstructure:"debug"`
 }
 
 func readConfig() *LogConfig {
@@ -117,7 +118,7 @@ func (l *logger) sqlLog(values ...interface{}) {
 					}
 				}
 			}
-			l.Debug(sql,
+			l.Info(sql,
 				String("type", "sql"),
 				String("rows", strconv.FormatInt(values[5].(int64), 10)),
 				String("duration", fmt.Sprintf("%.2fms", float64(values[2].(time.Duration).Nanoseconds()/1e4)/100.0)))

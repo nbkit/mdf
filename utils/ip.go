@@ -9,7 +9,7 @@ import (
 func GetIpAddrs(nets ...bool) []string {
 	var ips []string
 	if len(nets) > 0 && nets[0] {
-		ping := DefaultConfig.GetValue("PING")
+		ping := Config.GetValue("PING")
 		if ping == "" {
 			ping = "baidu.com:80"
 		}

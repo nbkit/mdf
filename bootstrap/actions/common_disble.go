@@ -13,7 +13,7 @@ func newCommonDisable() *commonDisable {
 }
 
 func (s commonDisable) Register() md.RuleRegister {
-	return md.RuleRegister{Code: "disable", OwnerType: md.RuleType_Widget, OwnerCode: "common"}
+	return md.RuleRegister{Code: "disable", Widget: "common"}
 }
 func (s commonDisable) Exec(flow *utils.FlowContext) {
 

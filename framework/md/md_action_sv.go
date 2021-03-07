@@ -8,21 +8,15 @@ import (
 	"sort"
 )
 
-const (
-	RuleType_Widget string = "widget"
-	RuleType_Entity string = "entity"
-)
-
 // 注册器
 type RuleRegister struct {
-	Domain    string //领域：
-	Code      string //规则编码：save,delete,query,find
-	OwnerCode string //规则拥有者：common,widgetID,entityID
-	OwnerType string //规则拥有者类型：widget,entity
+	Domain string //领域：
+	Code   string //规则编码：save,delete,query,find
+	Widget string //规则拥有者：common,widgetID,entityID
 }
 
 func (s RuleRegister) GetKey() string {
-	return fmt.Sprintf("%s:%s:%s", s.OwnerType, s.OwnerCode, s.Code)
+	return fmt.Sprintf("%s:%s", s.Widget, s.Code)
 }
 
 /**
@@ -81,13 +75,13 @@ func (s *actionSvImpl) Cache() {
 	db.Default().Where("enabled=1").Find(&ruleDatas)
 	for i, _ := range ruleDatas {
 		rule := ruleDatas[i]
-		s.mdRules[fmt.Sprintf("%s:%s:%s:%s", rule.OwnerType, rule.OwnerCode, rule.Action, rule.Code)] = &rule
+		s.mdRules[fmt.Sprintf("%s:%s:%s", rule.Widget, rule.Action, rule.Code)] = &rule
 	}
 }
 func (s *actionSvImpl) getActionRule(flow *utils.FlowContext) []MDActionRule {
 	ruleList := make([]MDActionRule, 0)
 	for _, r := range s.mdRules {
-		if r.OwnerType == flow.Request.OwnerType && r.Action == flow.Request.Action && (r.OwnerCode == mdCommonTag || r.OwnerCode == flow.Request.OwnerCode) {
+		if r.Action == flow.Request.Action && (r.Widget == mdCommonTag || r.Widget == flow.Request.Widget) {
 			ruleList = append(ruleList, *r)
 		}
 	}
@@ -101,11 +95,11 @@ func (s *actionSvImpl) getActionRule(flow *utils.FlowContext) []MDActionRule {
 func (s actionSvImpl) DoAction(flow *utils.FlowContext) *utils.FlowContext {
 	// 查找动作执行
 	var action IActionRule
-	if a, ok := s.GetAction(RuleRegister{OwnerType: flow.Request.OwnerType, OwnerCode: flow.Request.OwnerCode, Code: flow.Request.Action}); ok {
+	if a, ok := s.GetAction(RuleRegister{Widget: flow.Request.Widget, Code: flow.Request.Action}); ok {
 		action = a
 	}
 	if action == nil {
-		if a, ok := s.GetAction(RuleRegister{OwnerType: flow.Request.OwnerType, OwnerCode: mdCommonTag, Code: flow.Request.Action}); ok {
+		if a, ok := s.GetAction(RuleRegister{Widget: mdCommonTag, Code: flow.Request.Action}); ok {
 			action = a
 		}
 	}
@@ -126,11 +120,11 @@ func (s actionSvImpl) DoAction(flow *utils.FlowContext) *utils.FlowContext {
 			}
 		}
 		for _, r := range ruleDatas {
-			if replaced, ok := replacedList[fmt.Sprintf("%s:%s", r.OwnerCode, r.Code)]; ok {
+			if replaced, ok := replacedList[fmt.Sprintf("%s:%s", r.Widget, r.Code)]; ok {
 				glog.Error("规则被替换", glog.Any("replaced", replaced.Code))
 				continue
 			}
-			if rule, ok := s.GetRule(RuleRegister{Domain: r.Domain, OwnerType: r.OwnerType, OwnerCode: r.OwnerCode, Code: r.Code}); ok {
+			if rule, ok := s.GetRule(RuleRegister{Domain: r.Domain, Widget: r.Widget, Code: r.Code}); ok {
 				rules = append(rules, rule)
 			} else {
 				glog.Error("找不到规则", glog.Any("rule", r))

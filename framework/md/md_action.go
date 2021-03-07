@@ -6,8 +6,7 @@ type MDActionCommand struct {
 	ID         string      `gorm:"primary_key;size:36" json:"id"`
 	CreatedAt  utils.Time  `gorm:"name:创建时间" json:"created_at"`
 	UpdatedAt  utils.Time  `gorm:"name:更新时间" json:"updated_at"`
-	OwnerType  string      `gorm:"size:36;unique_index:uix_code;name:拥有者类型;not null" json:"owner_type"`   //entity,page,ent,domain
-	OwnerCode  string      `gorm:"size:36;unique_index:uix_code;name:拥有者Code;not null" json:"owner_code"` //common为公共动作
+	Widget     string      `gorm:"size:36;unique_index:uix_code;name:部件;not null" json:"widget"` //common为公共动作
 	Code       string      `gorm:"size:36;unique_index:uix_code;name:编码;not null" json:"code"`
 	Name       string      `gorm:"size:50;name:名称;not null" json:"name"`
 	Type       string      `gorm:"size:20;name:类型;not null" json:"type"`
@@ -17,7 +16,7 @@ type MDActionCommand struct {
 	Method     string      `gorm:"size:20;name:请求方式" json:"method"`
 	Target     string      `gorm:"size:36;name:目标" json:"target"`
 	PrevScript string      `gorm:"type:text;name:前置脚本" json:"prev_script"`
-	Script     string      `gorm:"type:text;name:脚本" json:"script"`
+	Script     string      `gorm:"type:text;name:脚本" json:"upgrade"`
 	PostScript string      `gorm:"type:text;name:后置脚本" json:"post_script"`
 	Enabled    utils.SBool `gorm:"default:true;not null" json:"enabled"`
 }
@@ -31,8 +30,7 @@ type MDActionRule struct {
 	CreatedAt utils.Time  `gorm:"name:创建时间" json:"created_at"`
 	UpdatedAt utils.Time  `gorm:"name:更新时间" json:"updated_at"`
 	Domain    string      `gorm:"size:36;name:模块" json:"domain"`
-	OwnerType string      `gorm:"size:36;unique_index:uix_code;index:idx_action;name:拥有者类型;not null" json:"owner_type"`
-	OwnerCode string      `gorm:"size:36;unique_index:uix_code;name:拥有者Code;not null" json:"owner_code"` //common为公共动作
+	Widget    string      `gorm:"size:36;unique_index:uix_code;name:部件;not null" json:"widget"` //common为公共动作
 	Code      string      `gorm:"size:50;unique_index:uix_code;name:编码;not null" json:"code"`
 	Name      string      `gorm:"size:50;name:名称" json:"name"`
 	Action    string      `gorm:"size:50;index:idx_action;name:动作;not null" json:"action"`

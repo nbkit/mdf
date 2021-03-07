@@ -12,7 +12,7 @@ func newCommonDelete() *CommonDelete {
 	return &CommonDelete{}
 }
 func (s CommonDelete) Register() md.RuleRegister {
-	return md.RuleRegister{Code: "delete", OwnerType: md.RuleType_Widget, OwnerCode: "common"}
+	return md.RuleRegister{Code: "delete", Widget: "common"}
 }
 
 func (s CommonDelete) Exec(flow *utils.FlowContext) {

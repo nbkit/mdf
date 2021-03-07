@@ -22,7 +22,7 @@ func RegisterOQLActuator(query OQLActuator) {
 }
 func GetOQLActuator(names ...string) OQLActuator {
 	if names == nil || len(names) == 0 {
-		return oqlActuatorMap[utils.DefaultConfig.Db.Driver]
+		return oqlActuatorMap[utils.Config.Db.Driver]
 	}
 	return oqlActuatorMap[names[0]]
 }

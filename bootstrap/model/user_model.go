@@ -26,27 +26,6 @@ type User struct {
 func (t User) TableName() string {
 	return "sys_users"
 }
-
 func (s *User) MD() *md.Mder {
 	return &md.Mder{ID: MD_DOMAIN + ".user", Domain: MD_DOMAIN, Name: "用户"}
-}
-
-/**
-用户收藏内容
-*/
-type UserFavorite struct {
-	md.Model
-	EntID    string `gorm:"size:50" json:"ent_id"`
-	UserID   string `gorm:"size:50" json:"user_id"`
-	DataID   string `gorm:"size:50" json:"data_id"`
-	DataCode string `gorm:"size:50" json:"data_code"`
-	DataType string `gorm:"size:50" json:"data_type"`
-	Name     string `gorm:"size:50" json:"name"`
-}
-
-func (t UserFavorite) TableName() string {
-	return "sys_user_favorites"
-}
-func (s *UserFavorite) MD() *md.Mder {
-	return &md.Mder{ID: MD_DOMAIN + ".user.favorite", Domain: MD_DOMAIN, Name: "用户收藏"}
 }

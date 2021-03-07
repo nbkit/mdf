@@ -7,12 +7,12 @@ import (
 )
 
 type RegObject struct {
-	Code    string        `json:"code"`
-	Name    string        `json:"name"`
-	Address string        `json:"address"`
-	Content string        `json:"content"`
-	Time    *utils.Time   `json:"time"`
-	Configs *utils.Config `json:"configs"`
+	Code    string           `json:"code"`
+	Name    string           `json:"name"`
+	Address string           `json:"address"`
+	Content string           `json:"content"`
+	Time    *utils.Time      `json:"time"`
+	Configs *utils.EnvConfig `json:"configs"`
 }
 
 func (s RegObject) Key() string {

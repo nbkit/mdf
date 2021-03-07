@@ -12,7 +12,7 @@ func Register() {
 	//product
 	md.MDSv().Migrate(&Product{}, &ProductModule{}, &ProductService{})
 	//user
-	md.MDSv().Migrate(&User{}, &UserFavorite{})
+	md.MDSv().Migrate(&User{})
 	//ent
 	md.MDSv().Migrate(&Ent{}, &EntUser{})
 	//role
@@ -23,5 +23,4 @@ func Register() {
 	md.MDSv().Migrate(&Oss{}, &OssObject{})
 	//dti
 	md.MDSv().Migrate(&DtiHook{})
-
 }

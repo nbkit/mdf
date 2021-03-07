@@ -16,7 +16,7 @@ func newCommonEnable() *commonEnable {
 }
 
 func (s commonEnable) Register() md.RuleRegister {
-	return md.RuleRegister{Code: "enable", OwnerType: md.RuleType_Widget, OwnerCode: "common"}
+	return md.RuleRegister{Code: "enable", Widget: "common"}
 }
 
 func (s commonEnable) Exec(flow *utils.FlowContext) {

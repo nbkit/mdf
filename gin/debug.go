@@ -43,7 +43,7 @@ func debugPrintLoadTemplate(tmpl *template.Template) {
 			buf.WriteString(tmpl.Name())
 			buf.WriteString("\n")
 		}
-		debugPrint("Loaded HTML Templates (%d): \n%s\n", len(tmpl.Templates()), buf.String())
+		debugPrint("Loaded HTML Templates (%d): %s", len(tmpl.Templates()), buf.String())
 	}
 }
 

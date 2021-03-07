@@ -34,15 +34,15 @@ func StartServer() {
 }
 
 func (s *regStoreSv) register() {
-	address := utils.DefaultConfig.App.Address
+	address := utils.Config.App.Address
 	if address == "" {
-		address = fmt.Sprintf("http://127.0.0.1:%s", utils.DefaultConfig.App.Port)
+		address = fmt.Sprintf("http://127.0.0.1:%s", utils.Config.App.Port)
 	}
 	s.Online(RegObject{
-		Code:    utils.DefaultConfig.App.Code,
-		Name:    utils.DefaultConfig.App.Name,
+		Code:    utils.Config.App.Code,
+		Name:    utils.Config.App.Name,
 		Address: address,
-		Configs: utils.DefaultConfig,
+		Configs: utils.Config,
 	})
 }
 func (s *regStoreSv) Online(item RegObject) {
@@ -76,7 +76,7 @@ func (s *regStoreSv) GetAll() []*RegObject {
 }
 func (s *regStoreSv) load() {
 	if s.dbFile == "" {
-		s.dbFile = utils.JoinCurrentPath(path.Join(utils.DefaultConfig.App.Storage, "system", "regs.db"))
+		s.dbFile = utils.JoinCurrentPath(path.Join(utils.Config.App.Storage, "system", "regs.db"))
 	}
 	if !utils.PathExists(s.dbFile) {
 		return

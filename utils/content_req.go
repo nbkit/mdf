@@ -8,8 +8,7 @@ import (
 
 type ReqContext struct {
 	Domain    string                  `json:"domain" form:"domain"`
-	OwnerCode string                  `json:"owner_code"  form:"owner_code"`
-	OwnerType string                  `json:"owner_type"  form:"owner_type"`
+	Widget    string                  `json:"widget"  form:"widget"`
 	Params    map[string]interface{}  `json:"params"  form:"params"` //一般指 页面 URI 参数
 	ID        string                  `json:"id" form:"id"`
 	IDS       []string                `json:"ids" form:"ids"`
@@ -54,7 +53,7 @@ func (s *ReqContext) Adjust(fn func(req *ReqContext)) *ReqContext {
 }
 func (s *ReqContext) Copy() *ReqContext {
 	return &ReqContext{
-		OwnerType: s.OwnerType, OwnerCode: s.OwnerCode, Domain: s.Domain,
+		Widget: s.Widget, Domain: s.Domain,
 		ID: s.ID, IDS: s.IDS,
 		Page: s.Page, PageSize: s.PageSize, Q: s.Q,
 		Action: s.Action, Rule: s.Rule,

@@ -325,7 +325,7 @@ func (s *ExcelSv) ToExcel(data *ToExcel) (*FileData, error) {
 		fileData.FileName = fmt.Sprintf("%s.%s", utils.GUID(), "xlsx")
 	}
 	if fileData.Dir == "" {
-		fileData.Dir = path.Join(utils.DefaultConfig.App.Storage, "exports", utils.TimeNow().Format("200601"))
+		fileData.Dir = path.Join(utils.Config.App.Storage, "exports", utils.TimeNow().Format("200601"))
 	}
 	utils.CreatePath(fileData.Dir)
 	fileData.FullPath = utils.JoinCurrentPath(path.Join(fileData.Dir, fileData.FileName))

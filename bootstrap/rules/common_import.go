@@ -19,10 +19,10 @@ func newCommonImport() *commonImport {
 	return &commonImport{}
 }
 func (s *commonImport) Register() md.RuleRegister {
-	return md.RuleRegister{Code: "import", OwnerType: md.RuleType_Widget, OwnerCode: "common"}
+	return md.RuleRegister{Code: "import", Widget: "common"}
 }
 func (s *commonImport) Exec(flow *utils.FlowContext) {
-	logData := model.Log{EntID: flow.EntID(), UserID: flow.UserID(), NodeType: flow.Request.OwnerType, NodeID: flow.Request.OwnerCode, DataID: flow.Request.Entity}
+	logData := model.Log{EntID: flow.EntID(), UserID: flow.UserID(), NodeType: flow.Request.Widget, NodeID: flow.Request.Widget, DataID: flow.Request.Entity}
 	services.LogSv().CreateLog(logData.Clone().SetMsg("导入开始======begin======"))
 
 	defer func() {
@@ -44,7 +44,7 @@ func (s *commonImport) Exec(flow *utils.FlowContext) {
 }
 func (s *commonImport) importMapData(flow *utils.FlowContext, data files.ImportData) {
 	log := services.LogSv()
-	logData := model.Log{EntID: flow.EntID(), UserID: flow.UserID(), NodeType: flow.Request.OwnerType, NodeID: flow.Request.OwnerCode, DataID: flow.Request.Entity}
+	logData := model.Log{EntID: flow.EntID(), UserID: flow.UserID(), NodeType: flow.Request.Widget, NodeID: flow.Request.Widget, DataID: flow.Request.Entity}
 	log.CreateLog(logData.Clone().SetMsg(fmt.Sprintf("接收到需要导入的数据-%s：%v条", flow.Request.Entity, len(data.Data))))
 
 	entity := md.MDSv().GetEntity(data.EntityCode)

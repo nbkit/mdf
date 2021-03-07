@@ -51,7 +51,7 @@ type AuthConfig struct {
 
 const AppConfigName = "app"
 
-var DefaultConfig *Config
+var Config *EnvConfig
 var _ENVMaps = gmap.New()
 
 type jsonConfig struct {
@@ -62,7 +62,7 @@ type jsonConfig struct {
 	Data map[string]interface{} `json:"data"`
 }
 
-type Config struct {
+type EnvConfig struct {
 	App  AppConfig  `mapstructure:"app" json:"app"`
 	Db   DbConfig   `mapstructure:"db" json:"db"`
 	Log  LogConfig  `mapstructure:"log" json:"log"`
@@ -70,7 +70,7 @@ type Config struct {
 	data map[string]interface{}
 }
 
-func (c Config) MarshalJSON() ([]byte, error) {
+func (c EnvConfig) MarshalJSON() ([]byte, error) {
 	jsonMap := jsonConfig{}
 	jsonMap.App = c.App
 	jsonMap.Db = c.Db
@@ -80,7 +80,7 @@ func (c Config) MarshalJSON() ([]byte, error) {
 	return json.Marshal(jsonMap)
 }
 
-func (c *Config) UnmarshalJSON(b []byte) error {
+func (c *EnvConfig) UnmarshalJSON(b []byte) error {
 	jsonMap := jsonConfig{}
 	json.Unmarshal(b, &jsonMap)
 	c.App = jsonMap.App
@@ -90,26 +90,26 @@ func (c *Config) UnmarshalJSON(b []byte) error {
 	c.data = jsonMap.Data
 	return nil
 }
-func (s *Config) GetValue(name string, envNames ...string) string {
+func (s *EnvConfig) GetValue(name string, envNames ...string) string {
 	return s.getViper(envNames...).GetString(name)
 }
-func (s *Config) UnmarshalValue(name string, rawVal interface{}, envNames ...string) error {
+func (s *EnvConfig) UnmarshalValue(name string, rawVal interface{}, envNames ...string) error {
 	return s.getViper(envNames...).UnmarshalKey(name, rawVal)
 }
-func (s *Config) Unmarshal(rawVal interface{}, envNames ...string) error {
+func (s *EnvConfig) Unmarshal(rawVal interface{}, envNames ...string) error {
 	return s.getViper(envNames...).Unmarshal(rawVal)
 }
-func (s *Config) GetBool(name string, envNames ...string) bool {
+func (s *EnvConfig) GetBool(name string, envNames ...string) bool {
 	return s.getViper(envNames...).GetBool(name)
 }
-func (s *Config) GetObject(name string, envNames ...string) interface{} {
+func (s *EnvConfig) GetObject(name string, envNames ...string) interface{} {
 	return s.getViper(envNames...).Get(name)
 }
-func (s *Config) SetValue(name string, value interface{}, envNames ...string) *Config {
+func (s *EnvConfig) SetValue(name string, value interface{}, envNames ...string) *EnvConfig {
 	s.getViper(envNames...).Set(name, value)
 	return s
 }
-func (s *Config) getViper(envNames ...string) *viper.Viper {
+func (s *EnvConfig) getViper(envNames ...string) *viper.Viper {
 	if len(envNames) > 0 {
 		return getConfigViper(envNames[0])
 	} else {
@@ -163,45 +163,45 @@ func getConfigViper(name string) *viper.Viper {
 	return v
 }
 func newInitConfig() {
-	DefaultConfig = &Config{}
+	Config = &EnvConfig{}
 	vp := getConfigViper(AppConfigName)
-	if err := vp.Unmarshal(&DefaultConfig); err != nil {
+	if err := vp.Unmarshal(&Config); err != nil {
 		glog.Errorf("Fatal error when reading %s config file:%s", AppConfigName, err)
 	}
-	if DefaultConfig.App.Port == "" {
-		DefaultConfig.App.Port = "8080"
+	if Config.App.Port == "" {
+		Config.App.Port = "8080"
 	}
-	if DefaultConfig.App.Locale == "" {
-		DefaultConfig.App.Locale = "zh-cn"
+	if Config.App.Locale == "" {
+		Config.App.Locale = "zh-cn"
 	}
-	if DefaultConfig.App.Token == "" {
-		DefaultConfig.App.Token = "01e8f6a984101b20b24e4d172ec741be"
+	if Config.App.Token == "" {
+		Config.App.Token = "01e8f6a984101b20b24e4d172ec741be"
 	}
-	if DefaultConfig.App.Storage == "" {
-		DefaultConfig.App.Storage = "./storage"
+	if Config.App.Storage == "" {
+		Config.App.Storage = "./storage"
 	}
-	if DefaultConfig.Db.Driver == "" {
-		DefaultConfig.Db.Driver = "mysql"
+	if Config.Db.Driver == "" {
+		Config.Db.Driver = "mysql"
 	}
-	if DefaultConfig.Db.Host == "" {
-		DefaultConfig.Db.Host = "localhost"
+	if Config.Db.Host == "" {
+		Config.Db.Host = "localhost"
 	}
-	if DefaultConfig.Db.Port == "" {
-		if DefaultConfig.Db.Driver == "mysql" {
-			DefaultConfig.Db.Port = "3306"
+	if Config.Db.Port == "" {
+		if Config.Db.Driver == "mysql" {
+			Config.Db.Port = "3306"
 		}
-		if DefaultConfig.Db.Driver == "mssql" {
-			DefaultConfig.Db.Port = "1433"
+		if Config.Db.Driver == "mssql" {
+			Config.Db.Port = "1433"
 		}
 	}
-	if DefaultConfig.Db.Charset == "" {
-		DefaultConfig.Db.Charset = "utf8mb4"
+	if Config.Db.Charset == "" {
+		Config.Db.Charset = "utf8mb4"
 	}
-	if DefaultConfig.Db.Collation == "" {
-		DefaultConfig.Db.Collation = "utf8mb4_general_ci"
+	if Config.Db.Collation == "" {
+		Config.Db.Collation = "utf8mb4_general_ci"
 	}
-	if DefaultConfig.Auth.Code == "" {
-		DefaultConfig.Auth.Code = DefaultConfig.App.Code
+	if Config.Auth.Code == "" {
+		Config.Auth.Code = Config.App.Code
 	}
 	kvs := make(map[string]interface{})
 	if err := vp.Unmarshal(&kvs); err != nil {
@@ -209,7 +209,7 @@ func newInitConfig() {
 	}
 	if len(kvs) > 0 {
 		for k, v := range kvs {
-			DefaultConfig.SetValue(k, v)
+			Config.SetValue(k, v)
 		}
 	}
 }

@@ -30,11 +30,11 @@ type DtiHandProc struct {
 func (c *DtiHandProc) getDSN() (driverName, dataSourceName string, err error) {
 	dbConfig := utils.DbConfig{}
 	if c.Group == "dti" {
-		utils.DefaultConfig.UnmarshalValue("dti", &dbConfig)
+		utils.Config.UnmarshalValue("dti", &dbConfig)
 	} else if c.Group == "localhost" || c.Group == "db" {
-		utils.DefaultConfig.UnmarshalValue("db", &dbConfig)
+		utils.Config.UnmarshalValue("db", &dbConfig)
 	} else {
-		utils.DefaultConfig.UnmarshalValue("dti."+c.Group, &dbConfig)
+		utils.Config.UnmarshalValue("dti."+c.Group, &dbConfig)
 	}
 	if dbConfig.Driver == "sqlserver" {
 		dataSourceName, err = c.getDSN_sqlserver(dbConfig)
@@ -70,7 +70,7 @@ func (c *DtiHandProc) getDSN_oci8(dbConfig utils.DbConfig) (dataSourceName strin
 		Host: dbConfig.Host,
 		Path: dbConfig.Database,
 	}
-	if utils.DefaultConfig.Db.Port != "" {
+	if utils.Config.Db.Port != "" {
 		u.Host = fmt.Sprintf("%s:%s", dbConfig.Host, dbConfig.Port)
 	}
 	return s + "@" + u.String(), nil
@@ -90,7 +90,7 @@ func (c *DtiHandProc) getDSN_sqlserver(dc utils.DbConfig) (driverName string, er
 		Host:     dc.Host,
 		RawQuery: query.Encode(),
 	}
-	if utils.DefaultConfig.Db.Port != "" {
+	if utils.Config.Db.Port != "" {
 		u.Host = fmt.Sprintf("%s:%s", dc.Host, dc.Port)
 	}
 	return u.String(), nil
@@ -131,7 +131,7 @@ func (c *DtiHandProc) Do() {
 	}
 	paramsIn := make([]ParamValue, 0)
 	rtn := utils.Map{"data": nil, "path": c.Path, "name": c.Ctx.GetHeader("REMOTE_CODE")}
-	if script, ok := bodyParams["script"]; ok && script != nil && script.(string) != "" {
+	if script, ok := bodyParams["upgrade"]; ok && script != nil && script.(string) != "" {
 		datas, err := c.execQuery(script.(string), utils.ToInterfaceSlice(bodyParams["params"])...)
 		if err != nil {
 			c.toError(err)

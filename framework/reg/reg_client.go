@@ -34,9 +34,9 @@ func getRegObjectCache(code string) *RegObject {
 获取注册中心地址
 */
 func getRegistryHost() string {
-	registry := utils.DefaultConfig.App.Registry
+	registry := utils.Config.App.Registry
 	if registry == "" {
-		registry = fmt.Sprintf("http://127.0.0.1:%s", utils.DefaultConfig.App.Port)
+		registry = fmt.Sprintf("http://127.0.0.1:%s", utils.Config.App.Port)
 	}
 	return registry
 }
@@ -47,13 +47,13 @@ func getRegistryHost() string {
 func GetTokenContext(tokenCode string) (*utils.TokenContext, error) {
 	//1、权限注册中心、2、应用注册中心，3、本地
 	authAddr := ""
-	if ser, err := FindServerByCode(utils.DefaultConfig.Auth.Code); ser != nil {
+	if ser, err := FindServerByCode(utils.Config.Auth.Code); ser != nil {
 		authAddr = ser.Address
 	} else {
 		glog.Error(err)
 	}
 	if authAddr == "" {
-		authAddr = fmt.Sprintf("http://127.0.0.1:%s", utils.DefaultConfig.App.Port)
+		authAddr = fmt.Sprintf("http://127.0.0.1:%s", utils.Config.App.Port)
 	}
 	client := &http.Client{}
 	client.Timeout = 2 * time.Second
@@ -111,15 +111,15 @@ func StartClient() {
 	registerDefault()
 }
 func registerDefault() {
-	address := utils.DefaultConfig.App.Address
+	address := utils.Config.App.Address
 	if address == "" {
-		address = fmt.Sprintf("http://127.0.0.1:%s", utils.DefaultConfig.App.Port)
+		address = fmt.Sprintf("http://127.0.0.1:%s", utils.Config.App.Port)
 	}
 	Register(RegObject{
-		Code:    utils.DefaultConfig.App.Code,
-		Name:    utils.DefaultConfig.App.Name,
+		Code:    utils.Config.App.Code,
+		Name:    utils.Config.App.Name,
 		Address: address,
-		Configs: utils.DefaultConfig,
+		Configs: utils.Config,
 	})
 }
 func Register(item RegObject) error {

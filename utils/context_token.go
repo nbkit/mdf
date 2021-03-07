@@ -38,7 +38,7 @@ func (s TokenContext) ToTokenString() string {
 		claim[k] = v
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claim)
-	tokenString, err := token.SignedString([]byte(DefaultConfig.App.Token))
+	tokenString, err := token.SignedString([]byte(Config.App.Token))
 	if err != nil {
 		return ""
 	}
@@ -51,7 +51,7 @@ func (s TokenContext) FromTokenString(token string) (*TokenContext, error) {
 		token = tokenParts[1]
 	}
 	parsedToken, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
-		return []byte(DefaultConfig.App.Token), nil
+		return []byte(Config.App.Token), nil
 	})
 	if err != nil {
 		return ctx, err

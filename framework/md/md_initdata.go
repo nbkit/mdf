@@ -75,12 +75,6 @@ func initEnumData() {
 	enumType.Enums = append(enumType.Enums, MDEnum{ID: KIND_TYPE_BELONGS_TO, Name: "从属关系"})
 	items = append(items, enumType)
 
-	//md.rule.type.enum
-	enumType = MDEnumType{ID: "md.rule.type.enum", Name: "规则类型", Domain: md_domain}
-	enumType.Enums = append(enumType.Enums, MDEnum{ID: RuleType_Widget, Name: "组件"})
-	enumType.Enums = append(enumType.Enums, MDEnum{ID: RuleType_Entity, Name: "实体"})
-	items = append(items, enumType)
-
 	for i, _ := range items {
 		MDSv().UpdateEnumType(items[i])
 	}

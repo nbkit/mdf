@@ -18,6 +18,6 @@ func routeView(engine *gin.Engine) {
 		utils.NewResContext().Set("data", true).Bind(c)
 	})
 	engine.GET("/", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "index.html", utils.Map{"title": utils.DefaultConfig.App.Name})
+		c.HTML(http.StatusOK, "index.html", utils.Map{"title": utils.Config.App.Name})
 	})
 }

@@ -12,7 +12,7 @@ func newCommonFetchMeta() *commonFetchMeta {
 	return &commonFetchMeta{}
 }
 func (s *commonFetchMeta) Register() md.RuleRegister {
-	return md.RuleRegister{Code: "fetchMeta", OwnerType: md.RuleType_Widget, OwnerCode: "common"}
+	return md.RuleRegister{Code: "fetchMeta", Widget: "common"}
 }
 func (s *commonFetchMeta) Exec(flow *utils.FlowContext) {
 

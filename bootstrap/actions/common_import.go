@@ -13,7 +13,7 @@ func newCommonImport() *commonImport {
 	return &commonImport{}
 }
 func (s *commonImport) Register() md.RuleRegister {
-	return md.RuleRegister{Code: "import", OwnerType: md.RuleType_Widget, OwnerCode: "common"}
+	return md.RuleRegister{Code: "import", Widget: "common"}
 }
 func (s *commonImport) Exec(flow *utils.FlowContext) {
 	if len(flow.Request.Files) > 0 {

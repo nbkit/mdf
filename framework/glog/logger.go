@@ -103,18 +103,23 @@ func createLogger(args ...string) Logger {
 		Compress:   true,
 	}
 	encoderConfig := zap.NewProductionEncoderConfig()
-
 	encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
 
 	logLevel := zap.NewAtomicLevel()
 	logLevel.SetLevel(getLevelByTag(envConfig.Level))
 
+	encoder := zapcore.NewJSONEncoder(encoderConfig)
+	if envConfig.debug {
+		encoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
+		encoder = zapcore.NewConsoleEncoder(encoderConfig)
+	}
 	core := zapcore.NewCore(
-		zapcore.NewJSONEncoder(encoderConfig),
+		encoder,
 		zapcore.NewMultiWriteSyncer(zapcore.AddSync(os.Stdout), zapcore.AddSync(&fileLogger)),
 		logLevel,
 	)
-	log := zap.New(core, zap.AddCaller(), zap.AddCallerSkip(2))
+
+	log := zap.New(core, zap.AddCaller(), zap.AddCallerSkip(3))
 	l := &logger{
 		atomicLevel: logLevel,
 		log:         log,
@@ -146,19 +151,19 @@ func (l *logger) SetLevel(tag string) {
 // Debug logs a message at DebugLevel. The message includes any fields passed
 // at the log site, as well as any fields accumulated on the logger.
 func (s *logger) Debug(msg string, fields ...Field) {
-	s.log.Error(msg, fields...)
+	s.log.Debug(msg, fields...)
 }
 
 // Info logs a message at InfoLevel. The message includes any fields passed
 // at the log site, as well as any fields accumulated on the logger.
 func (s *logger) Info(msg string, fields ...Field) {
-	s.log.Error(msg, fields...)
+	s.log.Info(msg, fields...)
 }
 
 // Warn logs a message at WarnLevel. The message includes any fields passed
 // at the log site, as well as any fields accumulated on the logger.
 func (s *logger) Warn(msg string, fields ...Field) {
-	s.log.Error(msg, fields...)
+	s.log.Warn(msg, fields...)
 }
 
 // Error logs a message at ErrorLevel. The message includes any fields passed
@@ -175,7 +180,7 @@ func (s *logger) Error(msg interface{}, fields ...Field) error {
 	return fmt.Errorf(fmt.Sprint(msg))
 }
 func (s *logger) Fatal(msg string, fields ...Field) {
-	s.log.Error(msg, fields...)
+	s.log.Fatal(msg, fields...)
 }
 
 //f

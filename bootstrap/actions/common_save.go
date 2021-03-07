@@ -13,7 +13,7 @@ func newCommonSave() *commonSave {
 }
 
 func (s *commonSave) Register() md.RuleRegister {
-	return md.RuleRegister{Code: "save", OwnerType: md.RuleType_Widget, OwnerCode: "common"}
+	return md.RuleRegister{Code: "save", Widget: "common"}
 }
 
 func (s *commonSave) Exec(flow *utils.FlowContext) {
