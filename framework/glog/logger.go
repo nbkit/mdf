@@ -102,21 +102,25 @@ func createLogger(args ...string) Logger {
 		LocalTime:  true,
 		Compress:   true,
 	}
-	encoderConfig := zap.NewProductionEncoderConfig()
-	encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
-
 	logLevel := zap.NewAtomicLevel()
 	logLevel.SetLevel(getLevelByTag(envConfig.Level))
 
-	encoder := zapcore.NewJSONEncoder(encoderConfig)
-	if envConfig.debug {
-		encoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
-		encoder = zapcore.NewConsoleEncoder(encoderConfig)
+	encodeTime := func(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
+		enc.AppendString(t.Format("2006-01-02 15:04:05.000"))
 	}
-	core := zapcore.NewCore(
-		encoder,
-		zapcore.NewMultiWriteSyncer(zapcore.AddSync(os.Stdout), zapcore.AddSync(&fileLogger)),
-		logLevel,
+
+	encoderFileConfig := zap.NewProductionEncoderConfig()
+	encoderFileConfig.EncodeTime = encodeTime
+	encoderFile := zapcore.NewJSONEncoder(encoderFileConfig)
+
+	encoderConsoleConfig := zap.NewDevelopmentEncoderConfig()
+	encoderConsoleConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
+	encoderConsoleConfig.EncodeTime = encodeTime
+	encoderConsole := zapcore.NewConsoleEncoder(encoderConsoleConfig)
+
+	core := zapcore.NewTee(
+		zapcore.NewCore(encoderConsole, zapcore.AddSync(os.Stdout), logLevel), //打印到控制台
+		zapcore.NewCore(encoderFile, zapcore.AddSync(&fileLogger), logLevel),
 	)
 
 	log := zap.New(core, zap.AddCaller(), zap.AddCallerSkip(3))
