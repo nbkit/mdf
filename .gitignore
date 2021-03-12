@@ -22,6 +22,6 @@ go.sum
 *.suo
 node_modules
 # vendor/
-
+~*.*
 
 /env/app.yaml

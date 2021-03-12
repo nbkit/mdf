@@ -5,6 +5,7 @@ import (
 )
 
 func main() {
+
 	server := bootstrap.NewServer()
 	server.Start()
 }
