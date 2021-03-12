@@ -10,7 +10,7 @@ package utils
 import (
 	"encoding/json"
 
-	"github.com/nbkit/mdf/framework/glog"
+	"github.com/nbkit/mdf/log"
 )
 
 /**
@@ -30,7 +30,7 @@ import (
 */
 func StructToJson(object interface{}) string {
 	data, err := json.Marshal(object)
-	glog.CheckAndPrintError("Struct convert json string failed", err)
+	log.CheckAndPrintError("Struct convert json string failed", err)
 	return string(data)
 }
 
@@ -46,5 +46,5 @@ func StructToJson(object interface{}) string {
 */
 func JsonToStruct(jsonString string, object interface{}) {
 	err := json.Unmarshal([]byte(jsonString), object)
-	glog.CheckAndPrintError("Json string convert struct failed", err)
+	log.CheckAndPrintError("Json string convert struct failed", err)
 }

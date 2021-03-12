@@ -13,7 +13,7 @@ import (
 
 	"github.com/nbkit/mdf/bootstrap/errors"
 	"github.com/nbkit/mdf/bootstrap/model"
-	"github.com/nbkit/mdf/framework/glog"
+	"github.com/nbkit/mdf/log"
 	"github.com/nbkit/mdf/utils"
 )
 
@@ -59,7 +59,7 @@ func (s *ossSvImpl) uploadObjectByLocal(item *model.Oss, fileItem *model.OssObje
 	}
 	outFile, err := os.OpenFile(outFilePathFull, os.O_WRONLY|os.O_CREATE, os.FileMode(0777))
 	if err != nil {
-		glog.Error(err.Error())
+		log.Error(err.Error())
 		return err
 	}
 	defer outFile.Close()

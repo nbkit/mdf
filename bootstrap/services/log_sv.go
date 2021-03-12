@@ -3,7 +3,7 @@ package services
 import (
 	"github.com/nbkit/mdf/bootstrap/model"
 	"github.com/nbkit/mdf/db"
-	"github.com/nbkit/mdf/framework/glog"
+	"github.com/nbkit/mdf/log"
 	"github.com/nbkit/mdf/utils"
 )
 
@@ -39,11 +39,11 @@ func (s *logSvImpl) Create(item model.Log) {
 		item.Type = "log"
 	}
 	if err := db.Default().Create(&item).Error; err != nil {
-		glog.Error(err)
+		log.Error(err)
 	}
-	glog.Errorf("%s-%s: %v", item.NodeType, item.NodeID, item.Msg)
+	log.Errorf("%s-%s: %v", item.NodeType, item.NodeID, item.Msg)
 }
 
 func (s *logSvImpl) Log(item model.Log) {
-	glog.Errorf("%s-%s: %v", item.NodeType, item.NodeID, item.Msg)
+	log.Errorf("%s-%s: %v", item.NodeType, item.NodeID, item.Msg)
 }

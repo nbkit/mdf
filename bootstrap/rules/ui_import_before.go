@@ -3,8 +3,8 @@ package rules
 import (
 	"github.com/nbkit/mdf/db"
 	"github.com/nbkit/mdf/framework/files"
-	"github.com/nbkit/mdf/framework/glog"
 	"github.com/nbkit/mdf/framework/md"
+	"github.com/nbkit/mdf/log"
 	"github.com/nbkit/mdf/utils"
 )
 
@@ -55,69 +55,69 @@ func (s *uiImportBefore) deleteData(flow *utils.FlowContext, data []files.Import
 	if len(widgetCodes) > 0 {
 		sql = "delete from md_widget_ds where widget_id in (select id from md_widgets where code in (?))"
 		if err := db.Default().Exec(sql, widgetCodes).Error; err != nil {
-			glog.Error(flow.Error(err))
+			log.Error(flow.Error(err))
 			return
 		}
 
 		sql = "delete from md_widget_layouts where widget_id in (select id from md_widgets where code in (?))"
 		if err := db.Default().Exec(sql, widgetCodes).Error; err != nil {
-			glog.Error(flow.Error(err))
+			log.Error(flow.Error(err))
 			return
 		}
 
 		sql = "delete from md_widget_items where widget_id in (select id from md_widgets where code in (?))"
 		if err := db.Default().Exec(sql, widgetCodes).Error; err != nil {
-			glog.Error(flow.Error(err))
+			log.Error(flow.Error(err))
 			return
 		}
 		sql = "delete from md_toolbars where widget_id in (select id from md_widgets where code in (?))"
 		if err := db.Default().Exec(sql, widgetCodes).Error; err != nil {
-			glog.Error(flow.Error(err))
+			log.Error(flow.Error(err))
 			return
 		}
 		sql = "delete from md_toolbar_items where widget_id in (select id from md_widgets where code in (?))"
 		if err := db.Default().Exec(sql, widgetCodes).Error; err != nil {
-			glog.Error(flow.Error(err))
+			log.Error(flow.Error(err))
 			return
 		}
 
 		sql = "delete from md_action_commands where widget in (?)"
 		if err := db.Default().Exec(sql, widgetCodes).Error; err != nil {
-			glog.Error(flow.Error(err))
+			log.Error(flow.Error(err))
 			return
 		}
 		sql = "delete from md_action_rules where widget in (?)"
 		if err := db.Default().Exec(sql, widgetCodes).Error; err != nil {
-			glog.Error(flow.Error(err))
+			log.Error(flow.Error(err))
 			return
 		}
 
 		sql = "delete from auth_permits where widget in (?)"
 		if err := db.Default().Exec(sql, widgetCodes).Error; err != nil {
-			glog.Error(flow.Error(err))
+			log.Error(flow.Error(err))
 			return
 		}
 
 		sql = "delete from md_widgets where code in (?)"
 		if err := db.Default().Exec(sql, widgetCodes).Error; err != nil {
-			glog.Error(flow.Error(err))
+			log.Error(flow.Error(err))
 			return
 		}
 	}
 	if len(filterCodes) > 0 {
 		sql = "delete from md_filter_items where filter_id in (select id from md_filters where code in (?))"
 		if err := db.Default().Exec(sql, filterCodes).Error; err != nil {
-			glog.Error(flow.Error(err))
+			log.Error(flow.Error(err))
 			return
 		}
 		sql = "delete from md_filter_solutions where filter_id in (select id from md_filters where code in (?))"
 		if err := db.Default().Exec(sql, filterCodes).Error; err != nil {
-			glog.Error(flow.Error(err))
+			log.Error(flow.Error(err))
 			return
 		}
 		sql = "delete from md_filters where code in (?)"
 		if err := db.Default().Exec(sql, filterCodes).Error; err != nil {
-			glog.Error(flow.Error(err))
+			log.Error(flow.Error(err))
 			return
 		}
 	}

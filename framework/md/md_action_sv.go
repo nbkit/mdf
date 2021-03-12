@@ -3,7 +3,7 @@ package md
 import (
 	"fmt"
 	"github.com/nbkit/mdf/db"
-	"github.com/nbkit/mdf/framework/glog"
+	"github.com/nbkit/mdf/log"
 	"github.com/nbkit/mdf/utils"
 	"sort"
 )
@@ -121,25 +121,25 @@ func (s actionSvImpl) DoAction(flow *utils.FlowContext) *utils.FlowContext {
 		}
 		for _, r := range ruleDatas {
 			if replaced, ok := replacedList[fmt.Sprintf("%s:%s", r.Widget, r.Code)]; ok {
-				glog.Error("规则被替换", glog.Any("replaced", replaced.Code))
+				log.Error("规则被替换", log.Any("replaced", replaced.Code))
 				continue
 			}
 			if rule, ok := s.GetRule(RuleRegister{Domain: r.Domain, Widget: r.Widget, Code: r.Code}); ok {
 				rules = append(rules, rule)
 			} else {
-				glog.Error("找不到规则", glog.Any("rule", r))
+				log.Error("找不到规则", log.Any("rule", r))
 			}
 		}
 	}
 	if len(rules) == 0 {
-		glog.Error("没有找到任何规则可执行！")
+		log.Error("没有找到任何规则可执行！")
 	} else {
 		for _, rule := range rules {
 			if rule.Exec(flow); flow.Error() != nil {
 				return flow
 			}
 			if flow.Canceled() {
-				glog.Errorf("请求已被规则%s终止！", rule.Register().Code)
+				log.Errorf("请求已被规则%s终止！", rule.Register().Code)
 				return flow
 			}
 		}

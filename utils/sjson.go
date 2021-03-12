@@ -4,7 +4,7 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 
-	"github.com/nbkit/mdf/framework/glog"
+	"github.com/nbkit/mdf/log"
 )
 
 // JSONTime format json time field by myself
@@ -105,7 +105,7 @@ func (t *SJson) Scan(v interface{}) error {
 	}
 	var vv interface{}
 	if err := json.Unmarshal([]byte(jsonStr), &vv); err != nil {
-		glog.Error(err)
+		log.Error(err)
 
 		if strValue, e := json.Marshal(jsonStr); e == nil {
 			t.value = jsonStr

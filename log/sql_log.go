@@ -1,58 +1,13 @@
-package glog
+package log
 
 import (
 	"database/sql/driver"
 	"fmt"
-	"github.com/spf13/viper"
 	"reflect"
 	"regexp"
 	"strconv"
 	"time"
-	"unicode"
 )
-
-var (
-	sqlRegexp                = regexp.MustCompile(`\?`)
-	oracleRegexp             = regexp.MustCompile(`\:\d+`)
-	numericPlaceHolderRegexp = regexp.MustCompile(`\$\d+`)
-)
-
-type LogConfig struct {
-	Level string `mapstructure:"level"`
-	Path  string `mapstructure:"path"`
-	Stack bool   `mapstructure:"stack"`
-	debug bool   `mapstructure:"debug"`
-}
-
-func readConfig() *LogConfig {
-	config := &LogConfig{}
-	viper.SetConfigType("yaml")
-
-	viper.SetConfigName("app")
-	viper.AddConfigPath(joinCurrentPath("env"))
-	if err := viper.ReadInConfig(); err != nil {
-		//Errorf("Fatal error when reading %s config file:%s", "app", err)
-	}
-	if err := viper.UnmarshalKey("log", config); err != nil {
-		//Errorf("Fatal error when reading %s config file:%s", "app", err)
-	}
-	if config.Path == "" {
-		config.Path = "./storage/logs"
-	}
-	return config
-}
-
-func isPrintable(s string) bool {
-	for _, r := range s {
-		if !unicode.IsPrint(r) {
-			return false
-		}
-	}
-	return true
-}
-func NowFunc() time.Time {
-	return time.Now()
-}
 
 func (l *logger) sqlLog(values ...interface{}) {
 	if len(values) > 1 {

@@ -1,4 +1,4 @@
-package glog
+package log
 
 // Default is the package-level ready-to-use logger,
 // level had set to "info", is changeable.
@@ -72,31 +72,15 @@ func Debugf(format string, args ...interface{}) {
 	Default.Debugf(format, args...)
 }
 
-//w interfce
-
-// Errorw logs a message with some additional context. The variadic key-value
-// pairs are treated as they are in With.
-//
-// When debug-level logging is disabled, this is much faster than
-//  s.With(keysAndValues).Debug(msg)
-func Errorw(msg string, keysAndValues ...interface{}) {
-	Default.Errorw(msg, keysAndValues...)
+func InfoD() *Flow {
+	return Default.InfoD()
 }
-
-// Infow logs a message with some additional context. The variadic key-value
-// pairs are treated as they are in With.
-func Warnw(msg string, keysAndValues ...interface{}) {
-	Default.Warnw(msg, keysAndValues...)
+func ErrorD() *Flow {
+	return Default.ErrorD()
 }
-
-// Warnw logs a message with some additional context. The variadic key-value
-// pairs are treated as they are in With.
-func Infow(msg string, keysAndValues ...interface{}) {
-	Default.Infow(msg, keysAndValues...)
+func DebugD() *Flow {
+	return Default.DebugD()
 }
-
-// Errorw logs a message with some additional context. The variadic key-value
-// pairs are treated as they are in With.
-func Debugw(msg string, keysAndValues ...interface{}) {
-	Default.Debugw(msg, keysAndValues...)
+func FatalD() *Flow {
+	return Default.FatalD()
 }

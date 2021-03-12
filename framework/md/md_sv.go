@@ -6,7 +6,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/nbkit/mdf/framework/glog"
+	"github.com/nbkit/mdf/log"
 	"github.com/nbkit/mdf/utils"
 )
 
@@ -94,7 +94,7 @@ func (s *mdSvImpl) Migrate(values ...interface{}) {
 			}
 		}
 		db.Default().AutoMigrate(needDb...)
-		glog.Error("AutoMigrate MD")
+		log.Error("AutoMigrate MD")
 		for _, v := range mds {
 			m := newMd(v)
 			m.Migrate()
@@ -112,7 +112,7 @@ func (s *mdSvImpl) Migrate(values ...interface{}) {
 			m.Migrate()
 		}
 		if err := db.Default().AutoMigrate(needDb...).Error; err != nil {
-			glog.Error(err)
+			log.Error(err)
 		}
 	}
 
@@ -165,7 +165,7 @@ func (s *mdSvImpl) createTable(item MDEntity) {
 	}
 	var tableOptions string
 	if err := db.Default().Exec(fmt.Sprintf("CREATE TABLE %v (%v %v)%s", s.quote(item.TableName), strings.Join(tags, ","), primaryKeyStr, tableOptions)).Error; err != nil {
-		glog.Error(err)
+		log.Error(err)
 	}
 }
 func (s *mdSvImpl) quote(str string) string {
@@ -194,12 +194,12 @@ func (s *mdSvImpl) updateTable(item MDEntity, old MDEntity) {
 			//修改字段类型、类型长度、默认值、注释
 			if oldString != newString && strings.Contains(item.Tags, "update") {
 				if err := db.Default().Exec(fmt.Sprintf("ALTER TABLE %v MODIFY %v", s.quote(item.TableName), newString)).Error; err != nil {
-					glog.Error(err)
+					log.Error(err)
 				}
 			}
 		} else { //新增字段
 			if err := db.Default().Exec(fmt.Sprintf("ALTER TABLE %v ADD %v", s.quote(item.TableName), newString)).Error; err != nil {
-				glog.Error(err)
+				log.Error(err)
 			}
 		}
 	}

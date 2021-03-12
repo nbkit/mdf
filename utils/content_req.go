@@ -1,8 +1,8 @@
 package utils
 
 import (
-	"github.com/nbkit/mdf/framework/glog"
 	"github.com/nbkit/mdf/gin"
+	"github.com/nbkit/mdf/log"
 	"mime/multipart"
 )
 
@@ -30,10 +30,10 @@ func NewReqContext() *ReqContext {
 }
 func (s *ReqContext) Bind(c *gin.Context) *ReqContext {
 	if err := c.Bind(&s); err != nil {
-		glog.Error(err)
+		log.Error(err)
 	}
 	if form, err := c.MultipartForm(); err != nil {
-		glog.Error(err)
+		log.Error(err)
 	} else if form != nil && form.File != nil {
 		s.Files = form.File["files"]
 	}

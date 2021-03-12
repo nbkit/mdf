@@ -5,7 +5,7 @@
 package gin
 
 import (
-	"github.com/nbkit/mdf/framework/glog"
+	"github.com/nbkit/mdf/log"
 	"html/template"
 	"runtime"
 	"strconv"
@@ -49,7 +49,7 @@ func debugPrintLoadTemplate(tmpl *template.Template) {
 
 func debugPrint(format string, values ...interface{}) {
 	if IsDebugging() {
-		glog.Infof(format, values...)
+		log.Infof(format, values...)
 	}
 }
 
@@ -64,17 +64,15 @@ func getMinVer(v string) (uint64, error) {
 
 func debugPrintWARNINGDefault() {
 	if v, e := getMinVer(runtime.Version()); e == nil && v <= ginSupportMinGoVer {
-		debugPrint(`[WARNING] Now Gin requires Go 1.12+.
-
-`)
+		debugPrint(`Now Gin requires Go 1.12+.`)
 	}
-	debugPrint(`[WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
+	debugPrint(`Creating an Engine instance with the Logger and Recovery middleware already attached.
 
 `)
 }
 
 func debugPrintWARNINGNew() {
-	debugPrint(`[WARNING] Running in "debug" mode. Switch to "release" mode in production.
+	debugPrint(`Running in "debug" mode. Switch to "release" mode in production.
  - using env:	export GIN_MODE=release
  - using code:	gin.SetMode(gin.ReleaseMode)
 
@@ -82,7 +80,7 @@ func debugPrintWARNINGNew() {
 }
 
 func debugPrintWARNINGSetHTMLTemplate() {
-	debugPrint(`[WARNING] Since SetHTMLTemplate() is NOT thread-safe. It should only be called
+	debugPrint(`Since SetHTMLTemplate() is NOT thread-safe. It should only be called
 at initialization. ie. before any route is registered or the router is listening in a socket:
 
 	router := gin.Default()
@@ -94,7 +92,7 @@ at initialization. ie. before any route is registered or the router is listening
 func debugPrintError(err error) {
 	if err != nil {
 		if IsDebugging() {
-			glog.Print(err)
+			log.Print(err)
 		}
 	}
 }

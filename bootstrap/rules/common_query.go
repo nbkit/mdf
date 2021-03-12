@@ -2,8 +2,8 @@ package rules
 
 import (
 	"fmt"
-	"github.com/nbkit/mdf/framework/glog"
 	"github.com/nbkit/mdf/framework/md"
+	"github.com/nbkit/mdf/log"
 	"github.com/nbkit/mdf/utils"
 )
 
@@ -89,7 +89,7 @@ func (s commonQuery) loadEntities(datas []map[string]interface{}, entity *md.MDE
 					exector.Where(fmt.Sprintf("%s in ( ? )", f.AssociationKey), ids)
 					refDatas := make([]map[string]interface{}, 0)
 					if err := exector.Find(&refDatas).Error(); err != nil {
-						glog.Error(err)
+						log.Error(err)
 					} else if len(refDatas) > 0 {
 						dataMap := make(map[string]interface{})
 						for i, _ := range refDatas {

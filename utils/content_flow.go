@@ -1,8 +1,8 @@
 package utils
 
 import (
-	"github.com/nbkit/mdf/framework/glog"
 	"github.com/nbkit/mdf/gin"
+	"github.com/nbkit/mdf/log"
 )
 
 type FlowContext struct {
@@ -28,10 +28,10 @@ func (s *FlowContext) Bind(c *gin.Context) *FlowContext {
 	s.c = c
 	//bind req
 	if err := c.Bind(s.Request); err != nil {
-		glog.Error(err)
+		log.Error(err)
 	}
 	if form, err := c.MultipartForm(); err != nil {
-		glog.Error(err)
+		log.Error(err)
 	} else if form != nil && form.File != nil {
 		s.Request.Files = form.File["files"]
 	}

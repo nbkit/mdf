@@ -2,14 +2,13 @@ package utils
 
 import (
 	"encoding/json"
+	"github.com/nbkit/mdf/gmap"
+	"github.com/nbkit/mdf/log"
 	"github.com/spf13/viper"
 	"io"
 	"os"
 	"path"
 	"strings"
-
-	"github.com/nbkit/mdf/framework/glog"
-	"github.com/nbkit/mdf/gmap"
 )
 
 type AppConfig struct {
@@ -157,7 +156,7 @@ func getConfigViper(name string) *viper.Viper {
 	v.SetConfigFile(envFile)
 
 	if err := v.ReadInConfig(); err != nil {
-		glog.Errorf("Fatal error when reading %s config file:%s", name, err)
+		log.Errorf("Fatal error when reading %s config file:%s", name, err)
 	}
 	_ENVMaps.Set(name, v)
 	return v
@@ -166,7 +165,7 @@ func newInitConfig() {
 	Config = &EnvConfig{}
 	vp := getConfigViper(AppConfigName)
 	if err := vp.Unmarshal(&Config); err != nil {
-		glog.Errorf("Fatal error when reading %s config file:%s", AppConfigName, err)
+		log.Errorf("Fatal error when reading %s config file:%s", AppConfigName, err)
 	}
 	if Config.App.Port == "" {
 		Config.App.Port = "8080"
@@ -205,7 +204,7 @@ func newInitConfig() {
 	}
 	kvs := make(map[string]interface{})
 	if err := vp.Unmarshal(&kvs); err != nil {
-		glog.Errorf("Fatal error when reading %s config file:%s", AppConfigName, err)
+		log.Errorf("Fatal error when reading %s config file:%s", AppConfigName, err)
 	}
 	if len(kvs) > 0 {
 		for k, v := range kvs {

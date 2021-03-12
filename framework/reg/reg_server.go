@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
-	"github.com/golang/glog"
+	"github.com/nbkit/mdf/log"
 	"github.com/nbkit/mdf/utils"
 	"io"
 	"os"
@@ -83,7 +83,7 @@ func (s *regStoreSv) load() {
 	}
 	fi, err := os.Open(s.dbFile)
 	if err != nil {
-		glog.Error(err)
+		log.Error(err)
 		return
 	}
 	defer fi.Close()
@@ -97,7 +97,7 @@ func (s *regStoreSv) load() {
 		item := RegObject{}
 		err = json.Unmarshal(a, &item)
 		if err != nil {
-			glog.Error(err)
+			log.Error(err)
 			return
 		}
 		s.Online(item)
@@ -107,7 +107,7 @@ func (s *regStoreSv) save() {
 	items := s.GetAll()
 	f, err := os.Create(s.dbFile)
 	if err != nil {
-		glog.Error(err)
+		log.Error(err)
 		f.Close()
 		return
 	}
@@ -117,18 +117,18 @@ func (s *regStoreSv) save() {
 		}
 		b, err := json.Marshal(item)
 		if err != nil {
-			glog.Error(err)
+			log.Error(err)
 			return
 		}
 		fmt.Fprintln(f, string(b))
 		if err != nil {
-			glog.Error(err)
+			log.Error(err)
 			return
 		}
 	}
 	err = f.Close()
 	if err != nil {
-		glog.Error(err)
+		log.Error(err)
 		return
 	}
 }

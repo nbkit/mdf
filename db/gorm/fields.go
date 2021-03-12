@@ -5,9 +5,9 @@ import (
 	"database/sql/driver"
 	"errors"
 	"fmt"
+	"github.com/nbkit/mdf/log"
 	"reflect"
 
-	"github.com/nbkit/mdf/framework/glog"
 	"github.com/nbkit/mdf/utils"
 )
 
@@ -57,7 +57,7 @@ func (field *Field) Set(value interface{}) (err error) {
 					err = scanner.Scan(v)
 				}
 			} else {
-				glog.Error(fieldValue.Addr().Interface())
+				log.Error(fieldValue.Addr().Interface())
 				err = fmt.Errorf("could not convert argument of field %s from %s to %s", field.Name, reflectValue.Type(), fieldValue.Type())
 			}
 		}

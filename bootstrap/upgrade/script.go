@@ -3,8 +3,8 @@ package upgrade
 import (
 	"github.com/nbkit/mdf/db"
 	"github.com/nbkit/mdf/framework/files"
-	"github.com/nbkit/mdf/framework/glog"
 	"github.com/nbkit/mdf/framework/md"
+	"github.com/nbkit/mdf/log"
 	"github.com/nbkit/mdf/utils"
 	"io/ioutil"
 	"os"
@@ -68,10 +68,10 @@ func (s *scriptImpl) isExcel(file string) bool {
 }
 func (s *scriptImpl) runScript(file string) error {
 	if bt, err := ioutil.ReadFile(file); err != nil {
-		return glog.Error(err)
+		return log.Error(err)
 	} else {
 		if err := db.Default().Exec(string(bt)).Error; err != nil {
-			return glog.Error(err)
+			return log.Error(err)
 		}
 	}
 	return nil

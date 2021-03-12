@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/nbkit/mdf/framework/glog"
+	"github.com/nbkit/mdf/log"
 )
 
 // JSONTime format json time field by myself
@@ -54,7 +54,7 @@ func ToTime(value interface{}) Time {
 		}
 		now, err := time.ParseInLocation(layout, string(data), time.Local)
 		if err != nil {
-			glog.Error(err)
+			log.Error(err)
 		}
 		return Time{now}
 	}

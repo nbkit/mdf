@@ -5,7 +5,7 @@ import (
 	"github.com/shopspring/decimal"
 	"strings"
 
-	"github.com/nbkit/mdf/framework/glog"
+	"github.com/nbkit/mdf/log"
 	"github.com/nbkit/mdf/utils"
 )
 
@@ -126,7 +126,7 @@ func (s MDField) CompileValue(value interface{}) interface{} {
 	}
 	if s.TypeID == utils.FIELD_TYPE_DECIMAL {
 		if v, err := decimal.NewFromString(utils.ToString(value)); err != nil {
-			return glog.Error(err)
+			return log.Error(err)
 		} else {
 			return v
 		}

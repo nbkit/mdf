@@ -6,13 +6,13 @@ import (
 	"fmt"
 	"github.com/go-sql-driver/mysql"
 	"github.com/nbkit/mdf/gin"
+	"github.com/nbkit/mdf/log"
 	"net/http"
 	"net/url"
 	"strings"
 	"time"
 
 	_ "github.com/denisenkom/go-mssqldb"
-	"github.com/nbkit/mdf/framework/glog"
 	"github.com/nbkit/mdf/utils"
 )
 
@@ -101,7 +101,7 @@ func (c *DtiHandProc) Do() {
 		c.toError(err)
 		return
 	}
-	glog.Errorf("请求连接为:%s", driverName, ds)
+	log.Errorf("请求连接为:%s", driverName, ds)
 	if driverName == "" || ds == "" {
 		c.toError("连接为空")
 		return
@@ -110,7 +110,7 @@ func (c *DtiHandProc) Do() {
 	paramKey := ""
 	otherParams := make(map[string]interface{})
 	if err := c.Ctx.Bind(&otherParams); err != nil {
-		glog.Error(err)
+		log.Error(err)
 	}
 	if len(otherParams) > 0 {
 		for k, v := range otherParams {
@@ -120,12 +120,12 @@ func (c *DtiHandProc) Do() {
 			}
 		}
 	}
-	glog.Errorf("解析到请求 path:%s,参数为:%v", c.Path, bodyParams)
+	log.Errorf("解析到请求 path:%s,参数为:%v", c.Path, bodyParams)
 	db, err := sql.Open(driverName, ds)
 	defer db.Close()
 	c.db = db
 	if err != nil {
-		glog.Error(err)
+		log.Error(err)
 		c.toError(err)
 		return
 	}
@@ -140,11 +140,11 @@ func (c *DtiHandProc) Do() {
 		rtn["data"] = datas
 	} else {
 		if spParams, err := c.getSpParams(driverName, c.Path); err != nil {
-			glog.Error(err)
+			log.Error(err)
 			c.toError(err)
 			return
 		} else {
-			glog.Errorf("存储过程:%s,参数为:%v", c.Path, spParams)
+			log.Errorf("存储过程:%s,参数为:%v", c.Path, spParams)
 			for _, pv := range spParams {
 				if pv["name"] == nil {
 					break
@@ -157,11 +157,11 @@ func (c *DtiHandProc) Do() {
 		}
 		// 执行SQL语句
 		fm_time := time.Now()
-		glog.Errorf("存储过程:%s,传入参数:%v,开始执行！", c.Path, paramsIn)
+		log.Errorf("存储过程:%s,传入参数:%v,开始执行！", c.Path, paramsIn)
 		maps, err := c.execProc(driverName, c.Path, paramsIn)
-		glog.Errorf("执行:%s 结束,%v条,time:%v Seconds", c.Path, len(maps), time.Now().Sub(fm_time).Seconds())
+		log.Errorf("执行:%s 结束,%v条,time:%v Seconds", c.Path, len(maps), time.Now().Sub(fm_time).Seconds())
 		if err != nil {
-			glog.Error(err)
+			log.Error(err)
 			c.toError(err)
 			return
 		}

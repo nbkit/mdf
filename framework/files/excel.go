@@ -2,6 +2,7 @@ package files
 
 import (
 	"fmt"
+	"github.com/nbkit/mdf/log"
 	"io"
 	"path"
 	"strings"
@@ -9,8 +10,6 @@ import (
 	"github.com/nbkit/mdf/utils"
 
 	"github.com/360EntSecGroup-Skylar/excelize"
-
-	"github.com/nbkit/mdf/framework/glog"
 )
 
 type FileData struct {
@@ -330,7 +329,7 @@ func (s *ExcelSv) ToExcel(data *ToExcel) (*FileData, error) {
 	utils.CreatePath(fileData.Dir)
 	fileData.FullPath = utils.JoinCurrentPath(path.Join(fileData.Dir, fileData.FileName))
 	if err := xlsx.SaveAs(fileData.FullPath); err != nil {
-		glog.Error(err)
+		log.Error(err)
 		return nil, err
 	}
 	return &fileData, nil

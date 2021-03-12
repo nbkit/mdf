@@ -1,48 +1,81 @@
-package glog
+package log
 
 import (
 	"fmt"
+	"github.com/spf13/viper"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
 	"os"
 	"path"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"sync"
 	"time"
-)
-
-const (
-	DebugLevel string = "debug"
-
-	InfoLevel string = "info"
-
-	ErrorLevel string = "error"
+	"unicode"
 )
 
 var mapLogs map[string]Logger = make(map[string]Logger)
 var mu sync.Mutex
 
 type logger struct {
-	atomicLevel zap.AtomicLevel
-	log         *zap.Logger
-	sugar       *zap.SugaredLogger
+	level zap.AtomicLevel
+	log   *zap.Logger
+	sugar *zap.SugaredLogger
 }
 
-func getLevelByTag(tag string) zapcore.Level {
-	var level zapcore.Level
-	switch tag {
-	case DebugLevel:
-		level = zap.DebugLevel
-	case InfoLevel:
-		level = zap.InfoLevel
-	case ErrorLevel:
-		level = zap.ErrorLevel
-	default:
-		level = zap.InfoLevel
+var (
+	sqlRegexp                = regexp.MustCompile(`\?`)
+	oracleRegexp             = regexp.MustCompile(`\:\d+`)
+	numericPlaceHolderRegexp = regexp.MustCompile(`\$\d+`)
+)
+
+type LogConfig struct {
+	Level string `mapstructure:"level"`
+	Path  string `mapstructure:"path"`
+	Stack bool   `mapstructure:"stack"`
+	debug bool   `mapstructure:"debug"`
+}
+
+func readConfig() *LogConfig {
+	config := &LogConfig{}
+	viper.SetConfigType("yaml")
+
+	viper.SetConfigName("app")
+	viper.AddConfigPath(joinCurrentPath("env"))
+	if err := viper.ReadInConfig(); err != nil {
+		//Errorf("Fatal error when reading %s config file:%s", "app", err)
 	}
-	return level
+	if err := viper.UnmarshalKey("log", config); err != nil {
+		//Errorf("Fatal error when reading %s config file:%s", "app", err)
+	}
+	if config.Path == "" {
+		config.Path = "./storage/logs"
+	}
+	return config
+}
+
+func isPrintable(s string) bool {
+	for _, r := range s {
+		if !unicode.IsPrint(r) {
+			return false
+		}
+	}
+	return true
+}
+func getLevelByTag(tag string) zapcore.Level {
+	switch tag {
+	case zap.DebugLevel.String():
+		return zap.DebugLevel
+	case zap.InfoLevel.String():
+		return zap.InfoLevel
+	case zap.ErrorLevel.String():
+		return zap.ErrorLevel
+	default:
+		return zap.InfoLevel
+	}
+	return zap.InfoLevel
 }
 func pathExists(path string) bool {
 	path = joinCurrentPath(path)
@@ -122,17 +155,18 @@ func createLogger(args ...string) Logger {
 		zapcore.NewCore(encoderConsole, zapcore.AddSync(os.Stdout), logLevel), //打印到控制台
 		zapcore.NewCore(encoderFile, zapcore.AddSync(&fileLogger), logLevel),
 	)
-
 	log := zap.New(core, zap.AddCaller(), zap.AddCallerSkip(3))
 	l := &logger{
-		atomicLevel: logLevel,
-		log:         log,
+		level: logLevel,
+		log:   log,
 	}
 	l.sugar = l.log.Sugar()
+	return l
+}
 
-	var single Logger
-	single = l
-	return single
+func (l *logger) newEvent(level zapcore.Level, done func(string)) *Flow {
+	e := newFlow(level, l)
+	return e
 }
 func (l *logger) Print(v ...interface{}) {
 	if v != nil && len(v) > 0 && v[0] == "sql" {
@@ -147,7 +181,11 @@ func (l *logger) CheckAndPrintError(flag string, err error) {
 	}
 }
 func (l *logger) SetLevel(tag string) {
-	l.atomicLevel.SetLevel(getLevelByTag(tag))
+	l.level.SetLevel(getLevelByTag(tag))
+}
+
+func (l *logger) getLevel() zap.AtomicLevel {
+	return l.level
 }
 
 //nor
@@ -213,30 +251,19 @@ func (s *logger) Fatalf(template string, args ...interface{}) {
 	s.sugar.Fatalf(template, args...)
 }
 
-// w
-// Debugw logs a message with some additional context. The variadic key-value
-// pairs are treated as they are in With.
-//
-// When debug-level logging is disabled, this is much faster than
-//  s.With(keysAndValues).Debug(msg)
-func (s *logger) Debugw(msg string, keysAndValues ...interface{}) {
-	s.sugar.Debugw(msg, keysAndValues...)
+func (s *logger) InfoD() *Flow {
+	return s.newEvent(zap.InfoLevel, nil)
+}
+func (s *logger) ErrorD() *Flow {
+	return s.newEvent(zap.ErrorLevel, nil)
+}
+func (s *logger) WarnD() *Flow {
+	return s.newEvent(zap.WarnLevel, nil)
+}
+func (s *logger) DebugD() *Flow {
+	return s.newEvent(zap.DebugLevel, nil)
 }
 
-// Infow logs a message with some additional context. The variadic key-value
-// pairs are treated as they are in With.
-func (s *logger) Infow(msg string, keysAndValues ...interface{}) {
-	s.sugar.Infow(msg, keysAndValues...)
-}
-
-// Warnw logs a message with some additional context. The variadic key-value
-// pairs are treated as they are in With.
-func (s *logger) Warnw(msg string, keysAndValues ...interface{}) {
-	s.sugar.Warnw(msg, keysAndValues...)
-}
-
-// Errorw logs a message with some additional context. The variadic key-value
-// pairs are treated as they are in With.
-func (s *logger) Errorw(msg string, keysAndValues ...interface{}) {
-	s.sugar.Errorw(msg, keysAndValues...)
+func (s *logger) FatalD() *Flow {
+	return s.newEvent(zap.FatalLevel, nil)
 }

@@ -2,8 +2,8 @@ package model
 
 import (
 	"encoding/json"
+	"github.com/nbkit/mdf/log"
 
-	"github.com/nbkit/mdf/framework/glog"
 	"github.com/nbkit/mdf/framework/md"
 	"github.com/nbkit/mdf/utils"
 )
@@ -32,7 +32,7 @@ func (s *AuthToken) MD() *md.Mder {
 func (s *AuthToken) SetContent(value interface{}) error {
 	str, err := json.Marshal(value)
 	if err != nil {
-		glog.Errorf("error:%v", err)
+		log.Errorf("error:%v", err)
 		return err
 	}
 	s.Content = string(str)
@@ -40,7 +40,7 @@ func (s *AuthToken) SetContent(value interface{}) error {
 }
 func (s *AuthToken) GetContent(value interface{}) error {
 	if err := json.Unmarshal([]byte(s.Content), value); err != nil {
-		glog.Errorf("parse content error:%v", err)
+		log.Errorf("parse content error:%v", err)
 		return err
 	}
 	return nil

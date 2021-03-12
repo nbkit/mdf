@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/nbkit/mdf/db/gorm"
-	"github.com/nbkit/mdf/framework/glog"
+	"github.com/nbkit/mdf/log"
 	"github.com/nbkit/mdf/utils"
 )
 
@@ -53,7 +53,7 @@ func (m *md) GetEntity() *MDEntity {
 	item := MDEntity{}
 	query := db.Default().Model(item).Preload("Fields").Order("id").Where("id=?", mdInfo.ID)
 	if err := query.Take(&item).Error; err != nil {
-		glog.Error(err)
+		log.Error(err)
 	} else {
 		return &item
 	}
@@ -122,7 +122,7 @@ func (m *md) Migrate() {
 		return
 	}
 	if mdInfo.ID == "" {
-		glog.Error("元数据ID为空", glog.String("Name", mdInfo.Name))
+		log.Error("元数据ID为空", log.String("Name", mdInfo.Name))
 		return
 	}
 	scope := db.Default().NewScope(m.Value)
@@ -166,7 +166,7 @@ func (m *md) Migrate() {
 		}
 	}
 	if entity == nil {
-		glog.Error("元数据ID为空", glog.String("Name", mdInfo.Name))
+		log.Error("元数据ID为空", log.String("Name", mdInfo.Name))
 		return
 	}
 	codes := make([]string, 0)

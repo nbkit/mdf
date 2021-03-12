@@ -2,8 +2,8 @@ package bootstrap
 
 import (
 	"github.com/nbkit/mdf/db"
-	"github.com/nbkit/mdf/framework/glog"
 	"github.com/nbkit/mdf/framework/md"
+	"github.com/nbkit/mdf/log"
 	"github.com/nbkit/mdf/utils"
 )
 
@@ -30,7 +30,7 @@ func initSeedAction() {
 		item.Async = utils.SBool_False
 		count := 0
 		if err := db.Default().Model(md.MDActionRule{}).Where("widget=? and code=?", item.Widget, item.Code).Count(&count).Error; err != nil {
-			glog.Error(err)
+			log.Error(err)
 		} else if count == 0 {
 			db.Default().Create(&item)
 		}

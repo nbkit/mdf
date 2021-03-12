@@ -9,10 +9,10 @@ import (
 	"github.com/nbkit/mdf/bootstrap/services"
 	"github.com/nbkit/mdf/bootstrap/upgrade"
 	"github.com/nbkit/mdf/db"
-	"github.com/nbkit/mdf/framework/glog"
 	"github.com/nbkit/mdf/framework/md"
 	"github.com/nbkit/mdf/framework/reg"
 	"github.com/nbkit/mdf/gin"
+	"github.com/nbkit/mdf/log"
 	"github.com/nbkit/mdf/middleware/token"
 	"github.com/nbkit/mdf/utils"
 	"os"
@@ -72,7 +72,7 @@ func (s *serverImpl) Start() {
 
 func (s *serverImpl) initContext() {
 	db.CreateDB(utils.Config.Db.Database)
-	db.Default().SetLogger(glog.GetLogger(""))
+	db.Default().SetLogger(log.GetLogger(""))
 	db.Default().DB.DB().SetConnMaxLifetime(0)
 
 	if s.runArg == "upgrade" || s.runArg == "init" {

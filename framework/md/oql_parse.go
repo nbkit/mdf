@@ -6,7 +6,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/nbkit/mdf/framework/glog"
+	"github.com/nbkit/mdf/log"
 	"github.com/nbkit/mdf/utils"
 )
 
@@ -67,7 +67,7 @@ func (s *oqlImpl) buildJoins() *OQLStatement {
 		}
 		relationship, _ := s.parseEntityField(t.Path)
 		if relationship == nil {
-			glog.Errorf("找不到关联字段")
+			log.Errorf("找不到关联字段")
 			continue
 		}
 		if relationship.Field.Kind == KIND_TYPE_BELONGS_TO || relationship.Field.Kind == KIND_TYPE_HAS_ONE {
@@ -95,7 +95,7 @@ func (s *oqlImpl) buildJoins() *OQLStatement {
 				queries = append(queries, fmt.Sprintf("left join %v  %v on %v.%v=%v.%v", t.Entity.TableName, t.Alias, t.Alias, fkey.DbName, relationship.Entity.Alias, lkey.DbName))
 				statement.Affected++
 			} else {
-				glog.Error("构建join 联系出错，", glog.String("ForeignKey", relationship.Field.ForeignKey), glog.String("AssociationKey", relationship.Field.AssociationKey))
+				log.Error("构建join 联系出错，", log.String("ForeignKey", relationship.Field.ForeignKey), log.String("AssociationKey", relationship.Field.AssociationKey))
 			}
 		}
 	}
@@ -350,7 +350,7 @@ func (s *oqlImpl) parseEntity(id, path string) *oqlEntity {
 	}
 	entity := MDSv().GetEntity(id)
 	if entity == nil {
-		err := glog.Errorf("找不到实体 %v", id)
+		err := log.Errorf("找不到实体 %v", id)
 		s.AddErr(err)
 		return nil
 	}
@@ -410,7 +410,7 @@ func (s *oqlImpl) parseEntityField(fieldPath string) (*oqlField, error) {
 		mdField := entity.Entity.GetField(part)
 		if mdField == nil {
 			mdField = &MDField{ID: part, Code: part, Name: part, DbName: part}
-			s.AddErr(glog.Error(fmt.Sprintf("找不到字段 %v", path)))
+			s.AddErr(log.Error(fmt.Sprintf("找不到字段 %v", path)))
 		}
 		field := s.formatEntityField(entity, mdField)
 		field.Path = path

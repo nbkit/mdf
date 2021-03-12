@@ -5,8 +5,8 @@ import (
 	"github.com/nbkit/mdf/db"
 	"strings"
 
-	"github.com/nbkit/mdf/framework/glog"
 	"github.com/nbkit/mdf/framework/md"
+	"github.com/nbkit/mdf/log"
 	"github.com/nbkit/mdf/utils"
 )
 
@@ -328,7 +328,7 @@ func (s *commonSave) saveRelationData(flow *utils.FlowContext, entity *md.MDEnti
 							state = s.(string)
 						}
 						if state == "" {
-							glog.Error("实体对应状态为空，跳过更新！", glog.String("state", state))
+							log.Error("实体对应状态为空，跳过更新！", log.String("state", state))
 							continue
 						}
 						newFlow := flow.Copy()
@@ -344,7 +344,7 @@ func (s *commonSave) saveRelationData(flow *utils.FlowContext, entity *md.MDEnti
 							ruleID = "delete"
 						}
 						if ruleID == "" {
-							glog.Error("该状态找不到对应规则", glog.String("state", state))
+							log.Error("该状态找不到对应规则", log.String("state", state))
 							continue
 						}
 						if state == utils.STATE_UPDATED || state == utils.STATE_DELETED {

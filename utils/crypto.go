@@ -10,7 +10,7 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 
-	"github.com/nbkit/mdf/framework/glog"
+	"github.com/nbkit/mdf/log"
 )
 
 func getKey(key string) []byte {
@@ -73,7 +73,7 @@ func CreateJWTToken(dic map[string]interface{}, SIGNED_KEY string) string {
 	//加密算法是HS256时，这里的SignedString必须是[]byte（）类型
 	ss, err := token.SignedString([]byte(SIGNED_KEY))
 	if err != nil {
-		glog.Infof("token生成签名错误,err=%v", err)
+		log.Infof("token生成签名错误,err=%v", err)
 		return ""
 	}
 	return base64.StdEncoding.EncodeToString([]byte(ss))

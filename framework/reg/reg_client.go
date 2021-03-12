@@ -14,7 +14,7 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/nbkit/mdf/framework/glog"
+	"github.com/nbkit/mdf/log"
 )
 
 //code 到 RegObject 的缓存
@@ -50,7 +50,7 @@ func GetTokenContext(tokenCode string) (*utils.TokenContext, error) {
 	if ser, err := FindServerByCode(utils.Config.Auth.Code); ser != nil {
 		authAddr = ser.Address
 	} else {
-		glog.Error(err)
+		log.Error(err)
 	}
 	if authAddr == "" {
 		authAddr = fmt.Sprintf("http://127.0.0.1:%s", utils.Config.App.Port)
@@ -61,20 +61,20 @@ func GetTokenContext(tokenCode string) (*utils.TokenContext, error) {
 	remoteUrl.Path = fmt.Sprintf("/api/oauth/token/%s", tokenCode)
 	req, err := http.NewRequest("GET", remoteUrl.String(), nil)
 	if err != nil {
-		glog.Error(err)
+		log.Error(err)
 		return nil, err
 	}
 	req.Header.Set("Content-Type", "application/json")
 	resp, err := client.Do(req)
 	if err != nil {
-		glog.Error(err)
+		log.Error(err)
 		return nil, err
 	}
 	defer resp.Body.Close()
 
 	resBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		glog.Error(err)
+		log.Error(err)
 		return nil, err
 	}
 	var resBodyObj struct {
@@ -85,11 +85,11 @@ func GetTokenContext(tokenCode string) (*utils.TokenContext, error) {
 		} `json:"token"`
 	}
 	if err := json.Unmarshal(resBody, &resBodyObj); err != nil {
-		glog.Error(err)
+		log.Error(err)
 		return nil, err
 	}
 	if resp.StatusCode != 200 || resBodyObj.Msg != "" {
-		glog.Error(resBodyObj.Msg)
+		log.Error(resBodyObj.Msg)
 		return nil, err
 	}
 	token := utils.NewTokenContext()
@@ -127,7 +127,7 @@ func Register(item RegObject) error {
 	client.Timeout = 3 * time.Second
 	postBody, err := json.Marshal(item)
 	if err != nil {
-		glog.Error(err)
+		log.Error(err)
 		return err
 	}
 	regHost := getRegistryHost()
@@ -135,20 +135,20 @@ func Register(item RegObject) error {
 	remoteUrl.Path = "/api/regs/register"
 	req, err := http.NewRequest("POST", remoteUrl.String(), bytes.NewBuffer([]byte(postBody)))
 	if err != nil {
-		glog.Error(err)
+		log.Error(err)
 		return err
 	}
 	req.Header.Set("Content-Type", "application/json")
 	resp, err := client.Do(req)
 	if err != nil {
-		glog.Error(err)
+		log.Error(err)
 		return err
 	}
 	defer resp.Body.Close()
 
 	resBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		glog.Error(err)
+		log.Error(err)
 		return err
 	}
 	var resBodyObj struct {
@@ -156,14 +156,14 @@ func Register(item RegObject) error {
 		Data interface{} `json:"data"`
 	}
 	if err := json.Unmarshal(resBody, &resBodyObj); err != nil {
-		glog.Error(err)
+		log.Error(err)
 		return err
 	}
 	if resp.StatusCode != 200 || resBodyObj.Msg != "" {
-		glog.Error(resBodyObj.Msg)
+		log.Error(resBodyObj.Msg)
 		return err
 	}
-	glog.Error("成功注册：", glog.Any("Item", item), glog.Any("RegHost", regHost))
+	log.Error("成功注册：", log.Any("Item", item), log.Any("RegHost", regHost))
 	return nil
 }
 func DoHttpRequest(serverCode, method, path string, body io.Reader) ([]byte, error) {
@@ -172,7 +172,7 @@ func DoHttpRequest(serverCode, method, path string, body io.Reader) ([]byte, err
 		return nil, err
 	}
 	if regs == nil || regs.Address == "" {
-		return nil, glog.Error("找不到服务,", glog.String("serverCode", serverCode))
+		return nil, log.Error("找不到服务,", log.String("serverCode", serverCode))
 	}
 	serverUrl := regs.Address
 	client := &http.Client{}
@@ -183,19 +183,19 @@ func DoHttpRequest(serverCode, method, path string, body io.Reader) ([]byte, err
 	remoteUrl.Path = path
 	req, err := http.NewRequest(method, remoteUrl.String(), body)
 	if err != nil {
-		glog.Error(err)
+		log.Error(err)
 		return nil, err
 	}
 	req.Header.Set("Content-Type", "application/json")
 	resp, err := client.Do(req)
 	if err != nil {
-		glog.Error(err)
+		log.Error(err)
 		return nil, err
 	}
 	defer resp.Body.Close()
 	resBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		glog.Error(err)
+		log.Error(err)
 		return nil, err
 	}
 	if resp.StatusCode != 200 {
@@ -205,7 +205,7 @@ func DoHttpRequest(serverCode, method, path string, body io.Reader) ([]byte, err
 		if err := json.Unmarshal(resBody, &resBodyObj); err != nil {
 			return nil, err
 		}
-		return nil, glog.Error(resBodyObj.Msg)
+		return nil, log.Error(resBodyObj.Msg)
 	}
 	return resBody, nil
 }
@@ -228,33 +228,33 @@ func FindServerByCode(serverCode string) (*RegObject, error) {
 	req, err := http.NewRequest("GET", remoteUrl.String(), nil)
 
 	if err != nil {
-		glog.Error(err)
+		log.Error(err)
 		return nil, err
 	}
 	req.Header.Set("Content-Type", "application/json")
 	resp, err := client.Do(req)
 	if err != nil {
-		glog.Error(err)
+		log.Error(err)
 		return nil, err
 	}
 	defer resp.Body.Close()
 
 	resBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		glog.Error(err)
+		log.Error(err)
 		return nil, err
 	}
 	var resBodyObj struct {
 		Msg  string     `json:"msg"`
 		Data *RegObject `json:"data"`
 	}
-	glog.Error(string(resBody))
+	log.Error(string(resBody))
 	if err := json.Unmarshal(resBody, &resBodyObj); err != nil {
-		glog.Error(err)
+		log.Error(err)
 		return nil, err
 	}
 	if resp.StatusCode != 200 || resBodyObj.Msg != "" {
-		glog.Error(resBodyObj.Msg)
+		log.Error(resBodyObj.Msg)
 		return nil, err
 	}
 	//设置缓存

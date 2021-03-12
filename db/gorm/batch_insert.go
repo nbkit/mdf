@@ -2,10 +2,10 @@ package gorm
 
 import (
 	"fmt"
+	"github.com/nbkit/mdf/log"
 	"reflect"
 	"strings"
 
-	"github.com/nbkit/mdf/framework/glog"
 	"github.com/nbkit/mdf/utils"
 )
 
@@ -103,7 +103,7 @@ func (s *DB) batchInsertSave(scope *Scope, quoted []string, placeholders []strin
 
 	scope.Raw(sql)
 	if _, err := scope.SQLDB().Exec(scope.SQL, scope.SQLVars...); err != nil {
-		glog.Error(err)
+		log.Error(err)
 		return err
 	}
 	return nil

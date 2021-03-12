@@ -1,8 +1,13 @@
-package glog
+package log
+
+import (
+	"go.uber.org/zap"
+)
 
 type Logger interface {
 	CheckAndPrintError(flag string, err error)
-	SetLevel(tag string)
+	SetLevel(level string)
+	getLevel() zap.AtomicLevel
 	Print(v ...interface{})
 
 	Debug(msg string, fields ...Field)
@@ -17,8 +22,9 @@ type Logger interface {
 	Errorf(template string, args ...interface{}) error
 	Fatalf(template string, args ...interface{})
 
-	Debugw(msg string, keysAndValues ...interface{})
-	Infow(msg string, keysAndValues ...interface{})
-	Warnw(msg string, keysAndValues ...interface{})
-	Errorw(msg string, keysAndValues ...interface{})
+	DebugD() *Flow
+	InfoD() *Flow
+	WarnD() *Flow
+	ErrorD() *Flow
+	FatalD() *Flow
 }

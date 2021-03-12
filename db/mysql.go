@@ -8,7 +8,7 @@ import (
 
 	"github.com/go-sql-driver/mysql"
 
-	"github.com/nbkit/mdf/framework/glog"
+	"github.com/nbkit/mdf/log"
 	"github.com/nbkit/mdf/utils"
 
 	"github.com/nbkit/mdf/db/gorm"
@@ -35,7 +35,7 @@ func SetDefault(d *Repo) {
 func Open() *Repo {
 	db, err := gorm.Open(utils.Config.Db.Driver, getDsnString(true))
 	if err != nil {
-		glog.Errorf("orm failed to initialized: %v", err)
+		log.Errorf("orm failed to initialized: %v", err)
 	}
 
 	db.LogMode(utils.Config.App.Debug)
@@ -54,7 +54,7 @@ func (s *Repo) New() *Repo {
 func NewMysqlRepo() *Repo {
 	db, err := gorm.Open(utils.Config.Db.Driver, getDsnString(true))
 	if err != nil {
-		glog.Errorf("orm failed to initialized: %v", err)
+		log.Errorf("orm failed to initialized: %v", err)
 		panic(err)
 	}
 	db.LogMode(utils.Config.App.Debug)
@@ -115,7 +115,7 @@ func getDsnString(inDb bool) string {
 func DestroyDB(name string) error {
 	db, err := gorm.Open(utils.Config.Db.Driver, getDsnString(false))
 	if err != nil {
-		glog.Errorf("orm failed to initialized: %v", err)
+		log.Errorf("orm failed to initialized: %v", err)
 	}
 	defer db.Close()
 	return db.Exec(fmt.Sprintf("Drop Database if exists %s;", name)).Error
@@ -123,7 +123,7 @@ func DestroyDB(name string) error {
 func CreateDB(name string) error {
 	db, err := gorm.Open(utils.Config.Db.Driver, getDsnString(false))
 	if err != nil {
-		return glog.Errorf("orm failed to initialized: %v", err)
+		return log.Errorf("orm failed to initialized: %v", err)
 	}
 	defer db.Close()
 	script := ""
@@ -134,7 +134,7 @@ func CreateDB(name string) error {
 	}
 	err = db.Exec(script).Error
 	if err != nil {
-		return glog.Errorf("create DATABASE err: %v", err)
+		return log.Errorf("create DATABASE err: %v", err)
 	}
 	return nil
 }
