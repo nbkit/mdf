@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func (l *logger) sqlLog(values ...interface{}) {
+func (s *logger) sqlLog(values ...interface{}) {
 	if len(values) > 1 {
 		var (
 			sql             string
@@ -73,7 +73,7 @@ func (l *logger) sqlLog(values ...interface{}) {
 					}
 				}
 			}
-			l.Info(sql,
+			s.Info(sql,
 				String("type", "sql"),
 				String("rows", strconv.FormatInt(values[5].(int64), 10)),
 				String("duration", fmt.Sprintf("%.2fms", float64(values[2].(time.Duration).Nanoseconds()/1e4)/100.0)))

@@ -49,7 +49,7 @@ func debugPrintLoadTemplate(tmpl *template.Template) {
 
 func debugPrint(format string, values ...interface{}) {
 	if IsDebugging() {
-		log.Infof(format, values...)
+		log.InfoF(format, values...)
 	}
 }
 

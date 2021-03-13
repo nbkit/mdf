@@ -139,7 +139,7 @@ func (s actionSvImpl) DoAction(flow *utils.FlowContext) *utils.FlowContext {
 				return flow
 			}
 			if flow.Canceled() {
-				log.Errorf("请求已被规则%s终止！", rule.Register().Code)
+				log.ErrorF("请求已被规则%s终止！", rule.Register().Code)
 				return flow
 			}
 		}

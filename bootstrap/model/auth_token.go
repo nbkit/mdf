@@ -32,7 +32,7 @@ func (s *AuthToken) MD() *md.Mder {
 func (s *AuthToken) SetContent(value interface{}) error {
 	str, err := json.Marshal(value)
 	if err != nil {
-		log.Errorf("error:%v", err)
+		log.ErrorF("error:%v", err)
 		return err
 	}
 	s.Content = string(str)
@@ -40,7 +40,7 @@ func (s *AuthToken) SetContent(value interface{}) error {
 }
 func (s *AuthToken) GetContent(value interface{}) error {
 	if err := json.Unmarshal([]byte(s.Content), value); err != nil {
-		log.Errorf("parse content error:%v", err)
+		log.ErrorF("parse content error:%v", err)
 		return err
 	}
 	return nil

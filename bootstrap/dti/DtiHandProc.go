@@ -101,7 +101,7 @@ func (c *DtiHandProc) Do() {
 		c.toError(err)
 		return
 	}
-	log.Errorf("请求连接为:%s", driverName, ds)
+	log.ErrorF("请求连接为:%s", driverName, ds)
 	if driverName == "" || ds == "" {
 		c.toError("连接为空")
 		return
@@ -120,7 +120,7 @@ func (c *DtiHandProc) Do() {
 			}
 		}
 	}
-	log.Errorf("解析到请求 path:%s,参数为:%v", c.Path, bodyParams)
+	log.ErrorF("解析到请求 path:%s,参数为:%v", c.Path, bodyParams)
 	db, err := sql.Open(driverName, ds)
 	defer db.Close()
 	c.db = db
@@ -144,7 +144,7 @@ func (c *DtiHandProc) Do() {
 			c.toError(err)
 			return
 		} else {
-			log.Errorf("存储过程:%s,参数为:%v", c.Path, spParams)
+			log.ErrorF("存储过程:%s,参数为:%v", c.Path, spParams)
 			for _, pv := range spParams {
 				if pv["name"] == nil {
 					break
@@ -157,9 +157,9 @@ func (c *DtiHandProc) Do() {
 		}
 		// 执行SQL语句
 		fm_time := time.Now()
-		log.Errorf("存储过程:%s,传入参数:%v,开始执行！", c.Path, paramsIn)
+		log.ErrorF("存储过程:%s,传入参数:%v,开始执行！", c.Path, paramsIn)
 		maps, err := c.execProc(driverName, c.Path, paramsIn)
-		log.Errorf("执行:%s 结束,%v条,time:%v Seconds", c.Path, len(maps), time.Now().Sub(fm_time).Seconds())
+		log.ErrorF("执行:%s 结束,%v条,time:%v Seconds", c.Path, len(maps), time.Now().Sub(fm_time).Seconds())
 		if err != nil {
 			log.Error(err)
 			c.toError(err)

@@ -2,7 +2,10 @@ package log
 
 // Default is the package-level ready-to-use logger,
 // level had set to "info", is changeable.
-var Default = createLogger()
+var (
+	LatencyFieldName = "latency"
+	Default          = createLogger()
+)
 
 // Reset re-sets the default logger to an empty one.
 func Reset() {
@@ -48,39 +51,39 @@ func Debug(msg string, fields ...Field) {
 // Fatalf will `os.Exit(1)` no matter the level of the logger.
 // If the logger's level is fatal, error, warn, info or debug
 // then it will print the log message too.
-func Fatalf(format string, args ...interface{}) {
-	Default.Fatalf(format, args...)
+func FatalF(format string, args ...interface{}) {
+	Default.FatalF(format, args...)
 }
 
 // Errorf will print only when logger's Level is error, warn, info or debug.
-func Errorf(format string, args ...interface{}) error {
-	return Default.Errorf(format, args...)
+func ErrorF(format string, args ...interface{}) error {
+	return Default.ErrorF(format, args...)
 }
 
 // Warnf will print when logger's Level is warn, info or debug.
-func Warnf(format string, args ...interface{}) {
-	Default.Warnf(format, args...)
+func WarnF(format string, args ...interface{}) {
+	Default.WarnF(format, args...)
 }
 
 // Infof will print when logger's Level is info or debug.
-func Infof(format string, args ...interface{}) {
-	Default.Infof(format, args...)
+func InfoF(format string, args ...interface{}) {
+	Default.InfoF(format, args...)
 }
 
 // Debugf will print when logger's Level is debug.
-func Debugf(format string, args ...interface{}) {
-	Default.Debugf(format, args...)
+func DebugF(format string, args ...interface{}) {
+	Default.DebugF(format, args...)
 }
 
-func InfoD() *Flow {
-	return Default.InfoD()
+func InfoS() *Flow {
+	return Default.InfoS()
 }
-func ErrorD() *Flow {
-	return Default.ErrorD()
+func ErrorS() *Flow {
+	return Default.ErrorS()
 }
-func DebugD() *Flow {
-	return Default.DebugD()
+func DebugS() *Flow {
+	return Default.DebugS()
 }
-func FatalD() *Flow {
-	return Default.FatalD()
+func FatalS() *Flow {
+	return Default.FatalS()
 }

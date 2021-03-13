@@ -16,15 +16,15 @@ type Logger interface {
 	Error(msg interface{}, fields ...Field) error
 	Fatal(msg string, fields ...Field)
 
-	Debugf(template string, args ...interface{})
-	Infof(template string, args ...interface{})
-	Warnf(template string, args ...interface{})
-	Errorf(template string, args ...interface{}) error
-	Fatalf(template string, args ...interface{})
+	DebugF(template string, args ...interface{})
+	InfoF(template string, args ...interface{})
+	WarnF(template string, args ...interface{})
+	ErrorF(template string, args ...interface{}) error
+	FatalF(template string, args ...interface{})
 
-	DebugD() *Flow
-	InfoD() *Flow
-	WarnD() *Flow
-	ErrorD() *Flow
-	FatalD() *Flow
+	DebugS() *Flow
+	InfoS() *Flow
+	WarnS() *Flow
+	ErrorS() *Flow
+	FatalS() *Flow
 }

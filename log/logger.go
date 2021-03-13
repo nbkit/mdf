@@ -164,28 +164,28 @@ func createLogger(args ...string) Logger {
 	return l
 }
 
-func (l *logger) newEvent(level zapcore.Level, done func(string)) *Flow {
-	e := newFlow(level, l)
+func (s *logger) newEvent(level zapcore.Level, done func(string)) *Flow {
+	e := newFlow(level, s)
 	return e
 }
-func (l *logger) Print(v ...interface{}) {
+func (s *logger) Print(v ...interface{}) {
 	if v != nil && len(v) > 0 && v[0] == "sql" {
-		l.sqlLog(v...)
+		s.sqlLog(v...)
 	} else {
-		l.sugar.Debug(v)
+		s.sugar.Debug(v)
 	}
 }
-func (l *logger) CheckAndPrintError(flag string, err error) {
+func (s *logger) CheckAndPrintError(flag string, err error) {
 	if err != nil {
-		l.Print(flag, err)
+		s.Print(flag, err)
 	}
 }
-func (l *logger) SetLevel(tag string) {
-	l.level.SetLevel(getLevelByTag(tag))
+func (s *logger) SetLevel(tag string) {
+	s.level.SetLevel(getLevelByTag(tag))
 }
 
-func (l *logger) getLevel() zap.AtomicLevel {
-	return l.level
+func (s *logger) getLevel() zap.AtomicLevel {
+	return s.level
 }
 
 //nor
@@ -228,42 +228,42 @@ func (s *logger) Fatal(msg string, fields ...Field) {
 //f
 
 // Debugf uses fmt.Sprintf to log a templated message.
-func (s *logger) Debugf(template string, args ...interface{}) {
+func (s *logger) DebugF(template string, args ...interface{}) {
 	s.sugar.Debugf(template, args...)
 }
 
 // Infof uses fmt.Sprintf to log a templated message.
-func (s *logger) Infof(template string, args ...interface{}) {
+func (s *logger) InfoF(template string, args ...interface{}) {
 	s.sugar.Infof(template, args...)
 }
 
 // Warnf uses fmt.Sprintf to log a templated message.
-func (s *logger) Warnf(template string, args ...interface{}) {
+func (s *logger) WarnF(template string, args ...interface{}) {
 	s.sugar.Warnf(template, args...)
 }
 
 // Errorf uses fmt.Sprintf to log a templated message.
-func (s *logger) Errorf(template string, args ...interface{}) error {
+func (s *logger) ErrorF(template string, args ...interface{}) error {
 	s.sugar.Errorf(template, args...)
 	return fmt.Errorf(template, args...)
 }
-func (s *logger) Fatalf(template string, args ...interface{}) {
+func (s *logger) FatalF(template string, args ...interface{}) {
 	s.sugar.Fatalf(template, args...)
 }
 
-func (s *logger) InfoD() *Flow {
+func (s *logger) InfoS() *Flow {
 	return s.newEvent(zap.InfoLevel, nil)
 }
-func (s *logger) ErrorD() *Flow {
+func (s *logger) ErrorS() *Flow {
 	return s.newEvent(zap.ErrorLevel, nil)
 }
-func (s *logger) WarnD() *Flow {
+func (s *logger) WarnS() *Flow {
 	return s.newEvent(zap.WarnLevel, nil)
 }
-func (s *logger) DebugD() *Flow {
+func (s *logger) DebugS() *Flow {
 	return s.newEvent(zap.DebugLevel, nil)
 }
 
-func (s *logger) FatalD() *Flow {
+func (s *logger) FatalS() *Flow {
 	return s.newEvent(zap.FatalLevel, nil)
 }

@@ -35,7 +35,7 @@ func SetDefault(d *Repo) {
 func Open() *Repo {
 	db, err := gorm.Open(utils.Config.Db.Driver, getDsnString(true))
 	if err != nil {
-		log.Errorf("orm failed to initialized: %v", err)
+		log.ErrorF("orm failed to initialized: %v", err)
 	}
 
 	db.LogMode(utils.Config.App.Debug)
@@ -54,7 +54,7 @@ func (s *Repo) New() *Repo {
 func NewMysqlRepo() *Repo {
 	db, err := gorm.Open(utils.Config.Db.Driver, getDsnString(true))
 	if err != nil {
-		log.Errorf("orm failed to initialized: %v", err)
+		log.ErrorF("orm failed to initialized: %v", err)
 		panic(err)
 	}
 	db.LogMode(utils.Config.App.Debug)
@@ -115,7 +115,7 @@ func getDsnString(inDb bool) string {
 func DestroyDB(name string) error {
 	db, err := gorm.Open(utils.Config.Db.Driver, getDsnString(false))
 	if err != nil {
-		log.Errorf("orm failed to initialized: %v", err)
+		log.ErrorF("orm failed to initialized: %v", err)
 	}
 	defer db.Close()
 	return db.Exec(fmt.Sprintf("Drop Database if exists %s;", name)).Error
@@ -123,7 +123,7 @@ func DestroyDB(name string) error {
 func CreateDB(name string) error {
 	db, err := gorm.Open(utils.Config.Db.Driver, getDsnString(false))
 	if err != nil {
-		return log.Errorf("orm failed to initialized: %v", err)
+		return log.ErrorF("orm failed to initialized: %v", err)
 	}
 	defer db.Close()
 	script := ""
@@ -134,7 +134,7 @@ func CreateDB(name string) error {
 	}
 	err = db.Exec(script).Error
 	if err != nil {
-		return log.Errorf("create DATABASE err: %v", err)
+		return log.ErrorF("create DATABASE err: %v", err)
 	}
 	return nil
 }

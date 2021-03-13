@@ -12,6 +12,7 @@ type Flow struct {
 	buf   []Field
 	log   Logger
 	level zapcore.Level
+	time  time.Time
 }
 
 var eventPool = &sync.Pool{
@@ -34,6 +35,7 @@ func newFlow(level zapcore.Level, log Logger) *Flow {
 	e.buf = e.buf[:0]
 	e.log = log
 	e.level = level
+	e.time = time.Now()
 	return e
 }
 
@@ -60,21 +62,21 @@ func (f *Flow) write(msg string) {
 	}
 	putEvent(f)
 }
+
+func (f *Flow) Enabled() bool {
+	return f != nil && f.log.getLevel().Enabled(f.level)
+}
+func (f *Flow) Output() {
+	if f == nil {
+		return
+	}
+	f.write("")
+}
 func (f *Flow) Msg(msg string) {
 	if f == nil {
 		return
 	}
 	f.write(msg)
-}
-
-// Send is equivalent to calling Msg("").
-//
-// NOTICE: once this method is called, the *Event should be disposed.
-func (f *Flow) Send() {
-	if f == nil {
-		return
-	}
-	f.write("")
 }
 
 // Msgf sends the event with formatted msg added as the message field if not empty.
@@ -87,10 +89,23 @@ func (f *Flow) Msgf(format string, v ...interface{}) {
 	}
 	f.write(fmt.Sprintf(format, v...))
 }
-func (f *Flow) Enabled() bool {
-	return f != nil && f.log.getLevel().Enabled(f.level)
-}
 
+func (f *Flow) Latency() *Flow {
+	f.buf = append(f.buf, zap.Duration(LatencyFieldName, time.Now().Sub(f.time)))
+	f.time = time.Now()
+	return f
+}
+func (f *Flow) Error(msg interface{}) error {
+	if ev, ok := msg.(error); ok {
+		f.write(ev.Error())
+		return ev
+	} else if ev, ok := msg.(string); ok {
+		f.write(ev)
+		return fmt.Errorf(ev)
+	}
+	f.write(fmt.Sprint(msg))
+	return fmt.Errorf(fmt.Sprint(msg))
+}
 func (f *Flow) Bool(key string, val bool) *Flow {
 	f.buf = append(f.buf, zap.Bool(key, val))
 	return f

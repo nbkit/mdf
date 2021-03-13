@@ -67,7 +67,7 @@ func (s *oqlImpl) buildJoins() *OQLStatement {
 		}
 		relationship, _ := s.parseEntityField(t.Path)
 		if relationship == nil {
-			log.Errorf("找不到关联字段")
+			log.ErrorF("找不到关联字段")
 			continue
 		}
 		if relationship.Field.Kind == KIND_TYPE_BELONGS_TO || relationship.Field.Kind == KIND_TYPE_HAS_ONE {
@@ -350,7 +350,7 @@ func (s *oqlImpl) parseEntity(id, path string) *oqlEntity {
 	}
 	entity := MDSv().GetEntity(id)
 	if entity == nil {
-		err := log.Errorf("找不到实体 %v", id)
+		err := log.ErrorF("找不到实体 %v", id)
 		s.AddErr(err)
 		return nil
 	}

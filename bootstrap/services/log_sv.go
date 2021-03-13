@@ -41,9 +41,9 @@ func (s *logSvImpl) Create(item model.Log) {
 	if err := db.Default().Create(&item).Error; err != nil {
 		log.Error(err)
 	}
-	log.Errorf("%s-%s: %v", item.NodeType, item.NodeID, item.Msg)
+	log.ErrorF("%s-%s: %v", item.NodeType, item.NodeID, item.Msg)
 }
 
 func (s *logSvImpl) Log(item model.Log) {
-	log.Errorf("%s-%s: %v", item.NodeType, item.NodeID, item.Msg)
+	log.ErrorF("%s-%s: %v", item.NodeType, item.NodeID, item.Msg)
 }
