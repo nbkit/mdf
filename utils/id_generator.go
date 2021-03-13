@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"encoding/hex"
 	"fmt"
+	"github.com/nbkit/mdf/internal/xid"
 	"io"
 	mrand "math/rand"
 	"net"
@@ -23,6 +24,9 @@ import (
 /*
   return eg: 4725f5ae6a350b1c45687c9934456e6f
 */
+func SSID() string {
+	return xid.New().String()
+}
 func GUID() string {
 	s := newRFC4122Generator()
 	u, _ := s.NewV1()
