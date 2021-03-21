@@ -1,6 +1,6 @@
 package utils
 
-import "github.com/shopspring/decimal"
+import "github.com/nbkit/mdf/decimal"
 
 func ToDecimal(v interface{}) decimal.Decimal {
 	if vv, ok := v.(decimal.Decimal); ok {

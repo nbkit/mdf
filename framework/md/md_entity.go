@@ -2,7 +2,7 @@ package md
 
 import (
 	"fmt"
-	"github.com/shopspring/decimal"
+	"github.com/nbkit/mdf/decimal"
 	"strings"
 
 	"github.com/nbkit/mdf/log"

@@ -2,7 +2,7 @@ package md
 
 import (
 	"github.com/nbkit/mdf/db"
-	"github.com/shopspring/decimal"
+	"github.com/nbkit/mdf/decimal"
 	"reflect"
 	"strconv"
 	"strings"

@@ -13,7 +13,6 @@ require (
 	github.com/mattn/go-isatty v0.0.3
 	github.com/mattn/go-sqlite3 v1.14.6 // indirect
 	github.com/robfig/cron v1.2.0
-	github.com/shopspring/decimal v1.2.0
 	github.com/spf13/viper v1.7.1
 	github.com/ugorji/go/codec v1.2.4
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
