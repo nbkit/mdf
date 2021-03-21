@@ -6,13 +6,16 @@ import (
 )
 
 type CommonDelete struct {
+	register *md.MDAction
 }
 
 func newCommonDelete() *CommonDelete {
-	return &CommonDelete{}
+	return &CommonDelete{
+		register: &md.MDAction{Code: "delete", Widget: "common"},
+	}
 }
-func (s CommonDelete) Register() md.RuleRegister {
-	return md.RuleRegister{Code: "delete", Widget: "common"}
+func (s CommonDelete) Register() *md.MDAction {
+	return s.register
 }
 
 func (s CommonDelete) Exec(flow *utils.FlowContext) {

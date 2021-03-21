@@ -192,7 +192,6 @@ func (engine *Engine) LoadHTMLGlob(pattern string) {
 		engine.HTMLRender = render.HTMLDebug{Glob: pattern, FuncMap: engine.FuncMap, Delims: engine.delims}
 		return
 	}
-
 	engine.SetHTMLTemplate(templ)
 }
 

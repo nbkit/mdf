@@ -9,7 +9,6 @@ func ToMapFrom(src interface{}, tag string, recursive bool) (map[interface{}]int
 	err := ToMap(dst, src, tag, recursive)
 	return dst, err
 }
-
 func ToMap(dst, src interface{}, tag string, recursive bool) (err error) {
 	if nil == dst || nil == src {
 		err = errInvalidParams

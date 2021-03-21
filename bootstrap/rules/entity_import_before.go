@@ -8,13 +8,16 @@ import (
 )
 
 type entityImportBefore struct {
+	register *md.MDRule
 }
 
 func newEntityImportBefore() *entityImportBefore {
-	return &entityImportBefore{}
+	return &entityImportBefore{
+		register: &md.MDRule{Code: "import.before", Widget: "md"},
+	}
 }
-func (s *entityImportBefore) Register() md.RuleRegister {
-	return md.RuleRegister{Code: "import.before", Widget: "md"}
+func (s *entityImportBefore) Register() *md.MDRule {
+	return s.register
 }
 func (s *entityImportBefore) Exec(flow *utils.FlowContext) {
 	if flow.Request.Data == nil {

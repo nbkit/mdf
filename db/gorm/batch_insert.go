@@ -103,8 +103,7 @@ func (s *DB) batchInsertSave(scope *Scope, quoted []string, placeholders []strin
 
 	scope.Raw(sql)
 	if _, err := scope.SQLDB().Exec(scope.SQL, scope.SQLVars...); err != nil {
-		log.Error(err)
-		return err
+		return log.ErrorD(err)
 	}
 	return nil
 }

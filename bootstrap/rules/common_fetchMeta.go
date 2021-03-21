@@ -6,13 +6,16 @@ import (
 )
 
 type commonFetchMeta struct {
+	register *md.MDRule
 }
 
 func newCommonFetchMeta() *commonFetchMeta {
-	return &commonFetchMeta{}
+	return &commonFetchMeta{
+		register: &md.MDRule{Code: "fetchMeta", Widget: "common"},
+	}
 }
-func (s *commonFetchMeta) Register() md.RuleRegister {
-	return md.RuleRegister{Code: "fetchMeta", Widget: "common"}
+func (s *commonFetchMeta) Register() *md.MDRule {
+	return s.register
 }
 func (s *commonFetchMeta) Exec(flow *utils.FlowContext) {
 

@@ -30,7 +30,9 @@ import (
 */
 func StructToJson(object interface{}) string {
 	data, err := json.Marshal(object)
-	log.CheckAndPrintError("Struct convert json string failed", err)
+	if err != nil {
+		log.Print("Struct convert json string failed", err)
+	}
 	return string(data)
 }
 
@@ -46,5 +48,7 @@ func StructToJson(object interface{}) string {
 */
 func JsonToStruct(jsonString string, object interface{}) {
 	err := json.Unmarshal([]byte(jsonString), object)
-	log.CheckAndPrintError("Json string convert struct failed", err)
+	if err != nil {
+		log.Print("Json string convert struct failed", err)
+	}
 }

@@ -105,8 +105,9 @@ func (t *SJson) Scan(v interface{}) error {
 	}
 	var vv interface{}
 	if err := json.Unmarshal([]byte(jsonStr), &vv); err != nil {
-		log.Error(err)
-
+		if err != nil {
+			log.Print("unmarshal Json string failed", err)
+		}
 		if strValue, e := json.Marshal(jsonStr); e == nil {
 			t.value = jsonStr
 			t.jsonString = string(strValue)

@@ -17,6 +17,9 @@ func IsEmpty(v interface{}) bool {
 		return true
 	}
 	t := reflect.ValueOf(v)
+	if t.Kind() == reflect.Ptr {
+		return t.IsNil()
+	}
 	switch t.Kind() {
 	case reflect.Slice, reflect.Map, reflect.String:
 		return t.Len() < 1
@@ -32,8 +35,10 @@ func IsEmpty(v interface{}) bool {
 
 func getValue(v interface{}) interface{} {
 	if nil != v {
-		if vl, ok := v.(driver.Valuer); ok {
-			v, _ = vl.Value()
+		if vl, ok := v.(driver.Valuer); ok && vl != nil {
+			if !IsEmpty(vl) {
+				v, _ = vl.Value()
+			}
 		}
 	}
 	return v

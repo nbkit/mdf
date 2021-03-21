@@ -11,14 +11,17 @@ import (
 )
 
 type commonSave struct {
+	register *md.MDRule
 }
 
 func newCommonSave() *commonSave {
-	return &commonSave{}
+	return &commonSave{
+		register: &md.MDRule{Code: "save", Widget: "common"},
+	}
 }
 
-func (s *commonSave) Register() md.RuleRegister {
-	return md.RuleRegister{Code: "save", Widget: "common"}
+func (s *commonSave) Register() *md.MDRule {
+	return s.register
 }
 
 func (s *commonSave) Exec(flow *utils.FlowContext) {
@@ -328,7 +331,7 @@ func (s *commonSave) saveRelationData(flow *utils.FlowContext, entity *md.MDEnti
 							state = s.(string)
 						}
 						if state == "" {
-							log.Error("实体对应状态为空，跳过更新！", log.String("state", state))
+							log.Error().String("state", state).Msg("实体对应状态为空，跳过更新！")
 							continue
 						}
 						newFlow := flow.Copy()
@@ -344,7 +347,7 @@ func (s *commonSave) saveRelationData(flow *utils.FlowContext, entity *md.MDEnti
 							ruleID = "delete"
 						}
 						if ruleID == "" {
-							log.Error("该状态找不到对应规则", log.String("state", state))
+							log.Error().String("state", state).Msg("该状态找不到对应规则")
 							continue
 						}
 						if state == utils.STATE_UPDATED || state == utils.STATE_DELETED {

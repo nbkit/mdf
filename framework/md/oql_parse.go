@@ -95,7 +95,7 @@ func (s *oqlImpl) buildJoins() *OQLStatement {
 				queries = append(queries, fmt.Sprintf("left join %v  %v on %v.%v=%v.%v", t.Entity.TableName, t.Alias, t.Alias, fkey.DbName, relationship.Entity.Alias, lkey.DbName))
 				statement.Affected++
 			} else {
-				log.Error("构建join 联系出错，", log.String("ForeignKey", relationship.Field.ForeignKey), log.String("AssociationKey", relationship.Field.AssociationKey))
+				log.Error().String("ForeignKey", relationship.Field.ForeignKey).String("AssociationKey", relationship.Field.AssociationKey).Msg("构建join 联系出错")
 			}
 		}
 	}
@@ -410,7 +410,7 @@ func (s *oqlImpl) parseEntityField(fieldPath string) (*oqlField, error) {
 		mdField := entity.Entity.GetField(part)
 		if mdField == nil {
 			mdField = &MDField{ID: part, Code: part, Name: part, DbName: part}
-			s.AddErr(log.Error(fmt.Sprintf("找不到字段 %v", path)))
+			s.AddErr(log.ErrorD(fmt.Sprintf("找不到字段 %v", path)))
 		}
 		field := s.formatEntityField(entity, mdField)
 		field.Path = path

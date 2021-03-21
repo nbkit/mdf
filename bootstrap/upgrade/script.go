@@ -68,10 +68,10 @@ func (s *scriptImpl) isExcel(file string) bool {
 }
 func (s *scriptImpl) runScript(file string) error {
 	if bt, err := ioutil.ReadFile(file); err != nil {
-		return log.Error(err)
+		return log.ErrorD(err)
 	} else {
 		if err := db.Default().Exec(string(bt)).Error; err != nil {
-			return log.Error(err)
+			return log.ErrorD(err)
 		}
 	}
 	return nil
@@ -95,6 +95,7 @@ func (s *scriptImpl) handExcelData(data []files.ImportData) error {
 		c.Request.Data = d
 		c.Request.Action = "import"
 		c.Request.Widget = k
+		c.Token = utils.NewTokenContext()
 		md.ActionSv().DoAction(c)
 	}
 	return nil

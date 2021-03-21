@@ -59,8 +59,7 @@ func (s *ossSvImpl) uploadObjectByLocal(item *model.Oss, fileItem *model.OssObje
 	}
 	outFile, err := os.OpenFile(outFilePathFull, os.O_WRONLY|os.O_CREATE, os.FileMode(0777))
 	if err != nil {
-		log.Error(err.Error())
-		return err
+		return log.ErrorD(err)
 	}
 	defer outFile.Close()
 	outFile.Write(fileBytes)

@@ -7,14 +7,17 @@ import (
 )
 
 type commonEnable struct {
+	register *md.MDAction
 }
 
 func newCommonEnable() *commonEnable {
-	return &commonEnable{}
+	return &commonEnable{
+		register: &md.MDAction{Code: "enable", Widget: "common"},
+	}
 }
 
-func (s commonEnable) Register() md.RuleRegister {
-	return md.RuleRegister{Code: "enable", Widget: "common"}
+func (s commonEnable) Register() *md.MDAction {
+	return s.register
 }
 
 func (s commonEnable) Exec(flow *utils.FlowContext) {

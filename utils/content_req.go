@@ -30,10 +30,10 @@ func NewReqContext() *ReqContext {
 }
 func (s *ReqContext) Bind(c *gin.Context) *ReqContext {
 	if err := c.Bind(&s); err != nil {
-		log.Error(err)
+		log.ErrorD(err)
 	}
 	if form, err := c.MultipartForm(); err != nil {
-		log.Error(err)
+		log.ErrorD(err)
 	} else if form != nil && form.File != nil {
 		s.Files = form.File["files"]
 	}

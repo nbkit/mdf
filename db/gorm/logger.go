@@ -3,8 +3,7 @@ package gorm
 import (
 	"database/sql/driver"
 	"fmt"
-	"log"
-	"os"
+	"github.com/nbkit/mdf/log"
 	"reflect"
 	"regexp"
 	"strconv"
@@ -13,7 +12,7 @@ import (
 )
 
 var (
-	defaultLogger            = Logger{log.New(os.Stdout, "\r\n", 0)}
+	defaultLogger            = Logger{}
 	sqlRegexp                = regexp.MustCompile(`\?`)
 	numericPlaceHolderRegexp = regexp.MustCompile(`\$\d+`)
 )
@@ -27,13 +26,16 @@ func isPrintable(s string) bool {
 	return true
 }
 
+//String("type", "sql"),
+//	String("rows", strconv.FormatInt(values[5].(int64), 10)),
+//	String("duration", fmt.Sprintf("%.2fms", float64(values[2].(time.Duration).Nanoseconds()/1e4)/100.0)))
 var LogFormatter = func(values ...interface{}) (messages []interface{}) {
 	if len(values) > 1 {
 		var (
 			sql             string
 			formattedValues []string
 			level           = values[0]
-			currentTime     = "\n\033[33m[" + NowFunc().Format("2006-01-02 15:04:05") + "]\033[0m"
+			currentTime     = "\033[33m[" + NowFunc().Format("2006-01-02 15:04:05") + "]\033[0m"
 			source          = fmt.Sprintf("\033[35m(%v)\033[0m", values[1])
 		)
 
@@ -106,7 +108,7 @@ var LogFormatter = func(values ...interface{}) (messages []interface{}) {
 			}
 
 			messages = append(messages, sql)
-			messages = append(messages, fmt.Sprintf(" \n\033[36;31m[%v]\033[0m ", strconv.FormatInt(values[5].(int64), 10)+" rows affected or returned "))
+			messages = append(messages, fmt.Sprintf(" \033[36;31m[%v]\033[0m ", strconv.FormatInt(values[5].(int64), 10)+" rows affected or returned "))
 		} else {
 			messages = append(messages, "\033[31;1m")
 			messages = append(messages, values[2:]...)
@@ -121,19 +123,14 @@ type logger interface {
 	Print(v ...interface{})
 }
 
-// LogWriter log writer interface
-type LogWriter interface {
-	Println(v ...interface{})
-}
-
 // Logger default logger
 type Logger struct {
-	LogWriter
 }
 
 // Print format & print log
 func (logger Logger) Print(values ...interface{}) {
-	logger.Println(LogFormatter(values...)...)
+	log.Info().Output(LogFormatter(values...)...)
+
 }
 
 type nopLogger struct{}

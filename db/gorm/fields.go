@@ -57,8 +57,8 @@ func (field *Field) Set(value interface{}) (err error) {
 					err = scanner.Scan(v)
 				}
 			} else {
-				log.Error(fieldValue.Addr().Interface())
 				err = fmt.Errorf("could not convert argument of field %s from %s to %s", field.Name, reflectValue.Type(), fieldValue.Type())
+				log.ErrorD(err)
 			}
 		}
 	} else {

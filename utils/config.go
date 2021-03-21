@@ -18,7 +18,7 @@ type AppConfig struct {
 	Name    string `mapstructure:"name" json:"name"`
 	Port    string `mapstructure:"port" json:"port"`
 	Locale  string `mapstructure:"locale" json:"locale"`
-	Debug   bool   `mapstructure:"debug" json:"debug"`
+	Mode    string `mapstructure:"mode" json:"mode"`
 	Storage string `mapstructure:"storage" json:"storage"`
 	//注册中心
 	Registry string `mapstructure:"registry" json:"registry"`
@@ -35,6 +35,7 @@ type DbConfig struct {
 	Password  string `mapstructure:"password" json:"password"`
 	Charset   string `mapstructure:"charset" json:"charset"`
 	Collation string `mapstructure:"collation" json:"collation"`
+	Mode      string `mapstructure:"mode" json:"mode"`
 }
 type LogConfig struct {
 	Level string `mapstructure:"level" json:"level"`
@@ -115,6 +116,14 @@ func (s *EnvConfig) getViper(envNames ...string) *viper.Viper {
 		return getConfigViper(AppConfigName)
 	}
 }
+
+func (s *EnvConfig) decrypt(value string) string {
+	if value != "" && strings.Index(value, "ECN(") == 0 {
+		value = value[4 : len(value)-1]
+		value, _ = AesCFBDecrypt(value, Config.App.Token)
+	}
+	return value
+}
 func getConfigViper(name string) *viper.Viper {
 	if name == "" {
 		name = AppConfigName
@@ -179,6 +188,9 @@ func newInitConfig() {
 	if Config.App.Storage == "" {
 		Config.App.Storage = "./storage"
 	}
+	if Config.App.Mode == "" {
+		Config.App.Mode = "release"
+	}
 	if Config.Db.Driver == "" {
 		Config.Db.Driver = "mysql"
 	}
@@ -202,6 +214,12 @@ func newInitConfig() {
 	if Config.Auth.Code == "" {
 		Config.Auth.Code = Config.App.Code
 	}
+
+	Config.Db.Password = Config.decrypt(Config.Db.Password)
+	Config.Db.Host = Config.decrypt(Config.Db.Host)
+	Config.Db.Username = Config.decrypt(Config.Db.Username)
+	Config.Db.Database = Config.decrypt(Config.Db.Database)
+
 	kvs := make(map[string]interface{})
 	if err := vp.Unmarshal(&kvs); err != nil {
 		log.ErrorF("Fatal error when reading %s config file:%s", AppConfigName, err)

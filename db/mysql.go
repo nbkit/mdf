@@ -38,7 +38,7 @@ func Open() *Repo {
 		log.ErrorF("orm failed to initialized: %v", err)
 	}
 
-	db.LogMode(utils.Config.App.Debug)
+	db.LogMode(utils.Config.Db.Mode == "debug" || utils.Config.Db.Mode == "")
 	repo := &Repo{db}
 	return repo
 }
@@ -57,7 +57,7 @@ func NewMysqlRepo() *Repo {
 		log.ErrorF("orm failed to initialized: %v", err)
 		panic(err)
 	}
-	db.LogMode(utils.Config.App.Debug)
+	db.LogMode(utils.Config.Db.Mode == "debug" || utils.Config.Db.Mode == "")
 	repo := &Repo{db}
 	return repo
 }

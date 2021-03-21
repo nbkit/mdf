@@ -99,7 +99,7 @@ func (s *cronSvImpl) runJobItem(item *model.CronTask) {
 
 	client := &http.Client{}
 	if item.Endpoint == nil || item.Endpoint.Path == "" || item.Endpoint.Code == "" {
-		s.runJobItemFailed(item, log.Error("没有配置可执行接口"))
+		s.runJobItemFailed(item, log.ErrorD("没有配置可执行接口"))
 		return
 	}
 
@@ -130,7 +130,7 @@ func (s *cronSvImpl) runJobItem(item *model.CronTask) {
 	}
 	resBodyObj := resBodyDTO{}
 	if err := json.Unmarshal(resBody, &resBodyObj); err != nil {
-		log.Error(utils.ToString(resBody))
+		log.ErrorD(utils.ToString(resBody))
 		s.runJobItemFailed(item, err)
 		return
 	}
@@ -267,7 +267,7 @@ func (s *cronSvImpl) CreateTask(entID string, item *model.CronTask) (*model.Cron
 		}
 	}
 	if item.EndpointID == "" {
-		return nil, log.Error("endpoint为空")
+		return nil, log.ErrorD("endpoint为空")
 	}
 	//下次执行时间
 	item.NeTime = item.FmTime.Unix()

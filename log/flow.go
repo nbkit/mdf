@@ -2,17 +2,18 @@ package log
 
 import (
 	"fmt"
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
+	"github.com/nbkit/mdf/internal/zap"
+	"github.com/nbkit/mdf/internal/zap/zapcore"
 	"sync"
 	"time"
 )
 
 type Flow struct {
-	buf   []Field
-	log   Logger
-	level zapcore.Level
-	time  time.Time
+	buf        []Field
+	output     IOutput
+	level      zapcore.Level
+	time       time.Time
+	callerSkip int
 }
 
 var eventPool = &sync.Pool{
@@ -30,53 +31,61 @@ func putEvent(e *Flow) {
 	}
 	eventPool.Put(e)
 }
-func newFlow(level zapcore.Level, log Logger) *Flow {
+func newFlow(level zapcore.Level, output IOutput) *Flow {
 	e := eventPool.Get().(*Flow)
 	e.buf = e.buf[:0]
-	e.log = log
+	e.output = output
 	e.level = level
 	e.time = time.Now()
+	e.callerSkip = 0
 	return e
 }
 
-func (f *Flow) write(msg string) {
+func (f *Flow) write(msg string, fields ...Field) {
+	if len(fields) > 0 {
+		f.buf = append(f.buf, fields...)
+	}
 	switch f.level {
 	case zap.InfoLevel:
-		f.log.Info(msg, f.buf...)
+		f.output.Info(msg, f.buf...)
 		break
 	case zap.WarnLevel:
-		f.log.Warn(msg, f.buf...)
+		f.output.Warn(msg, f.buf...)
 		break
 	case zap.DebugLevel:
-		f.log.Debug(msg, f.buf...)
+		f.output.Debug(msg, f.buf...)
 		break
 	case zap.FatalLevel:
-		f.log.Fatal(msg, f.buf...)
+		f.output.Fatal(msg, f.buf...)
 		break
 	case zap.ErrorLevel:
-		f.log.Error(msg, f.buf...)
+		f.output.Error(msg, f.buf...)
 		break
 	default:
-		f.log.Error(msg, f.buf...)
+		f.output.Error(msg, f.buf...)
 		break
 	}
 	putEvent(f)
 }
 
 func (f *Flow) Enabled() bool {
-	return f != nil && f.log.getLevel().Enabled(f.level)
+	return f != nil && f.output.GetLevel().Enabled(f.level)
 }
-func (f *Flow) Output() {
+func (f *Flow) Output(msg ...interface{}) {
 	if f == nil {
 		return
 	}
-	f.write("")
+	if len(msg) > 0 {
+		f.write(fmt.Sprint(msg...))
+	} else {
+		f.write("")
+	}
 }
-func (f *Flow) Msg(msg string) {
+func (f *Flow) Msg(msg string, fields ...Field) {
 	if f == nil {
 		return
 	}
-	f.write(msg)
+	f.write(msg, fields...)
 }
 
 // Msgf sends the event with formatted msg added as the message field if not empty.
@@ -90,20 +99,25 @@ func (f *Flow) Msgf(format string, v ...interface{}) {
 	f.write(fmt.Sprintf(format, v...))
 }
 
+func (f *Flow) CallerSkip(skip int) *Flow {
+	f.callerSkip = skip
+	return f
+}
+
 func (f *Flow) Latency() *Flow {
 	f.buf = append(f.buf, zap.Duration(LatencyFieldName, time.Now().Sub(f.time)))
 	f.time = time.Now()
 	return f
 }
-func (f *Flow) Error(msg interface{}) error {
+func (f *Flow) Error(msg interface{}, fields ...Field) error {
 	if ev, ok := msg.(error); ok {
-		f.write(ev.Error())
+		f.write(ev.Error(), fields...)
 		return ev
 	} else if ev, ok := msg.(string); ok {
-		f.write(ev)
+		f.write(ev, fields...)
 		return fmt.Errorf(ev)
 	}
-	f.write(fmt.Sprint(msg))
+	f.write(fmt.Sprint(msg), fields...)
 	return fmt.Errorf(fmt.Sprint(msg))
 }
 func (f *Flow) Bool(key string, val bool) *Flow {
@@ -185,5 +199,9 @@ func (f *Flow) Duration(key string, val time.Duration) *Flow {
 }
 func (f *Flow) Any(key string, val interface{}) *Flow {
 	f.buf = append(f.buf, zap.Any(key, val))
+	return f
+}
+func (f *Flow) StackSkip(key string, skip int) *Flow {
+	f.buf = append(f.buf, zap.StackSkip(key, skip))
 	return f
 }

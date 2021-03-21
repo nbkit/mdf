@@ -13,14 +13,6 @@ import (
 	"github.com/nbkit/mdf/utils"
 )
 
-//字段关联关系
-const (
-	KIND_TYPE_MANY_TO_MANT = "many_to_many"
-	KIND_TYPE_HAS_MANT     = "has_many"
-	KIND_TYPE_HAS_ONE      = "has_one"
-	KIND_TYPE_BELONGS_TO   = "belongs_to"
-)
-
 type MD interface {
 	MD() *Mder
 }
@@ -53,7 +45,7 @@ func (m *md) GetEntity() *MDEntity {
 	item := MDEntity{}
 	query := db.Default().Model(item).Preload("Fields").Order("id").Where("id=?", mdInfo.ID)
 	if err := query.Take(&item).Error; err != nil {
-		log.Error(err)
+		log.ErrorD(err)
 	} else {
 		return &item
 	}
@@ -122,7 +114,7 @@ func (m *md) Migrate() {
 		return
 	}
 	if mdInfo.ID == "" {
-		log.Error("元数据ID为空", log.String("Name", mdInfo.Name))
+		log.Error().String("Name", mdInfo.Name).Msg("元数据ID为空")
 		return
 	}
 	scope := db.Default().NewScope(m.Value)
@@ -166,15 +158,32 @@ func (m *md) Migrate() {
 		}
 	}
 	if entity == nil {
-		log.Error("元数据ID为空", log.String("Name", mdInfo.Name))
+		log.Error().String("Name", mdInfo.Name).Msg("元数据ID为空")
 		return
 	}
 	codes := make([]string, 0)
 	for _, field := range scope.GetModelStruct().StructFields {
-		newField := MDField{Code: field.Name, DbName: field.DBName, IsPrimaryKey: utils.ToSBool(field.IsPrimaryKey), IsNormal: utils.ToSBool(field.IsNormal), Name: field.TagSettings["NAME"], EntityID: entity.ID}
 		if field.IsIgnored {
 			continue
 		}
+
+		newField := MDField{
+			Code:         field.Name,
+			DbName:       field.DBName,
+			IsPrimaryKey: utils.ToSBool(field.IsPrimaryKey),
+			IsNormal:     utils.ToSBool(field.IsNormal),
+			Name:         field.TagSettings["NAME"],
+			EntityID:     entity.ID,
+			Tags:         field.TagSettings["TAG"],
+			DefaultValue: field.TagSettings["DEFAULT"],
+		}
+		if size, ok := field.TagSettings["SIZE"]; ok {
+			newField.Length = utils.ToInt(size)
+		}
+		if _, ok := field.TagSettings["NOT NULL"]; ok {
+			newField.Nullable = utils.SBool_False
+		}
+
 		if newField.Name == "" {
 			newField.Name = newField.Code
 		}
@@ -228,6 +237,9 @@ func (m *md) Migrate() {
 			if oldField.Name != newField.Name {
 				updates["Name"] = newField.Name
 			}
+			if oldField.Length != newField.Length {
+				updates["Length"] = newField.Length
+			}
 			if oldField.DbName != newField.DbName {
 				updates["DbName"] = newField.DbName
 			}
@@ -252,11 +264,20 @@ func (m *md) Migrate() {
 			if oldField.TypeType != newField.TypeType {
 				updates["TypeType"] = newField.TypeType
 			}
+			if oldField.DefaultValue != newField.DefaultValue {
+				updates["DefaultValue"] = newField.DefaultValue
+			}
+			if oldField.Nullable.NotEqual(newField.Nullable) {
+				updates["Nullable"] = newField.Nullable
+			}
 			if oldField.Limit != newField.Limit {
 				updates["Limit"] = newField.Limit
 			}
 			if oldField.SrcID != newField.SrcID && newField.SrcID != "" {
 				updates["SrcID"] = newField.SrcID
+			}
+			if oldField.Tags != newField.Tags {
+				updates["Tags"] = newField.Tags
 			}
 			if len(updates) > 0 {
 				db.Default().Model(MDField{}).Where("id=?", oldField.ID).Updates(updates)

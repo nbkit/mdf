@@ -90,7 +90,7 @@ func (s *mdSvImpl) UpdateOrCreateEnum(enum MDEnum) (*MDEnum, error) {
 	}
 	db.Default().Model(entity).Where("id=?", enum.EntityID).Order("id").Take(&entity)
 	if entity.ID == "" {
-		return nil, log.Error("找不到枚举类型！")
+		return nil, log.ErrorD("找不到枚举类型！")
 	}
 	old := MDEnum{}
 	if db.Default().Where("entity_id=? and id=?", enum.EntityID, enum.ID).Order("id").Take(&old).RecordNotFound() {

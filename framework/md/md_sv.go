@@ -80,10 +80,10 @@ func (s *mdSvImpl) Migrate(values ...interface{}) {
 		s.initMDCompleted = true
 		mds := []interface{}{
 			&MDEntity{}, &MDEntityRelation{}, &MDField{}, &MDEnum{},
-			&MDActionCommand{}, &MDActionRule{},
+			&MDAction{}, &MDRule{},
 			&MDWidget{}, &MDWidgetDs{}, &MDWidgetLayout{}, &MDWidgetItem{},
 			&MDToolbars{}, &MDToolbarItem{},
-			&MDActionCommand{}, &MDActionRule{},
+			&MDAction{}, &MDRule{},
 			&MDFilters{}, &MDFilterSolution{}, &MDFilterItem{},
 		}
 		needDb := make([]interface{}, 0)
@@ -94,7 +94,7 @@ func (s *mdSvImpl) Migrate(values ...interface{}) {
 			}
 		}
 		db.Default().AutoMigrate(needDb...)
-		log.Error("AutoMigrate MD")
+		log.Print("AutoMigrate MD")
 		for _, v := range mds {
 			m := newMd(v)
 			m.Migrate()
@@ -112,7 +112,7 @@ func (s *mdSvImpl) Migrate(values ...interface{}) {
 			m.Migrate()
 		}
 		if err := db.Default().AutoMigrate(needDb...).Error; err != nil {
-			log.Error(err)
+			log.ErrorD(err)
 		}
 	}
 
@@ -165,7 +165,7 @@ func (s *mdSvImpl) createTable(item MDEntity) {
 	}
 	var tableOptions string
 	if err := db.Default().Exec(fmt.Sprintf("CREATE TABLE %v (%v %v)%s", s.quote(item.TableName), strings.Join(tags, ","), primaryKeyStr, tableOptions)).Error; err != nil {
-		log.Error(err)
+		log.ErrorD(err)
 	}
 }
 func (s *mdSvImpl) quote(str string) string {
@@ -194,12 +194,12 @@ func (s *mdSvImpl) updateTable(item MDEntity, old MDEntity) {
 			//修改字段类型、类型长度、默认值、注释
 			if oldString != newString && strings.Contains(item.Tags, "update") {
 				if err := db.Default().Exec(fmt.Sprintf("ALTER TABLE %v MODIFY %v", s.quote(item.TableName), newString)).Error; err != nil {
-					log.Error(err)
+					log.ErrorD(err)
 				}
 			}
 		} else { //新增字段
 			if err := db.Default().Exec(fmt.Sprintf("ALTER TABLE %v ADD %v", s.quote(item.TableName), newString)).Error; err != nil {
-				log.Error(err)
+				log.ErrorD(err)
 			}
 		}
 	}

@@ -9,10 +9,6 @@ import (
 	"github.com/nbkit/mdf/utils"
 )
 
-const (
-	md_domain string = "md"
-)
-
 type MDEntity struct {
 	ID        string     `gorm:"primary_key;size:50" json:"id"`
 	CreatedAt utils.Time `gorm:"name:创建时间" json:"created_at"`
@@ -126,7 +122,7 @@ func (s MDField) CompileValue(value interface{}) interface{} {
 	}
 	if s.TypeID == utils.FIELD_TYPE_DECIMAL {
 		if v, err := decimal.NewFromString(utils.ToString(value)); err != nil {
-			return log.Error(err)
+			return log.ErrorD(err)
 		} else {
 			return v
 		}

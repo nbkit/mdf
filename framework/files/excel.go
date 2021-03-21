@@ -206,7 +206,7 @@ func (s *ExcelSv) getSheetData(xlsx *excelize.File, sheetName string) ([]ImportD
 				isData = true
 				for c, value := range row {
 					if cName, ok := colsMap[c]; ok && cName != "" {
-						if cName == utils.STATE_FIELD && value == utils.STATE_IGNORED {
+						if cName == utils.STATE_FIELD && (value == utils.STATE_IGNORED || value == "-") {
 							isData = false
 							break
 						}
@@ -329,8 +329,7 @@ func (s *ExcelSv) ToExcel(data *ToExcel) (*FileData, error) {
 	utils.CreatePath(fileData.Dir)
 	fileData.FullPath = utils.JoinCurrentPath(path.Join(fileData.Dir, fileData.FileName))
 	if err := xlsx.SaveAs(fileData.FullPath); err != nil {
-		log.Error(err)
-		return nil, err
+		return nil, log.ErrorD(err)
 	}
 	return &fileData, nil
 }

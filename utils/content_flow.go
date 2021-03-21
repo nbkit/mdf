@@ -28,10 +28,10 @@ func (s *FlowContext) Bind(c *gin.Context) *FlowContext {
 	s.c = c
 	//bind req
 	if err := c.Bind(s.Request); err != nil {
-		log.Error(err)
+		log.ErrorD(err)
 	}
 	if form, err := c.MultipartForm(); err != nil {
-		log.Error(err)
+		log.ErrorD(err)
 	} else if form != nil && form.File != nil {
 		s.Request.Files = form.File["files"]
 	}

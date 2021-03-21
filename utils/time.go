@@ -22,6 +22,16 @@ const (
 	Layout_YYYYMMDD2       = "20060102"
 )
 
+var timeFormatMap map[string]string
+
+func init() {
+	timeFormatMap = make(map[string]string)
+	timeFormatMap["YYMM"] = "0601"
+	timeFormatMap["YYYYMM"] = "20060102"
+}
+func TimeFormatStr(format string) string {
+	return timeFormatMap[format]
+}
 func TimeNow() Time {
 	return ToTime(time.Now())
 }
@@ -54,7 +64,7 @@ func ToTime(value interface{}) Time {
 		}
 		now, err := time.ParseInLocation(layout, string(data), time.Local)
 		if err != nil {
-			log.Error(err)
+			log.Print("string to ToTime failed", err)
 		}
 		return Time{now}
 	}

@@ -24,33 +24,27 @@ func IsDebugging() bool {
 var DebugPrintRouteFunc func(httpMethod, absolutePath, handlerName string, nuHandlers int)
 
 func debugPrintRoute(httpMethod, absolutePath string, handlers HandlersChain) {
-	if IsDebugging() {
-		nuHandlers := len(handlers)
-		handlerName := nameOfFunction(handlers.Last())
-		if DebugPrintRouteFunc == nil {
-			debugPrint("%-6s %-25s --> %s (%d handlers)\n", httpMethod, absolutePath, handlerName, nuHandlers)
-		} else {
-			DebugPrintRouteFunc(httpMethod, absolutePath, handlerName, nuHandlers)
-		}
+	nuHandlers := len(handlers)
+	handlerName := nameOfFunction(handlers.Last())
+	if DebugPrintRouteFunc == nil {
+		debugPrint("%-6s %-25s --> %s (%d handlers)\n", httpMethod, absolutePath, handlerName, nuHandlers)
+	} else {
+		DebugPrintRouteFunc(httpMethod, absolutePath, handlerName, nuHandlers)
 	}
 }
 
 func debugPrintLoadTemplate(tmpl *template.Template) {
-	if IsDebugging() {
-		var buf strings.Builder
-		for _, tmpl := range tmpl.Templates() {
-			buf.WriteString("\t- ")
-			buf.WriteString(tmpl.Name())
-			buf.WriteString("\n")
-		}
-		debugPrint("Loaded HTML Templates (%d): %s", len(tmpl.Templates()), buf.String())
+	var buf strings.Builder
+	for _, tmpl := range tmpl.Templates() {
+		buf.WriteString("\t- ")
+		buf.WriteString(tmpl.Name())
+		buf.WriteString("\n")
 	}
+	debugPrint("Loaded HTML Templates (%d) : %s", len(tmpl.Templates()), buf.String())
 }
 
 func debugPrint(format string, values ...interface{}) {
-	if IsDebugging() {
-		log.InfoF(format, values...)
-	}
+	log.Info().Msgf(format, values...)
 }
 
 func getMinVer(v string) (uint64, error) {
@@ -66,24 +60,20 @@ func debugPrintWARNINGDefault() {
 	if v, e := getMinVer(runtime.Version()); e == nil && v <= ginSupportMinGoVer {
 		debugPrint(`Now Gin requires Go 1.12+.`)
 	}
-	debugPrint(`Creating an Engine instance with the Logger and Recovery middleware already attached.
+	debugPrint(`Creating an Engine instance with the IOutput and Recovery middleware already attached.
 
 `)
 }
 
 func debugPrintWARNINGNew() {
-	debugPrint(`Running in "debug" mode. Switch to "release" mode in production.
- - using env:	export GIN_MODE=release
- - using code:	gin.SetMode(gin.ReleaseMode)
-
-`)
+	log.Info().Msgf(`Running in %s mode`, modeName)
 }
 
 func debugPrintWARNINGSetHTMLTemplate() {
 	debugPrint(`Since SetHTMLTemplate() is NOT thread-safe. It should only be called
 at initialization. ie. before any route is registered or the router is listening in a socket:
 
-	router := gin.Default()
+	router := gin.defaultOutput()
 	router.SetHTMLTemplate(template) // << good place
 
 `)

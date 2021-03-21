@@ -6,14 +6,17 @@ import (
 )
 
 type commonSave struct {
+	register *md.MDAction
 }
 
 func newCommonSave() *commonSave {
-	return &commonSave{}
+	return &commonSave{
+		register: &md.MDAction{Code: "save", Widget: "common"},
+	}
 }
 
-func (s *commonSave) Register() md.RuleRegister {
-	return md.RuleRegister{Code: "save", Widget: "common"}
+func (s *commonSave) Register() *md.MDAction {
+	return s.register
 }
 
 func (s *commonSave) Exec(flow *utils.FlowContext) {

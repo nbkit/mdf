@@ -5,6 +5,7 @@ import (
 )
 
 func main() {
-	server := bootstrap.NewServer()
+	server := bootstrap.NewServer(bootstrap.Option{})
+	server.Cache().Upgrade().Cache()
 	server.Start()
 }

@@ -2,35 +2,27 @@ package md
 
 import (
 	"fmt"
-	"github.com/nbkit/mdf/db"
 	"github.com/nbkit/mdf/log"
 	"github.com/nbkit/mdf/utils"
 	"sort"
 )
 
-// 注册器
-type RuleRegister struct {
-	Domain string //领域：
-	Code   string //规则编码：save,delete,query,find
-	Widget string //规则拥有者：common,widgetID,entityID
-}
-
-func (s RuleRegister) GetKey() string {
-	return fmt.Sprintf("%s:%s", s.Widget, s.Code)
-}
-
 /**
 规则通用接口
 */
-type IActionRule interface {
+
+type IAction interface {
 	Exec(flow *utils.FlowContext)
-	Register() RuleRegister
+	Register() *MDAction
+}
+type IRule interface {
+	Exec(flow *utils.FlowContext)
+	Register() *MDRule
 }
 type IActionSv interface {
 	DoAction(flow *utils.FlowContext) *utils.FlowContext
-	RegisterRule(rules ...IActionRule)
-	RegisterAction(rules ...IActionRule)
-	Cache()
+	RegisterRule(rules ...IRule)
+	RegisterAction(rules ...IAction)
 }
 
 func ActionSv() IActionSv {
@@ -40,53 +32,61 @@ func ActionSv() IActionSv {
 var mdCommonTag string = "common"
 
 type actionSvImpl struct {
-	rules   map[string]IActionRule
-	actions map[string]IActionRule
-
-	mdRules map[string]*MDActionRule
+	rules   map[string]IRule
+	actions map[string]IAction
 }
 
 var actionSv IActionSv = newActionSvImpl()
 
 func newActionSvImpl() *actionSvImpl {
 	return &actionSvImpl{
-		rules:   make(map[string]IActionRule),
-		actions: make(map[string]IActionRule),
-		mdRules: make(map[string]*MDActionRule),
+		rules:   make(map[string]IRule),
+		actions: make(map[string]IAction),
 	}
 }
-func (s actionSvImpl) GetRule(reg RuleRegister) (IActionRule, bool) {
-	if r, ok := s.rules[reg.GetKey()]; ok {
-		return r, ok
+func (s actionSvImpl) getAction(flow *utils.FlowContext) IAction {
+	key := fmt.Sprintf("%s:%s", flow.Request.Widget, flow.Request.Action)
+	if r, ok := s.actions[key]; ok {
+		return r
 	}
-	return nil, false
-}
-
-func (s actionSvImpl) GetAction(reg RuleRegister) (IActionRule, bool) {
-	if r, ok := s.actions[reg.GetKey()]; ok {
-		return r, ok
+	key = fmt.Sprintf("%s:%s", mdCommonTag, flow.Request.Action)
+	if r, ok := s.actions[key]; ok {
+		return r
 	}
-	return nil, false
+	return nil
 }
-
-func (s *actionSvImpl) Cache() {
-	s.mdRules = make(map[string]*MDActionRule)
-	ruleDatas := make([]MDActionRule, 0)
-	db.Default().Where("enabled=1").Find(&ruleDatas)
-	for i, _ := range ruleDatas {
-		rule := ruleDatas[i]
-		s.mdRules[fmt.Sprintf("%s:%s:%s", rule.Widget, rule.Action, rule.Code)] = &rule
+func (s *actionSvImpl) getRules(flow *utils.FlowContext) []IRule {
+	ruleList := make([]IRule, 0)
+	if len(s.rules) == 0 {
+		return ruleList
 	}
-}
-func (s *actionSvImpl) getActionRule(flow *utils.FlowContext) []MDActionRule {
-	ruleList := make([]MDActionRule, 0)
-	for _, r := range s.mdRules {
-		if r.Action == flow.Request.Action && (r.Widget == mdCommonTag || r.Widget == flow.Request.Widget) {
-			ruleList = append(ruleList, *r)
+	replacedList := make(map[string]IRule)
+	for i, _ := range s.rules {
+		rule := s.rules[i]
+		g := rule.Register()
+		if g.Action != flow.Request.Action {
+			continue
+		}
+		if g.Replaced != "" {
+			replacedList[g.Replaced] = rule
+		}
+	}
+	for i, _ := range s.rules {
+		rule := s.rules[i]
+		g := rule.Register()
+		if g.Action != flow.Request.Action {
+			continue
+		}
+		if replaced, ok := replacedList[fmt.Sprintf("%s:%s", g.Widget, g.Code)]; ok {
+			log.Error().Any("replaced", replaced.Register().Code).Msg("规则被替换")
+			continue
+		}
+		if g.Widget == mdCommonTag || g.Widget == flow.Request.Widget {
+			ruleList = append(ruleList, rule)
 		}
 	}
 	sort.Slice(ruleList, func(i, j int) bool {
-		return ruleList[i].Sequence < ruleList[i].Sequence
+		return ruleList[i].Register().Sequence < ruleList[i].Register().Sequence
 	})
 	return ruleList
 }
@@ -94,45 +94,14 @@ func (s *actionSvImpl) getActionRule(flow *utils.FlowContext) []MDActionRule {
 //执行命令
 func (s actionSvImpl) DoAction(flow *utils.FlowContext) *utils.FlowContext {
 	// 查找动作执行
-	var action IActionRule
-	if a, ok := s.GetAction(RuleRegister{Widget: flow.Request.Widget, Code: flow.Request.Action}); ok {
-		action = a
-	}
-	if action == nil {
-		if a, ok := s.GetAction(RuleRegister{Widget: mdCommonTag, Code: flow.Request.Action}); ok {
-			action = a
-		}
-	}
-	if action != nil {
+	if action := s.getAction(flow); action != nil {
 		if action.Exec(flow); flow.Error() != nil {
 			return flow
 		}
 	}
 	//执行规则集合
-	rules := make([]IActionRule, 0)
-	ruleDatas := s.getActionRule(flow)
-
-	if len(ruleDatas) > 0 {
-		replacedList := make(map[string]MDActionRule)
-		for _, r := range ruleDatas {
-			if r.Replaced != "" {
-				replacedList[r.Replaced] = r
-			}
-		}
-		for _, r := range ruleDatas {
-			if replaced, ok := replacedList[fmt.Sprintf("%s:%s", r.Widget, r.Code)]; ok {
-				log.Error("规则被替换", log.Any("replaced", replaced.Code))
-				continue
-			}
-			if rule, ok := s.GetRule(RuleRegister{Domain: r.Domain, Widget: r.Widget, Code: r.Code}); ok {
-				rules = append(rules, rule)
-			} else {
-				log.Error("找不到规则", log.Any("rule", r))
-			}
-		}
-	}
-	if len(rules) == 0 {
-		log.Error("没有找到任何规则可执行！")
+	if rules := s.getRules(flow); len(rules) == 0 {
+		log.Error().Msg("没有找到任何规则可执行！")
 	} else {
 		for _, rule := range rules {
 			if rule.Exec(flow); flow.Error() != nil {
@@ -146,7 +115,7 @@ func (s actionSvImpl) DoAction(flow *utils.FlowContext) *utils.FlowContext {
 	}
 	return flow
 }
-func (s actionSvImpl) RegisterRule(rules ...IActionRule) {
+func (s actionSvImpl) RegisterRule(rules ...IRule) {
 	if len(rules) > 0 {
 		for i, _ := range rules {
 			rule := rules[i]
@@ -154,7 +123,7 @@ func (s actionSvImpl) RegisterRule(rules ...IActionRule) {
 		}
 	}
 }
-func (s actionSvImpl) RegisterAction(rules ...IActionRule) {
+func (s actionSvImpl) RegisterAction(rules ...IAction) {
 	if len(rules) > 0 {
 		for i, _ := range rules {
 			rule := rules[i]

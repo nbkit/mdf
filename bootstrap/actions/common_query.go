@@ -6,13 +6,16 @@ import (
 )
 
 type commonQuery struct {
+	register *md.MDAction
 }
 
 func newCommonQuery() *commonQuery {
-	return &commonQuery{}
+	return &commonQuery{
+		register: &md.MDAction{Code: "query", Widget: "common"},
+	}
 }
-func (s *commonQuery) Register() md.RuleRegister {
-	return md.RuleRegister{Code: "query", Widget: "common"}
+func (s *commonQuery) Register() *md.MDAction {
+	return s.register
 }
 
 func (s commonQuery) Exec(flow *utils.FlowContext) {

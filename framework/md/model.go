@@ -7,3 +7,7 @@ type Model struct {
 	CreatedAt utils.Time `gorm:"name:创建时间" json:"created_at"`
 	UpdatedAt utils.Time `gorm:"name:更新时间" json:"updated_at"`
 }
+
+func (s Model) String() string {
+	return s.ID
+}

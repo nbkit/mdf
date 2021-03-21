@@ -8,13 +8,16 @@ import (
 )
 
 type commonQuery struct {
+	register *md.MDRule
 }
 
 func newCommonQuery() *commonQuery {
-	return &commonQuery{}
+	return &commonQuery{
+		register: &md.MDRule{Code: "query", Widget: "common"},
+	}
 }
-func (s *commonQuery) Register() md.RuleRegister {
-	return md.RuleRegister{Code: "query", Widget: "common"}
+func (s *commonQuery) Register() *md.MDRule {
+	return s.register
 }
 
 func (s commonQuery) Exec(flow *utils.FlowContext) {
@@ -89,7 +92,7 @@ func (s commonQuery) loadEntities(datas []map[string]interface{}, entity *md.MDE
 					exector.Where(fmt.Sprintf("%s in ( ? )", f.AssociationKey), ids)
 					refDatas := make([]map[string]interface{}, 0)
 					if err := exector.Find(&refDatas).Error(); err != nil {
-						log.Error(err)
+						log.ErrorD(err)
 					} else if len(refDatas) > 0 {
 						dataMap := make(map[string]interface{})
 						for i, _ := range refDatas {

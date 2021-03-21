@@ -13,13 +13,16 @@ import (
 )
 
 type commonImport struct {
+	register *md.MDRule
 }
 
 func newCommonImport() *commonImport {
-	return &commonImport{}
+	return &commonImport{
+		register: &md.MDRule{Code: "import", Widget: "common"},
+	}
 }
-func (s *commonImport) Register() md.RuleRegister {
-	return md.RuleRegister{Code: "import", Widget: "common"}
+func (s *commonImport) Register() *md.MDRule {
+	return s.register
 }
 func (s *commonImport) Exec(flow *utils.FlowContext) {
 	logData := model.Log{EntID: flow.EntID(), UserID: flow.UserID(), NodeType: flow.Request.Widget, NodeID: flow.Request.Widget, DataID: flow.Request.Entity}
