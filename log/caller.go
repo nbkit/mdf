@@ -9,7 +9,7 @@ func (f optionFunc) Apply(log *zap.Logger) {
 	f(log)
 }
 
-func CallerSkip(skip int) zap.Option {
+func callerSkip(skip int) zap.Option {
 	return optionFunc(func(log *zap.Logger) {
 		log.CallerSkip += skip
 	})

@@ -47,22 +47,22 @@ func (f *Flow) write(msg string, fields ...Field) {
 	}
 	switch f.level {
 	case zap.InfoLevel:
-		f.output.Info(msg, f.buf...)
+		f.output.Clone(callerSkip(f.callerSkip)).Info(msg, f.buf...)
 		break
 	case zap.WarnLevel:
-		f.output.Warn(msg, f.buf...)
+		f.output.Clone(callerSkip(f.callerSkip)).Warn(msg, f.buf...)
 		break
 	case zap.DebugLevel:
-		f.output.Debug(msg, f.buf...)
+		f.output.Clone(callerSkip(f.callerSkip)).Debug(msg, f.buf...)
 		break
 	case zap.FatalLevel:
-		f.output.Fatal(msg, f.buf...)
+		f.output.Clone(callerSkip(f.callerSkip)).Fatal(msg, f.buf...)
 		break
 	case zap.ErrorLevel:
-		f.output.Error(msg, f.buf...)
+		f.output.Clone(callerSkip(f.callerSkip)).Error(msg, f.buf...)
 		break
 	default:
-		f.output.Error(msg, f.buf...)
+		f.output.Clone(callerSkip(f.callerSkip)).Error(msg, f.buf...)
 		break
 	}
 	putEvent(f)

@@ -44,7 +44,7 @@ func debugPrintLoadTemplate(tmpl *template.Template) {
 }
 
 func debugPrint(format string, values ...interface{}) {
-	log.Info().Msgf(format, values...)
+	log.Info().CallerSkip(1).Msgf(format, values...)
 }
 
 func getMinVer(v string) (uint64, error) {
@@ -66,7 +66,7 @@ func debugPrintWARNINGDefault() {
 }
 
 func debugPrintWARNINGNew() {
-	log.Info().Msgf(`Running in %s mode`, modeName)
+	log.Info().CallerSkip(1).Msgf(`Running in %s mode`, modeName)
 }
 
 func debugPrintWARNINGSetHTMLTemplate() {

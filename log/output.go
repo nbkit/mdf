@@ -13,6 +13,7 @@ import (
 type IOutput interface {
 	SetLevel(tag string)
 	GetLevel() Level
+	Clone(opts ...zap.Option) IOutput
 	Debug(msg string, fields ...Field)
 	Info(msg string, fields ...Field)
 	Warn(msg string, fields ...Field)
@@ -75,7 +76,7 @@ func createDefaultOutput(args ...string) IOutput {
 		zapcore.NewCore(encoderConsole, zapcore.AddSync(os.Stdout), logLevel), //打印到控制台
 		zapcore.NewCore(encoderFile, zapcore.AddSync(&fileLogger), logLevel),
 	)
-	log := zap.New(core, zap.AddCaller(), zap.AddCallerSkip(2))
+	log := zap.New(core, zap.AddCaller(), zap.AddCallerSkip(3))
 	l := &DefaultOutput{
 		level: logLevel,
 		log:   log,
@@ -83,6 +84,11 @@ func createDefaultOutput(args ...string) IOutput {
 	return l
 }
 
+func (s *DefaultOutput) Clone(opts ...zap.Option) IOutput {
+	copy := *s
+	copy.log = copy.log.WithOptions(opts...)
+	return &copy
+}
 func (s *DefaultOutput) SetLevel(tag string) {
 	s.level.SetLevel(getLevelByTag(tag))
 }
@@ -100,7 +106,7 @@ func (s *DefaultOutput) Debug(msg string, fields ...Field) {
 // Info logs a message at InfoLevel. The message includes any fields passed
 // at the output site, as well as any fields accumulated on the DefaultOutput.
 func (s *DefaultOutput) Info(msg string, fields ...Field) {
-	s.log.WithOptions(CallerSkip(1)).Info(msg, fields...)
+	s.log.Info(msg, fields...)
 }
 
 // Warn logs a message at WarnLevel. The message includes any fields passed

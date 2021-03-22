@@ -129,7 +129,7 @@ type Logger struct {
 
 // Print format & print log
 func (logger Logger) Print(values ...interface{}) {
-	log.Info().Output(LogFormatter(values...)...)
+	log.Info().CallerSkip(7).Output(LogFormatter(values...)...)
 
 }
 
