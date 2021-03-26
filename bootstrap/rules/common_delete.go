@@ -14,7 +14,7 @@ type CommonDelete struct {
 
 func newCommonDelete() *CommonDelete {
 	return &CommonDelete{
-		register: &md.MDRule{Code: "delete", Widget: "common"},
+		register: &md.MDRule{Action: "delete", Code: "delete", Widget: "common", Sequence: 50},
 	}
 }
 

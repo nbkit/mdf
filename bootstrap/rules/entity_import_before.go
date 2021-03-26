@@ -13,7 +13,7 @@ type entityImportBefore struct {
 
 func newEntityImportBefore() *entityImportBefore {
 	return &entityImportBefore{
-		register: &md.MDRule{Code: "import.before", Widget: "md"},
+		register: &md.MDRule{Action: "import", Code: "import.before", Widget: "md", Sequence: 20},
 	}
 }
 func (s *entityImportBefore) Register() *md.MDRule {

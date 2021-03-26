@@ -11,7 +11,7 @@ type commonQuery struct {
 
 func newCommonQuery() *commonQuery {
 	return &commonQuery{
-		register: &md.MDAction{Code: "query", Widget: "common"},
+		register: &md.MDAction{Code: "query", Widget: "common", Action: "query"},
 	}
 }
 func (s *commonQuery) Register() *md.MDAction {

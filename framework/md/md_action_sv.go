@@ -86,7 +86,7 @@ func (s *actionSvImpl) getRules(flow *utils.FlowContext) []IRule {
 		}
 	}
 	sort.Slice(ruleList, func(i, j int) bool {
-		return ruleList[i].Register().Sequence < ruleList[i].Register().Sequence
+		return ruleList[i].Register().Sequence < ruleList[j].Register().Sequence
 	})
 	return ruleList
 }

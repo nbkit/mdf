@@ -18,7 +18,7 @@ type commonImport struct {
 
 func newCommonImport() *commonImport {
 	return &commonImport{
-		register: &md.MDRule{Code: "import", Widget: "common"},
+		register: &md.MDRule{Action: "import", Code: "import", Widget: "common", Sequence: 50},
 	}
 }
 func (s *commonImport) Register() *md.MDRule {

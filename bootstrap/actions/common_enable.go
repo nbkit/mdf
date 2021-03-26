@@ -12,7 +12,7 @@ type commonEnable struct {
 
 func newCommonEnable() *commonEnable {
 	return &commonEnable{
-		register: &md.MDAction{Code: "enable", Widget: "common"},
+		register: &md.MDAction{Code: "enable", Widget: "common", Action: "enable"},
 	}
 }
 

@@ -12,7 +12,7 @@ type commonImport struct {
 
 func newCommonImport() *commonImport {
 	return &commonImport{
-		register: &md.MDAction{Code: "import", Widget: "common"},
+		register: &md.MDAction{Code: "import", Widget: "common", Action: "import"},
 	}
 }
 func (s *commonImport) Register() *md.MDAction {

@@ -13,7 +13,7 @@ type commonQuery struct {
 
 func newCommonQuery() *commonQuery {
 	return &commonQuery{
-		register: &md.MDRule{Code: "query", Widget: "common"},
+		register: &md.MDRule{Action: "query", Code: "query", Widget: "common", Sequence: 50},
 	}
 }
 func (s *commonQuery) Register() *md.MDRule {

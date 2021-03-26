@@ -14,7 +14,7 @@ type commonEnable struct {
 
 func newCommonEnable() *commonEnable {
 	return &commonEnable{
-		register: &md.MDRule{Code: "enable", Widget: "common"},
+		register: &md.MDRule{Action: "enable", Code: "enable", Widget: "common", Sequence: 50},
 	}
 }
 

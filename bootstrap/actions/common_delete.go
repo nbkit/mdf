@@ -11,7 +11,7 @@ type CommonDelete struct {
 
 func newCommonDelete() *CommonDelete {
 	return &CommonDelete{
-		register: &md.MDAction{Code: "delete", Widget: "common"},
+		register: &md.MDAction{Code: "delete", Widget: "common", Action: "delete"},
 	}
 }
 func (s CommonDelete) Register() *md.MDAction {

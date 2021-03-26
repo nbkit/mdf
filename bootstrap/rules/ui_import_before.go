@@ -14,7 +14,7 @@ type uiImportBefore struct {
 
 func newUiImportBefore() *uiImportBefore {
 	return &uiImportBefore{
-		register: &md.MDRule{Code: "import.before", Widget: "ui"},
+		register: &md.MDRule{Action: "import", Code: "import.before", Widget: "ui", Sequence: 20},
 	}
 }
 func (s *uiImportBefore) Register() *md.MDRule {

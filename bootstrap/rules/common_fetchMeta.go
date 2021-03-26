@@ -11,7 +11,7 @@ type commonFetchMeta struct {
 
 func newCommonFetchMeta() *commonFetchMeta {
 	return &commonFetchMeta{
-		register: &md.MDRule{Code: "fetchMeta", Widget: "common"},
+		register: &md.MDRule{Action: "fetchMeta", Code: "fetchMeta", Widget: "common", Sequence: 50},
 	}
 }
 func (s *commonFetchMeta) Register() *md.MDRule {

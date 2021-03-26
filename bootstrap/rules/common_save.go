@@ -16,7 +16,7 @@ type commonSave struct {
 
 func newCommonSave() *commonSave {
 	return &commonSave{
-		register: &md.MDRule{Code: "save", Widget: "common"},
+		register: &md.MDRule{Action: "save", Code: "save", Widget: "common", Sequence: 50},
 	}
 }
 

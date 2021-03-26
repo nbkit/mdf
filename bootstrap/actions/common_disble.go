@@ -11,7 +11,7 @@ type commonDisable struct {
 
 func newCommonDisable() *commonDisable {
 	return &commonDisable{
-		register: &md.MDAction{Code: "disable", Widget: "common"},
+		register: &md.MDAction{Code: "disable", Widget: "common", Action: "disable"},
 	}
 }
 
