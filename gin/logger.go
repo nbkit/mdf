@@ -75,7 +75,8 @@ type LogFormatterParams struct {
 	// BodySize is the size of the Response Body
 	BodySize int
 	// Keys are the keys set on the request's context.
-	Keys map[string]interface{}
+	Keys    map[string]interface{}
+	Referer string
 }
 
 // StatusCodeColor is the ANSI color for appropriately logging http status code to a terminal.
@@ -136,18 +137,18 @@ var defaultLogFormatter = func(param LogFormatterParams) string {
 		methodColor = param.MethodColor()
 		resetColor = param.ResetColor()
 	}
-
 	if param.Latency > time.Minute {
 		// Truncate in a golang < 1.8 safe way
 		param.Latency = param.Latency - param.Latency%time.Second
 	}
-	return fmt.Sprintf("[GIN] %v |%s %3d %s| %13v | %15s |%s %-7s %s %#v\n%s",
+	return fmt.Sprintf("[HTTP] %v |%s %3d %s| %13v | %15s |%s %-7s %s %#v |%s \n%s",
 		param.TimeStamp.Format("2006/01/02 - 15:04:05"),
 		statusColor, param.StatusCode, resetColor,
 		param.Latency,
 		param.ClientIP,
 		methodColor, param.Method, resetColor,
 		param.Path,
+		param.Referer,
 		param.ErrorMessage,
 	)
 }
@@ -256,7 +257,7 @@ func LoggerWithConfig(conf LoggerConfig) HandlerFunc {
 			param.Method = c.Request.Method
 			param.StatusCode = c.Writer.Status()
 			param.ErrorMessage = c.Errors.ByType(ErrorTypePrivate).String()
-
+			param.Referer = c.Request.Referer()
 			param.BodySize = c.Writer.Size()
 
 			if raw != "" {

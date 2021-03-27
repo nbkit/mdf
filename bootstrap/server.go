@@ -41,6 +41,7 @@ func newServer(option Option) *serverImpl {
 	utils.Config.SetValue("DisabledFeature", option.DisabledFeature)
 	utils.Config.SetValue("DisabledMdf", option.DisabledMdf)
 	gin.SetMode(utils.Config.App.Mode)
+	gin.ForceConsoleColor()
 	ser := &serverImpl{
 		engine:   gin.New(),
 		option:   option,
