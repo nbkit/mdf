@@ -107,6 +107,9 @@ func (s *serverImpl) initContext() {
 		//使用token中间件
 		s.engine.Use(token.Default())
 	}
+	// 日志输出
+	s.engine.Use(gin.Logger())
+
 	if !s.option.DisabledFeature {
 		//注册路由
 		routes.Register(s.engine)
