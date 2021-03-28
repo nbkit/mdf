@@ -1,4 +1,4 @@
-package bootstrap
+package mdf
 
 import (
 	"github.com/nbkit/mdf/db"
