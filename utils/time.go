@@ -22,15 +22,75 @@ const (
 	Layout_YYYYMMDD2       = "20060102"
 )
 
-var timeFormatMap map[string]string
-
-func init() {
-	timeFormatMap = make(map[string]string)
-	timeFormatMap["YYMM"] = "0601"
-	timeFormatMap["YYYYMM"] = "20060102"
+// yyyy-MM-dd HH:mm:ss.SSSSS
+// 2006-01-02T15:04:05.000000
+func formatStrEnd(from int, in string, target rune) (string, int) {
+	var out = new(strings.Builder)
+	for i := from; i < len(in); i++ {
+		r := rune(in[i])
+		from = i
+		if r == target {
+			out.WriteRune(r)
+			if i == len(in)-1 {
+				return out.String(), i + 1
+			}
+			continue
+		}
+		return out.String(), i
+	}
+	return "", from + 1
 }
-func TimeFormatStr(format string) string {
-	return timeFormatMap[format]
+
+// y:年,M:年中的月份
+// w:年中的周数	,W:月份中的周数
+// D:年中的天数,d:月份中的天数
+// H:一天中的小时数（0-23）,m:小时中的分钟数	,s:分钟中的秒数,S:毫秒数
+// yyyy-MM-dd HH:mm:ss.SSSSS
+// 2006-01-02T15:04:05.000000
+func TimeFormatStr(layout string) string {
+	var i = 0
+	var t = new(strings.Builder)
+	for i < len(layout) {
+		c := layout[i]
+		switch c {
+		case 'y': // 年[year]
+			y, endIndex := formatStrEnd(i, layout, 'y')
+			if length := len(y); length > 3 {
+				t.WriteString("2006")
+			} else {
+				t.WriteString("06")
+			}
+			i = endIndex
+		case 'M': // 月[month]
+			_, endIndex := formatStrEnd(i, layout, 'M')
+			t.WriteString("01")
+			i = endIndex
+		case 'd': // 月份中的天数[number]
+			_, endIndex := formatStrEnd(i, layout, 'd')
+			t.WriteString("02")
+			i = endIndex
+		case 'H': // 一天中的小时数，0-23[number]
+			_, endIndex := formatStrEnd(i, layout, 'H')
+			t.WriteString("15")
+			i = endIndex
+		case 'm': // 小时中的分钟数[number]
+			_, endIndex := formatStrEnd(i, layout, 'm')
+			t.WriteString("04")
+			i = endIndex
+		case 's': // 分钟中的秒数[number]
+			_, endIndex := formatStrEnd(i, layout, 's')
+			t.WriteString("05")
+			i = endIndex
+		case 'S': // 毫秒数[number]
+			ss, endIndex := formatStrEnd(i, layout, 'S')
+			t.WriteString(fmt.Sprintf("%0*d", len(ss), 0))
+			i = endIndex
+		default:
+			t.WriteByte(c)
+			i = i + 1
+		}
+	}
+	return t.String()
 }
 func TimeNow() Time {
 	return ToTime(time.Now())
