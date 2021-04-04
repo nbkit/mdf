@@ -34,10 +34,14 @@ type serverImpl struct {
 	entities []interface{}
 }
 
-func NewServer(option Option) Server {
-	return newServer(option)
+func NewServer(options ...Option) Server {
+	return newServer(options...)
 }
-func newServer(option Option) *serverImpl {
+func newServer(options ...Option) *serverImpl {
+	option := Option{DisabledMdf: false, DisabledFeature: false}
+	if len(options) > 0 {
+		option = options[0]
+	}
 	utils.Config.SetValue("DisabledFeature", option.DisabledFeature)
 	utils.Config.SetValue("DisabledMdf", option.DisabledMdf)
 	gin.SetMode(utils.Config.App.Mode)
