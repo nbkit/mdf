@@ -91,9 +91,9 @@ func (s *serverImpl) initContext() {
 		db.Default().DB.DB().SetConnMaxLifetime(0)
 	}
 	//设置模板
-	utils.CreatePath("dist")
-	s.engine.LoadHTMLGlob(utils.JoinCurrentPath("dist/*.html"))
-
+	if utils.PathExists("dist") {
+		s.engine.LoadHTMLGlob(utils.JoinCurrentPath("dist/*.html"))
+	}
 	if s.runArg == "upgrade" || s.runArg == "init" || s.runArg == "debug" {
 		model.Register()
 		initSeedAction()
