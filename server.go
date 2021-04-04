@@ -18,8 +18,7 @@ import (
 )
 
 type Option struct {
-	DisabledMdf     bool
-	DisabledFeature bool
+	EnabledFeature bool
 }
 type Server interface {
 	Upgrade() Server
@@ -38,12 +37,11 @@ func NewServer(options ...Option) Server {
 	return newServer(options...)
 }
 func newServer(options ...Option) *serverImpl {
-	option := Option{DisabledMdf: false, DisabledFeature: false}
+	option := Option{EnabledFeature: false}
 	if len(options) > 0 {
 		option = options[0]
 	}
-	utils.Config.SetValue("DisabledFeature", option.DisabledFeature)
-	utils.Config.SetValue("DisabledMdf", option.DisabledMdf)
+	utils.Config.SetValue("EnabledFeature", option.EnabledFeature)
 	gin.SetMode(utils.Config.App.Mode)
 	gin.ForceConsoleColor()
 	ser := &serverImpl{
@@ -97,25 +95,20 @@ func (s *serverImpl) initContext() {
 	s.engine.LoadHTMLGlob(utils.JoinCurrentPath("dist/*.html"))
 
 	if s.runArg == "upgrade" || s.runArg == "init" || s.runArg == "debug" {
-		if !s.option.DisabledMdf {
-			model.Register()
-		}
-		if !s.option.DisabledMdf {
-			initSeedAction()
-		}
+		model.Register()
+		initSeedAction()
 	}
-	if !s.option.DisabledMdf {
-		//动作注册
-		actions.Register()
-		//规则注册
-		rules.Register()
-		//使用token中间件
-		s.engine.Use(token.Default())
-	}
+	//动作注册
+	actions.Register()
+	//规则 注册
+	rules.Register()
+	//使用token中间件
+	s.engine.Use(token.Default())
+
 	// 日志输出
 	s.engine.Use(gin.Logger())
 
-	if !s.option.DisabledFeature {
+	if s.option.EnabledFeature {
 		//注册路由
 		routes.Register(s.engine)
 	}
@@ -125,7 +118,7 @@ func (s *serverImpl) initContext() {
 	s.Cache()
 }
 func (s *serverImpl) startReg() {
-	if !s.option.DisabledFeature {
+	if s.option.EnabledFeature {
 		go reg.StartServer()
 	}
 }

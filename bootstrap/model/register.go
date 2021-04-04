@@ -9,7 +9,7 @@ import (
 func Register() {
 	//log
 	md.MDSv().Migrate(&Log{})
-	if !utils.Config.GetBool("DisabledFeature") {
+	if utils.Config.GetBool("EnabledFeature") {
 		//sys
 		md.MDSv().Migrate(&Client{}, &AuthToken{}, &CodeRule{}, &CodeValue{})
 		//profile
