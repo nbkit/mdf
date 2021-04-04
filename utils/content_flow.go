@@ -9,7 +9,7 @@ type FlowContext struct {
 	Token    *TokenContext
 	Request  *ReqContext
 	Response *ResContext
-	c        *gin.Context
+	Context  *gin.Context
 }
 
 func NewFlowContext() *FlowContext {
@@ -20,12 +20,12 @@ func (s *FlowContext) Copy() *FlowContext {
 	f := NewFlowContext()
 	f.Request = s.Request.Copy()
 	f.Token = s.Token
-	f.c = s.c
+	f.Context = s.Context
 	return f
 }
 
 func (s *FlowContext) Bind(c *gin.Context) *FlowContext {
-	s.c = c
+	s.Context = c
 	//bind req
 	if err := c.Bind(s.Request); err != nil {
 		log.ErrorD(err)
@@ -38,7 +38,7 @@ func (s *FlowContext) Bind(c *gin.Context) *FlowContext {
 
 	//bind token
 
-	if v, ok := s.c.Get("context"); ok {
+	if v, ok := s.Context.Get("context"); ok {
 		if vv, is := v.(*TokenContext); is {
 			s.Token = vv
 		}
@@ -86,7 +86,7 @@ func (s *FlowContext) Adjust(fn func(req *FlowContext)) *FlowContext {
 }
 
 func (s *FlowContext) Output() {
-	s.Response.Bind(s.c)
+	s.Response.Bind(s.Context)
 }
 func (s *FlowContext) Error(err ...interface{}) error {
 	return s.Response.Error(err...)
