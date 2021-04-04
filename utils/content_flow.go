@@ -45,6 +45,12 @@ func (s *FlowContext) Bind(c *gin.Context) *FlowContext {
 	}
 	return s
 }
+func (s *FlowContext) Param(key string) string {
+	return s.Context.Param(key)
+}
+func (s *FlowContext) Query(key string) string {
+	return s.Context.Query(key)
+}
 
 // Token
 func (s *FlowContext) UserID() string {
