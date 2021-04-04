@@ -51,6 +51,9 @@ func (s *FlowContext) Param(key string) string {
 func (s *FlowContext) Query(key string) string {
 	return s.Context.Query(key)
 }
+func (s *FlowContext) Unmarshal(obj interface{}) error {
+	return s.Context.ShouldBind(obj)
+}
 
 // Token
 func (s *FlowContext) UserID() string {
