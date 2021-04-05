@@ -9,6 +9,7 @@ type MDLog struct {
 	CreatedAt  utils.Time `gorm:"name:创建时间" json:"created_at"`
 	UpdatedAt  utils.Time `gorm:"name:更新时间" json:"updated_at"`
 	EntID      string     `gorm:"size:50;index:idx_ent_type"`
+	OrgID      string     `gorm:"size:50;index:idx_ent_type"`
 	Type       string     `gorm:"not null;size:10;index:idx_ent_type;name:日志类型"` //login,op
 	UserID     string     `gorm:"size:50"`
 	UserName   string     `gorm:"size:50"`
@@ -22,6 +23,8 @@ type MDLog struct {
 	Level      string     `gorm:"size:50" json:"level"` //error,warn,info,debug
 	Status     string     `gorm:"size:36;name:状态" json:"status"`
 	ReqIP      string     `gorm:"size:50"`
+	ReqUrl     string     `gorm:"size:550"`
+	ReqBody    string     `gorm:"type:text"`
 	ReqClient  string     `gorm:"size:50;name:设备" json:"req_client"`
 	ReqAgent   string     `gorm:"size:500"`
 }
@@ -30,6 +33,7 @@ func (s MDLog) Clone() *MDLog {
 	return &MDLog{
 		Type:       s.Type,
 		EntID:      s.EntID,
+		OrgID:      s.OrgID,
 		UserID:     s.UserID,
 		UserName:   s.UserName,
 		Title:      s.Title,
@@ -42,6 +46,9 @@ func (s MDLog) Clone() *MDLog {
 		Level:      s.Level,
 		Status:     s.Status,
 		ReqIP:      s.ReqIP,
+		ReqUrl:     s.ReqUrl,
+		ReqBody:    s.ReqBody,
+		ReqClient:  s.ReqClient,
 		ReqAgent:   s.ReqAgent,
 	}
 }
