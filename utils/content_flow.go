@@ -3,6 +3,7 @@ package utils
 import (
 	"github.com/nbkit/mdf/gin"
 	"github.com/nbkit/mdf/log"
+	"net/http"
 )
 
 type FlowContext struct {
@@ -27,7 +28,7 @@ func (s *FlowContext) Copy() *FlowContext {
 func (s *FlowContext) Bind(c *gin.Context) *FlowContext {
 	s.Context = c
 	//bind req
-	if err := c.Bind(s.Request); err != nil {
+	if err := c.ShouldBind(s.Request); err != nil {
 		log.ErrorD(err)
 	}
 	if form, err := c.MultipartForm(); err != nil {
@@ -51,6 +52,11 @@ func (s *FlowContext) Param(key string) string {
 func (s *FlowContext) Query(key string) string {
 	return s.Context.Query(key)
 }
+
+func (s *FlowContext) Path() string {
+	return s.Context.Request.RequestURI
+}
+
 func (s *FlowContext) Unmarshal(obj interface{}) error {
 	return s.Context.ShouldBind(obj)
 }
@@ -94,6 +100,12 @@ func (s *FlowContext) Adjust(fn func(req *FlowContext)) *FlowContext {
 	return s
 }
 
+func (s *FlowContext) OutputString(format string, values ...interface{}) {
+	s.Context.String(http.StatusOK, format, values...)
+}
+func (s *FlowContext) OutputFile(filePath string) {
+	s.Context.File(filePath)
+}
 func (s *FlowContext) Output() {
 	s.Response.Bind(s.Context)
 }

@@ -24,7 +24,9 @@ type Server interface {
 	Upgrade() Server
 	Cache() Server
 	Start()
-	Use(func(engine *gin.Engine)) Server
+	Use(func(server Server)) Server
+	GetEngine() *gin.Engine
+	GetRunArg() string
 }
 type serverImpl struct {
 	engine   *gin.Engine
@@ -51,7 +53,7 @@ func newServer(options ...Option) *serverImpl {
 	}
 	if os.Args != nil && len(os.Args) > 0 {
 		if len(os.Args) > 1 {
-			ser.runArg = os.Args[1]
+			ser.runArg = os.Args[len(os.Args)-1]
 		}
 	}
 	ser.initContext()
@@ -79,11 +81,18 @@ func (s *serverImpl) Upgrade() Server {
 	}
 	return s
 }
-func (s *serverImpl) Use(done func(engine *gin.Engine)) Server {
+func (s *serverImpl) Use(done func(server Server)) Server {
 	if done != nil {
-		done(s.engine)
+		done(s)
 	}
 	return s
+}
+
+func (s *serverImpl) GetEngine() *gin.Engine {
+	return s.engine
+}
+func (s *serverImpl) GetRunArg() string {
+	return s.runArg
 }
 func (s *serverImpl) initContext() {
 	if utils.Config.Db.Database != "" {
@@ -95,6 +104,7 @@ func (s *serverImpl) initContext() {
 		s.engine.LoadHTMLGlob(utils.JoinCurrentPath("dist/*.html"))
 	}
 	if s.runArg == "upgrade" || s.runArg == "init" || s.runArg == "debug" {
+		md.MDSv().Migrate()
 		model.Register()
 		initSeedAction()
 	}

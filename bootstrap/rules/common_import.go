@@ -2,11 +2,9 @@ package rules
 
 import (
 	"fmt"
-	"github.com/nbkit/mdf/bootstrap/services"
 	"github.com/nbkit/mdf/db"
 	"strings"
 
-	"github.com/nbkit/mdf/bootstrap/model"
 	"github.com/nbkit/mdf/framework/files"
 	"github.com/nbkit/mdf/framework/md"
 	"github.com/nbkit/mdf/utils"
@@ -25,15 +23,15 @@ func (s *commonImport) Register() *md.MDRule {
 	return s.register
 }
 func (s *commonImport) Exec(flow *utils.FlowContext) {
-	logData := model.Log{EntID: flow.EntID(), UserID: flow.UserID(), NodeType: flow.Request.Widget, NodeID: flow.Request.Widget, DataID: flow.Request.Entity}
-	services.LogSv().CreateLog(logData.Clone().SetMsg("导入开始======begin======"))
+	logData := &md.MDLog{EntID: flow.EntID(), UserID: flow.UserID(), NodeType: flow.Request.Widget, NodeID: flow.Request.Widget, DataID: flow.Request.Entity}
+	md.LogSv().CreateLog(logData.Clone().SetMsg("导入开始======begin======"))
 
 	defer func() {
-		services.LogSv().CreateLog(logData.Clone().SetMsg("导入结束"))
+		md.LogSv().CreateLog(logData.Clone().SetMsg("导入结束"))
 	}()
 	if flow.Request.Data == nil {
 		err := flow.Error("没有要导入的数据")
-		services.LogSv().CreateLog(logData.Clone().SetMsg(err))
+		md.LogSv().CreateLog(logData.Clone().SetMsg(err))
 		return
 	}
 	data := flow.Request.Data
@@ -46,8 +44,8 @@ func (s *commonImport) Exec(flow *utils.FlowContext) {
 	}
 }
 func (s *commonImport) importMapData(flow *utils.FlowContext, data files.ImportData) {
-	log := services.LogSv()
-	logData := model.Log{EntID: flow.EntID(), UserID: flow.UserID(), NodeType: flow.Request.Widget, NodeID: flow.Request.Widget, DataID: flow.Request.Entity}
+	log := md.LogSv()
+	logData := &md.MDLog{EntID: flow.EntID(), UserID: flow.UserID(), NodeType: flow.Request.Widget, NodeID: flow.Request.Widget, DataID: flow.Request.Entity}
 	log.CreateLog(logData.Clone().SetMsg(fmt.Sprintf("接收到需要导入的数据-%s：%v条", flow.Request.Entity, len(data.Data))))
 
 	entity := md.MDSv().GetEntity(data.EntityCode)

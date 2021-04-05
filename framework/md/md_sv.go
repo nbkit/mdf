@@ -85,6 +85,7 @@ func (s *mdSvImpl) Migrate(values ...interface{}) {
 			&MDToolbars{}, &MDToolbarItem{},
 			&MDAction{}, &MDRule{},
 			&MDFilters{}, &MDFilterSolution{}, &MDFilterItem{},
+			&MDLog{},
 		}
 		needDb := make([]interface{}, 0)
 		for _, v := range mds {

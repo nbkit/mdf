@@ -7,8 +7,6 @@ import (
 
 // 注册数据模型,提供数据层，按模块注册数据模型
 func Register() {
-	//log
-	md.MDSv().Migrate(&Log{})
 	if utils.Config.GetBool("EnabledFeature") {
 		//sys
 		md.MDSv().Migrate(&Client{}, &AuthToken{}, &CodeRule{}, &CodeValue{})

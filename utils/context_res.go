@@ -92,6 +92,7 @@ func (s *ResContext) Bind(c *gin.Context) {
 		c.JSON(http.StatusOK, s.data)
 	}
 }
+
 func (s *ResContext) Adjust(fn func(res *ResContext)) *ResContext {
 	fn(s)
 	return s
