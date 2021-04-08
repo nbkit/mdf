@@ -44,6 +44,7 @@ func (s *commonImport) Exec(flow *utils.FlowContext) {
 	}
 }
 func (s *commonImport) importMapData(flow *utils.FlowContext, data files.ImportData) {
+
 	log := md.LogSv()
 	logData := &md.MDLog{EntID: flow.EntID(), UserID: flow.UserID(), NodeType: flow.Request.Widget, NodeID: flow.Request.Widget, DataID: flow.Request.Entity}
 	log.CreateLog(logData.Clone().SetMsg(fmt.Sprintf("接收到需要导入的数据-%s：%v条", flow.Request.Entity, len(data.Data))))
@@ -53,7 +54,7 @@ func (s *commonImport) importMapData(flow *utils.FlowContext, data files.ImportD
 		entity = md.MDSv().GetEntity(flow.Request.Entity)
 	}
 	if entity == nil {
-		flow.Error("没有配置导入实体")
+		log.CreateLog(logData.Clone().SetMsg(fmt.Sprintf("没有配置导入实体，请确认是否需要导入,%v", data.SheetName)))
 		return
 	}
 	dbDatas := make([]map[string]interface{}, 0)
