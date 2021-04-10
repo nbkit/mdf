@@ -700,6 +700,9 @@ func (c *Context) ShouldBindUri(obj interface{}) error {
 // ShouldBindWith binds the passed struct pointer using the specified binding engine.
 // See the binding package.
 func (c *Context) ShouldBindWith(obj interface{}, b binding.Binding) error {
+	if body, ok := b.(binding.BindingBody); ok {
+		return c.ShouldBindBodyWith(obj, body)
+	}
 	return b.Bind(c.Request, obj)
 }
 

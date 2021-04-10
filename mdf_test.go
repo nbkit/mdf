@@ -10,7 +10,7 @@ func TestDate_Date(t *testing.T) {
 	t.Log(d)
 
 	server := NewServer(Option{
-		EnabledFeature: true,
+		EnabledFeature: false,
 	})
 
 	server.Start()
