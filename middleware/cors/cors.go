@@ -151,6 +151,13 @@ func DefaultConfig() Config {
 		MaxAge:           12 * time.Hour,
 	}
 }
+func AllCross() gin.HandlerFunc {
+	config := DefaultConfig()
+	config.AllowAllOrigins = true
+	config.AllowHeaders = []string{"*"}
+	config.AllowMethods = []string{"GET", "POST"}
+	return New(config)
+}
 
 // Default returns the location middleware with default configuration.
 func Default() gin.HandlerFunc {

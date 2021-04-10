@@ -8,7 +8,7 @@ import (
 func TestDate_Date(t *testing.T) {
 	d := utils.TimeNow().Format(utils.TimeFormatStr("yyyy-MM-dd HH:mm:ss.SSSSSSSS"))
 	t.Log(d)
-t.Log(d)
+
 	server := NewServer(Option{
 		EnabledFeature: true,
 	})
