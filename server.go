@@ -66,7 +66,13 @@ func newServer(options ...Option) *serverImpl {
 	ser.initContext()
 	return ser
 }
+
+var initArgs = []string{"install", "uninstall"}
+
 func (s *serverImpl) Start() {
+	if utils.StringsContains(initArgs, s.runArg) >= -1 {
+		return
+	}
 	//注册中心
 	s.startReg()
 	//启动 JOB
