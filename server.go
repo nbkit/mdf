@@ -12,9 +12,11 @@ import (
 	"github.com/nbkit/mdf/framework/md"
 	"github.com/nbkit/mdf/framework/reg"
 	"github.com/nbkit/mdf/gin"
+	"github.com/nbkit/mdf/log"
 	"github.com/nbkit/mdf/middleware/token"
 	"github.com/nbkit/mdf/utils"
 	"os"
+	"path/filepath"
 )
 
 type Option struct {
@@ -26,13 +28,15 @@ type Server interface {
 	Start()
 	Use(func(server Server)) Server
 	GetEngine() *gin.Engine
-	GetRunArg() string
+	IsMigrate() bool
+	GetRunArg() []string
 }
 type serverImpl struct {
-	engine   *gin.Engine
-	runArg   string
-	option   Option
-	entities []interface{}
+	engine    *gin.Engine
+	runArg    string
+	option    Option
+	isMigrate bool
+	entities  []interface{}
 }
 
 func NewServer(options ...Option) Server {
@@ -56,6 +60,9 @@ func newServer(options ...Option) *serverImpl {
 			ser.runArg = os.Args[len(os.Args)-1]
 		}
 	}
+	if ser.runArg == "upgrade" || ser.runArg == "init" || ser.runArg == "debug" {
+		ser.isMigrate = true
+	}
 	ser.initContext()
 	return ser
 }
@@ -72,7 +79,7 @@ func (s *serverImpl) Cache() Server {
 	return s
 }
 func (s *serverImpl) Upgrade() Server {
-	if utils.Config.Db.Database != "" && (s.runArg == "upgrade" || s.runArg == "init" || s.runArg == "debug") {
+	if utils.Config.Db.Database != "" && s.isMigrate {
 		upgrade.Script(upgrade.ScriptOption{Path: "./storage/script/pre"}).Exec()
 
 		upgrade.Script(upgrade.ScriptOption{Path: "./storage/script/seeds"}).Exec()
@@ -91,8 +98,11 @@ func (s *serverImpl) Use(done func(server Server)) Server {
 func (s *serverImpl) GetEngine() *gin.Engine {
 	return s.engine
 }
-func (s *serverImpl) GetRunArg() string {
-	return s.runArg
+func (s *serverImpl) GetRunArg() []string {
+	return []string{s.runArg}
+}
+func (s *serverImpl) IsMigrate() bool {
+	return s.isMigrate
 }
 func (s *serverImpl) initContext() {
 	if utils.Config.Db.Database != "" {
@@ -100,10 +110,16 @@ func (s *serverImpl) initContext() {
 		db.Default().DB.DB().SetConnMaxLifetime(0)
 	}
 	//设置模板
+
 	if utils.PathExists("dist") {
-		s.engine.LoadHTMLGlob(utils.JoinCurrentPath("dist/*.html"))
+		pattern := utils.JoinCurrentPath("dist/*.html")
+		if filenames, err := filepath.Glob(pattern); err != nil {
+			log.Error().Error(err)
+		} else if len(filenames) > 0 {
+			s.engine.LoadHTMLGlob(pattern)
+		}
 	}
-	if s.runArg == "upgrade" || s.runArg == "init" || s.runArg == "debug" {
+	if s.isMigrate {
 		md.MDSv().Migrate()
 		model.Register()
 		initSeedAction()
