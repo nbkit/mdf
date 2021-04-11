@@ -60,7 +60,7 @@ func newServer(options ...Option) *serverImpl {
 			ser.runArg = os.Args[len(os.Args)-1]
 		}
 	}
-	if ser.runArg == "upgrade" || ser.runArg == "init" || ser.runArg == "debug" {
+	if ser.runArg == "migrate" || ser.runArg == "upgrade" || ser.runArg == "init" || ser.runArg == "debug" {
 		ser.isMigrate = true
 	}
 	ser.initContext()
