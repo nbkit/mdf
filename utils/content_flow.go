@@ -101,6 +101,10 @@ func (s *FlowContext) Adjust(fn func(req *FlowContext)) *FlowContext {
 	return s
 }
 
+func (s *FlowContext) OutputError(err ...interface{}) {
+	s.Response.Error(err...)
+	s.Output()
+}
 func (s *FlowContext) OutputString(format string, values ...interface{}) {
 	s.Context.String(http.StatusOK, format, values...)
 }
