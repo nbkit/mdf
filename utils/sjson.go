@@ -3,7 +3,6 @@ package utils
 import (
 	"database/sql/driver"
 	"encoding/json"
-
 	"github.com/nbkit/mdf/log"
 )
 
@@ -41,6 +40,13 @@ func (t SJson) Valid() bool {
 }
 func (t SJson) Equal(v SJson) bool {
 	return t.jsonString == v.jsonString
+}
+
+func (t SJson) IsArray() bool {
+	if t.jsonString == "" {
+		return false
+	}
+	return t.jsonString[0] == '['
 }
 
 func (t SJson) NotEqual(v SJson) bool {
