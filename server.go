@@ -70,7 +70,7 @@ func newServer(options ...Option) *serverImpl {
 var initArgs = []string{"install", "uninstall"}
 
 func (s *serverImpl) Start() {
-	if utils.StringsContains(initArgs, s.runArg) >= -1 {
+	if utils.StringsContains(initArgs, s.runArg) > -1 {
 		return
 	}
 	//注册中心
