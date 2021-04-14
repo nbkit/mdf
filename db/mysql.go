@@ -1,15 +1,10 @@
 package db
 
 import (
-	"bytes"
 	"fmt"
-	"sync"
-	"time"
-
-	"github.com/go-sql-driver/mysql"
-
 	"github.com/nbkit/mdf/log"
 	"github.com/nbkit/mdf/utils"
+	"sync"
 
 	"github.com/nbkit/mdf/db/gorm"
 )
@@ -32,12 +27,34 @@ func Default() *Repo {
 func SetDefault(d *Repo) {
 	dbIns = d
 }
-func Open() *Repo {
-	db, err := gorm.Open(utils.Config.Db.Driver, getDsnString(true))
+func Open(args ...interface{}) *Repo {
+	var (
+		dialect string
+		source  string
+	)
+	if len(args) > 0 {
+		dialect = utils.Config.Db.Driver
+		source = utils.Config.Db.GetDsnString(true)
+	} else {
+		switch value := args[0].(type) {
+		case string:
+			if len(args) == 1 {
+				dialect = utils.Config.Db.Driver
+				source = value
+			} else if len(args) >= 2 {
+				dialect = value
+				source = args[1].(string)
+			}
+		case utils.DbConfig:
+		case *utils.DbConfig:
+			dialect = value.Driver
+			source = value.GetDsnString(true)
+		}
+	}
+	db, err := gorm.Open(dialect, source)
 	if err != nil {
 		log.ErrorF("orm failed to initialized: %v", err)
 	}
-
 	db.LogMode(utils.Config.Db.Mode == "debug" || utils.Config.Db.Mode == "")
 	repo := &Repo{db}
 	return repo
@@ -52,7 +69,7 @@ func (s *Repo) New() *Repo {
 	return &Repo{s.DB.New()}
 }
 func NewMysqlRepo() *Repo {
-	db, err := gorm.Open(utils.Config.Db.Driver, getDsnString(true))
+	db, err := gorm.Open(utils.Config.Db.Driver, utils.Config.Db.GetDsnString(true))
 	if err != nil {
 		log.ErrorF("orm failed to initialized: %v", err)
 		panic(err)
@@ -61,59 +78,8 @@ func NewMysqlRepo() *Repo {
 	repo := &Repo{db}
 	return repo
 }
-func getDsnString(inDb bool) string {
-	//[username[:password]@][protocol[(address)]]/dbname[?param1=value1&...&paramN=valueN]
-	//mssql:   =>  sqlserver://username:password@localhost:1433?database=dbname
-	//mysql => user:password@(localhost)/dbname?charset=utf8&parseTime=True&loc=Local
-	str := ""
-	// 创建连接
-	if utils.Config.Db.Driver == utils.ORM_DRIVER_MSSQL {
-		var buf bytes.Buffer
-		buf.WriteString("sqlserver://")
-		buf.WriteString(utils.Config.Db.Username)
-		if utils.Config.Db.Password != "" {
-			buf.WriteByte(':')
-			buf.WriteString(utils.Config.Db.Password)
-		}
-		buf.WriteByte('@')
-		if utils.Config.Db.Host != "" {
-			buf.WriteString(utils.Config.Db.Host)
-			if utils.Config.Db.Port != "" {
-				buf.WriteByte(':')
-				buf.WriteString(utils.Config.Db.Port)
-			} else {
-				buf.WriteString(":1433")
-			}
-		}
-		if utils.Config.Db.Database != "" && inDb {
-			buf.WriteString("?database=")
-			buf.WriteString(utils.Config.Db.Database)
-		} else {
-			buf.WriteString("?database=master")
-		}
-		str = buf.String()
-		return str
-	}
-	{
-		config := mysql.Config{
-			User:   utils.Config.Db.Username,
-			Passwd: utils.Config.Db.Password, Net: "tcp", Addr: utils.Config.Db.Host,
-			AllowNativePasswords: true,
-			ParseTime:            true,
-			Loc:                  time.Local,
-		}
-		if inDb {
-			config.DBName = utils.Config.Db.Database
-		}
-		if utils.Config.Db.Port != "" {
-			config.Addr = fmt.Sprintf("%s:%s", utils.Config.Db.Host, utils.Config.Db.Port)
-		}
-		str = config.FormatDSN()
-	}
-	return str
-}
 func DestroyDB(name string) error {
-	db, err := gorm.Open(utils.Config.Db.Driver, getDsnString(false))
+	db, err := gorm.Open(utils.Config.Db.Driver, utils.Config.Db.GetDsnString(false))
 	if err != nil {
 		log.ErrorF("orm failed to initialized: %v", err)
 	}
@@ -121,7 +87,7 @@ func DestroyDB(name string) error {
 	return db.Exec(fmt.Sprintf("Drop Database if exists %s;", name)).Error
 }
 func CreateDB(name string) error {
-	db, err := gorm.Open(utils.Config.Db.Driver, getDsnString(false))
+	db, err := gorm.Open(utils.Config.Db.Driver, utils.Config.Db.GetDsnString(false))
 	if err != nil {
 		return log.ErrorF("orm failed to initialized: %v", err)
 	}

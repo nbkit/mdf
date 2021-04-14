@@ -1,7 +1,10 @@
 package utils
 
 import (
+	"bytes"
 	"encoding/json"
+	"fmt"
+	"github.com/go-sql-driver/mysql"
 	"github.com/nbkit/mdf/gmap"
 	"github.com/nbkit/mdf/log"
 	"github.com/spf13/viper"
@@ -9,6 +12,7 @@ import (
 	"os"
 	"path"
 	"strings"
+	"time"
 )
 
 type AppConfig struct {
@@ -37,6 +41,59 @@ type DbConfig struct {
 	Collation string `mapstructure:"collation" json:"collation"`
 	Mode      string `mapstructure:"mode" json:"mode"`
 }
+
+func (s DbConfig) GetDsnString(useDB bool) string {
+	//[username[:password]@][protocol[(address)]]/dbname[?param1=value1&...&paramN=valueN]
+	//mssql:   =>  sqlserver://username:password@localhost:1433?database=dbname
+	//mysql => user:password@(localhost)/dbname?charset=utf8&parseTime=True&loc=Local
+	str := ""
+	// 创建连接
+	if s.Driver == ORM_DRIVER_MSSQL {
+		var buf bytes.Buffer
+		buf.WriteString("sqlserver://")
+		buf.WriteString(s.Username)
+		if s.Password != "" {
+			buf.WriteByte(':')
+			buf.WriteString(s.Password)
+		}
+		buf.WriteByte('@')
+		if s.Host != "" {
+			buf.WriteString(s.Host)
+			if s.Port != "" {
+				buf.WriteByte(':')
+				buf.WriteString(s.Port)
+			} else {
+				buf.WriteString(":1433")
+			}
+		}
+		if s.Database != "" && useDB {
+			buf.WriteString("?database=")
+			buf.WriteString(s.Database)
+		} else {
+			buf.WriteString("?database=master")
+		}
+		str = buf.String()
+		return str
+	}
+	{
+		config := mysql.Config{
+			User:   s.Username,
+			Passwd: s.Password, Net: "tcp", Addr: s.Host,
+			AllowNativePasswords: true,
+			ParseTime:            true,
+			Loc:                  time.Local,
+		}
+		if useDB {
+			config.DBName = s.Database
+		}
+		if s.Port != "" {
+			config.Addr = fmt.Sprintf("%s:%s", s.Host, s.Port)
+		}
+		str = config.FormatDSN()
+	}
+	return str
+}
+
 type LogConfig struct {
 	Level string `mapstructure:"level" json:"level"`
 	Path  string `mapstructure:"path" json:"path"`
