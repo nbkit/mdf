@@ -33,9 +33,6 @@ func Open(args ...interface{}) *Repo {
 		source  string
 	)
 	if len(args) > 0 {
-		dialect = utils.Config.Db.Driver
-		source = utils.Config.Db.GetDsnString(true)
-	} else {
 		switch value := args[0].(type) {
 		case string:
 			if len(args) == 1 {
@@ -50,6 +47,9 @@ func Open(args ...interface{}) *Repo {
 			dialect = value.Driver
 			source = value.GetDsnString(true)
 		}
+	} else {
+		dialect = utils.Config.Db.Driver
+		source = utils.Config.Db.GetDsnString(true)
 	}
 	db, err := gorm.Open(dialect, source)
 	if err != nil {
