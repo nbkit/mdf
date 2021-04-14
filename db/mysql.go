@@ -2,11 +2,10 @@ package db
 
 import (
 	"fmt"
+	"github.com/nbkit/mdf/db/gorm"
 	"github.com/nbkit/mdf/log"
 	"github.com/nbkit/mdf/utils"
 	"sync"
-
-	"github.com/nbkit/mdf/db/gorm"
 )
 
 type Repo struct {
@@ -27,7 +26,7 @@ func Default() *Repo {
 func SetDefault(d *Repo) {
 	dbIns = d
 }
-func Open(args ...interface{}) *Repo {
+func Open(args ...interface{}) (*Repo, error) {
 	var (
 		dialect string
 		source  string
@@ -53,11 +52,11 @@ func Open(args ...interface{}) *Repo {
 	}
 	db, err := gorm.Open(dialect, source)
 	if err != nil {
-		log.ErrorF("orm failed to initialized: %v", err)
+		return nil, log.ErrorF("orm failed to initialized: %v", err)
 	}
 	db.LogMode(utils.Config.Db.Mode == "debug" || utils.Config.Db.Mode == "")
 	repo := &Repo{db}
-	return repo
+	return repo, nil
 }
 func (s *Repo) Close() error {
 	return s.DB.Close()
