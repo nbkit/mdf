@@ -42,7 +42,31 @@ type DbConfig struct {
 	Mode      string `mapstructure:"mode" json:"mode"`
 }
 
+func (s *DbConfig) fill() {
+	if s.Driver == "" {
+		s.Driver = ORM_DRIVER_MYSQL
+	}
+	if s.Host == "" {
+		s.Host = "localhost"
+	}
+	if s.Port == "" {
+		if s.Driver == ORM_DRIVER_MYSQL {
+			s.Port = "3306"
+		}
+		if s.Driver == ORM_DRIVER_MSSQL {
+			s.Port = "1433"
+		}
+	}
+	if s.Charset == "" {
+		s.Charset = "utf8mb4"
+	}
+	if s.Collation == "" {
+		s.Collation = "utf8mb4_general_ci"
+	}
+}
+
 func (s DbConfig) GetDsnString(useDB bool) string {
+	s.fill()
 	//[username[:password]@][protocol[(address)]]/dbname[?param1=value1&...&paramN=valueN]
 	//mssql:   =>  sqlserver://username:password@localhost:1433?database=dbname
 	//mysql => user:password@(localhost)/dbname?charset=utf8&parseTime=True&loc=Local
@@ -77,8 +101,10 @@ func (s DbConfig) GetDsnString(useDB bool) string {
 	}
 	{
 		config := mysql.Config{
-			User:   s.Username,
-			Passwd: s.Password, Net: "tcp", Addr: s.Host,
+			User:                 s.Username,
+			Passwd:               s.Password,
+			Net:                  "tcp",
+			Addr:                 s.Host,
 			AllowNativePasswords: true,
 			ParseTime:            true,
 			Loc:                  time.Local,
