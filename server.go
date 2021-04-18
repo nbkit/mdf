@@ -116,9 +116,8 @@ func (s *serverImpl) initContext() {
 		db.Default().DB.DB().SetConnMaxLifetime(0)
 	}
 	//设置模板
-
-	if utils.PathExists("dist") {
-		pattern := utils.JoinCurrentPath("dist/*.html")
+	if utils.PathExists("storage/template") {
+		pattern := utils.JoinCurrentPath("storage/template/*.html")
 		if filenames, err := filepath.Glob(pattern); err != nil {
 			log.Error().Error(err)
 		} else if len(filenames) > 0 {
