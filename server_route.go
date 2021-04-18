@@ -32,6 +32,6 @@ func (s *serverImpl) commonRoute() {
 	})
 	s.engine.GET("md/:widget", func(c *gin.Context) {
 		widget := c.Param("widget")
-		c.HTML(http.StatusOK, "index.html", utils.Map{"title": utils.Config.App.Name, "widget": widget})
+		c.HTML(http.StatusOK, "index.html", utils.Map{"app": utils.Config.App.Name, "time": utils.TimeNow().Format(utils.Layout_YYYYMMDDHHIISS), "widget": widget})
 	})
 }
