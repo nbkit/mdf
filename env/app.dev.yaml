@@ -22,5 +22,8 @@ log:
   #Level such as fatal,error, warn, info, debug, or disable,Level defaults to "info"
   level: info
   path: ./storage/logs
+view:
+  path: ./storage/template
+  binary: true
 #是否启动调度任务
 CRON: false

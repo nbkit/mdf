@@ -16,6 +16,7 @@ import (
 	"github.com/nbkit/mdf/middleware/token"
 	"github.com/nbkit/mdf/utils"
 	"os"
+	"path"
 	"path/filepath"
 )
 
@@ -110,20 +111,32 @@ func (s *serverImpl) GetRunArg() []string {
 func (s *serverImpl) IsMigrate() bool {
 	return s.isMigrate
 }
-func (s *serverImpl) initContext() {
-	if utils.Config.Db.Database != "" {
-		db.CreateDB(utils.Config.Db.Database)
-		db.Default().DB.DB().SetConnMaxLifetime(0)
+func (s *serverImpl) initHtmlTemplate() {
+	viewPath := utils.Config.GetValue("view.path")
+	if viewPath == "" {
+		viewPath = "./storage/template"
 	}
+	isBinary := utils.Config.GetBool("view.binary")
 	//设置模板
-	if utils.PathExists("storage/template") {
-		pattern := utils.JoinCurrentPath("storage/template/*.html")
+	if utils.PathExists(viewPath) {
+		if isBinary {
+
+		}
+		pattern := utils.JoinCurrentPath(path.Join(viewPath, "*.html"))
 		if filenames, err := filepath.Glob(pattern); err != nil {
 			log.Error().Error(err)
 		} else if len(filenames) > 0 {
 			s.engine.LoadHTMLGlob(pattern)
 		}
 	}
+}
+func (s *serverImpl) initContext() {
+	if utils.Config.Db.Database != "" {
+		db.CreateDB(utils.Config.Db.Database)
+		db.Default().DB.DB().SetConnMaxLifetime(0)
+	}
+	s.initHtmlTemplate()
+
 	if s.isMigrate {
 		md.MDSv().Migrate()
 		model.Register()
