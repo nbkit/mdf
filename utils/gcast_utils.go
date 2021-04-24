@@ -5,7 +5,7 @@ import (
 	"reflect"
 )
 
-func reflectTarget(r reflect.Value) reflect.Value {
+func ReflectTarget(r reflect.Value) reflect.Value {
 	for reflect.Ptr == r.Kind() || reflect.Interface == r.Kind() {
 		r = r.Elem()
 	}

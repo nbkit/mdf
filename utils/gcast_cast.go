@@ -21,7 +21,7 @@ func ToT(v interface{}, t reflect.Type, tags string) (interface{}, error) {
 
 func ToType(v reflect.Value, t reflect.Type, tags string) (interface{}, error) {
 	if reflect.Ptr == v.Kind() {
-		v = reflectTarget(v)
+		v = ReflectTarget(v)
 	}
 
 	var err error

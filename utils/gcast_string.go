@@ -38,5 +38,5 @@ func ToString(v interface{}) string {
 	case []byte:
 		return string(s)
 	}
-	return ToStringByReflect(reflectTarget(reflect.ValueOf(v)))
+	return ToStringByReflect(ReflectTarget(reflect.ValueOf(v)))
 }

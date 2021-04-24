@@ -13,9 +13,9 @@ func ToMap(dst, src interface{}, tag string, recursive bool) (err error) {
 	if nil == dst || nil == src {
 		err = errInvalidParams
 	} else {
-		dst = reflectTarget(reflect.ValueOf(dst)).Interface()
+		dst = ReflectTarget(reflect.ValueOf(dst)).Interface()
 		destType := reflect.TypeOf(dst)
-		s := reflectTarget(reflect.ValueOf(src))
+		s := ReflectTarget(reflect.ValueOf(src))
 		t := s.Type()
 
 		switch dst.(type) {

@@ -77,12 +77,12 @@ func ToSlice(dst, src interface{}, tags string) error {
 		return errInvalidParams
 	}
 
-	dstSlice := reflectTarget(reflect.ValueOf(dst))
+	dstSlice := ReflectTarget(reflect.ValueOf(dst))
 	if reflect.Slice != dstSlice.Kind() {
 		return errInvalidParams
 	}
 
-	srcSlice := reflectTarget(reflect.ValueOf(src))
+	srcSlice := ReflectTarget(reflect.ValueOf(src))
 	if reflect.Slice != srcSlice.Kind() {
 		return errInvalidParams
 	}

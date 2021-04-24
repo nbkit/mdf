@@ -23,22 +23,22 @@ func ToStruct(dst, src interface{}, tag string) (err error) {
 	case time.Time, *time.Time:
 		switch v := src.(type) {
 		case time.Time:
-			s := reflectTarget(reflect.ValueOf(dst))
+			s := ReflectTarget(reflect.ValueOf(dst))
 			s.Set(reflect.ValueOf(v))
 			break
 		case *time.Time:
-			s := reflectTarget(reflect.ValueOf(dst))
+			s := ReflectTarget(reflect.ValueOf(dst))
 			s.Set(reflect.ValueOf(*v))
 			break
 		case string:
 			var tm time.Time
 			if tm, err = ParseTime(v); nil == err {
-				s := reflectTarget(reflect.ValueOf(dst))
+				s := ReflectTarget(reflect.ValueOf(dst))
 				s.Set(reflect.ValueOf(tm))
 			}
 			break
 		case int64:
-			s := reflectTarget(reflect.ValueOf(dst))
+			s := ReflectTarget(reflect.ValueOf(dst))
 			s.Set(reflect.ValueOf(time.Unix(v, 0)))
 			break
 		default:
@@ -47,7 +47,7 @@ func ToStruct(dst, src interface{}, tag string) (err error) {
 		break
 	default:
 
-		s := reflectTarget(reflect.ValueOf(dst))
+		s := ReflectTarget(reflect.ValueOf(dst))
 		t := s.Type()
 
 		switch src.(type) {
@@ -106,7 +106,7 @@ func ToStruct(dst, src interface{}, tag string) (err error) {
 func StructFields(st interface{}, tag string) []string {
 	fields := []string{}
 
-	s := reflectTarget(reflect.ValueOf(st))
+	s := ReflectTarget(reflect.ValueOf(st))
 	t := s.Type()
 
 	for i := 0; i < s.NumField(); i++ {
@@ -132,7 +132,7 @@ func StructFieldTagsUnsorted(st interface{}, tag string) ([]string, []string) {
 	keys := []string{}
 	values := []string{}
 
-	s := reflectTarget(reflect.ValueOf(st))
+	s := ReflectTarget(reflect.ValueOf(st))
 	t := s.Type()
 
 	for i := 0; i < s.NumField(); i++ {
