@@ -68,6 +68,13 @@ func (c BizObject) GetInt(key string) (i int) {
 	}
 	return
 }
+func (c *BizObject) ShouldBind(obj interface{}) error {
+	if b, err := c.MarshalJSON(); err != nil {
+		return err
+	} else {
+		return json.Unmarshal(b, obj)
+	}
+}
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
 func (d *BizObject) UnmarshalJSON(bytes []byte) error {

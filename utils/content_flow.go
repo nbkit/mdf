@@ -58,7 +58,7 @@ func (s *FlowContext) Path() string {
 	return s.Context.Request.RequestURI
 }
 
-func (s *FlowContext) Unmarshal(obj interface{}) error {
+func (s *FlowContext) ShouldBind(obj interface{}) error {
 	return s.Context.ShouldBind(obj)
 }
 
