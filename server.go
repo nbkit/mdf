@@ -82,7 +82,9 @@ func (s *serverImpl) Start() {
 	s.engine.Run(fmt.Sprintf(":%s", utils.Config.App.Port))
 }
 func (s *serverImpl) Cache() Server {
-	md.MDSv().Cache()
+	if utils.Config.Db.Database != "" {
+		md.MDSv().Cache()
+	}
 	return s
 }
 func (s *serverImpl) Upgrade() Server {
