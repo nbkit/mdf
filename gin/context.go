@@ -5,6 +5,7 @@
 package gin
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"io"
@@ -723,6 +724,8 @@ func (c *Context) ShouldBindBodyWith(obj interface{}, bb binding.BindingBody) (e
 		if err != nil {
 			return err
 		}
+		c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(body))
+
 		c.Set(BodyBytesKey, body)
 	}
 	return bb.BindBody(body, obj)
