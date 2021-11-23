@@ -18,19 +18,21 @@ func NewTokenContext() *TokenContext {
 	return &TokenContext{BizObject: NewBizObject()}
 }
 func (s *TokenContext) UserID() string {
-	return s.GetString("UserID")
+	//sub jwt 的所有者，可以是用户 ID、唯一标识。
+	return s.GetString("sub")
 }
 
 func (s *TokenContext) EntID() string {
-	return s.GetString("EntID")
+	//aud jwt 的适用对象，其值应为大小写敏感的字符串或 Uri。一般可以为特定的 App、服务或模块。
+	return s.GetString("aud")
 }
 
 func (s *TokenContext) OrgID() string {
-	return s.GetString("OrgID")
+	return s.GetString("org")
 }
 
 func (s *TokenContext) ID() string {
-	return s.GetString("ID")
+	return s.GetString("id")
 }
 
 func (s TokenContext) ToTokenString() string {
