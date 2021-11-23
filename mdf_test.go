@@ -1,17 +1,14 @@
 package mdf
 
 import (
+	"github.com/nbkit/mdf/log"
 	"github.com/nbkit/mdf/utils"
 	"testing"
 )
 
 func TestDate_Date(t *testing.T) {
-	d := utils.TimeNow().Format(utils.TimeFormatStr("yyyy-MM-dd HH:mm:ss.SSSSSSSS"))
-	t.Log(d)
-
-	server := NewServer(Option{
-		EnabledFeature: false,
-	})
-
-	server.Start()
+	tokenStr := "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6ImY1MTQ2MWUxM2NlNjc0MTY2ZWZiMDk0OTdmM2U3NmIzODE5Mjc5NWQ2OTU0MzExOGIxODE2NGRhMGVhYzg1YWYyNTU1MGQ0ZDNkMzFiNjdkIn0.eyJhdWQiOiI2N2U1M2M1MGZhYmYxMWU3OWU2MTIzMGNjYjZiMGU5YyIsImp0aSI6ImY1MTQ2MWUxM2NlNjc0MTY2ZWZiMDk0OTdmM2U3NmIzODE5Mjc5NWQ2OTU0MzExOGIxODE2NGRhMGVhYzg1YWYyNTU1MGQ0ZDNkMzFiNjdkIiwiaWF0IjoxNjM3NTg2NzQyLCJuYmYiOjE2Mzc1ODY3NDIsImV4cCI6MTY2OTEyMjc0Miwic3ViIjoiMWFiOWFhZTRkZWI4ZjdkZDIyZTdlYWYwYWRjN2E5OTgiLCJzY29wZXMiOltdfQ.f5u732uOlgRYrxm469Hg29EjvsT_OVO6BCfVm_otgYDDoahspcqm2zfC4_x-zJDUB0QBgeWCh-TPxHGDoj5AatJ6hRU0Lq2uRZF7MjH5xPcHXnHVHanbSkzdo5Wq9j0IVNB5j9DavRxnGYrzAyvPKzlHi8QYaGTNES0SiXt5ei9qWmKi6xRet2QvZduYHoeUDlEJOreANIRqNWptGdmNMDTZjWKO7-ItD0GrjA717CSGWpWMS52roEu7xwbX8le8S27967taTXn-4AfpPrwawdYOcg6SQf_cwMLRiVS4IRoe6lXRHyEmbJ5ezYawf6k6pNajcdaNpobprZTIYhYTB0T85BQkKsMS5Ry43ZR17kWudq0mS6wyWRbAwVdaYEIm22HhHHJ5dFxqGnmjmksmYL1og2gKsK7vFg0WjiHDpiuSmdUlJxEWOL1M4IF2rXxKmmNorMlZ067H7u1JiAMU2T773FKoYdkpCGX18HBROryRQKAHEuFLTlN9WMQQPDnkZQNL8kNkfqFIFhEcsNlYBnsbQkFfhVUXSo0NcDptt5GG0fOJ6VT_4DnlGsQ_6PVlOgpIRU4KobzxBew-2aQ7KtKlKZQVOzFvcYhDTOn8EF7jUcMO3xqEROnymxpU0fZOjbi-wZkcF5TAKss1FJkS8r7qj1zVhnFjah_9Jm19rcQ"
+	tt, err := utils.NewTokenContext().FromTokenString(tokenStr)
+	log.ErrorD(tt)
+	log.ErrorD(err)
 }
