@@ -84,12 +84,12 @@ func (s *ResContext) Bind(c *gin.Context) {
 		s.Set("msg", strings.Join(errText, ";"))
 		s.Set("errors", errText)
 
-		c.JSON(http.StatusBadRequest, s.data)
+		c.PureJSON(http.StatusBadRequest, s.data)
 	} else {
 		if _, ok := s.data["code"]; !ok {
 			s.Set("code", 200)
 		}
-		c.JSON(http.StatusOK, s.data)
+		c.PureJSON(http.StatusOK, s.data)
 	}
 }
 
