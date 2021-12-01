@@ -1,5 +1,7 @@
 package utils
 
+import "reflect"
+
 type Pager struct {
 	Value    interface{}
 	Error    error
@@ -9,6 +11,20 @@ type Pager struct {
 	Items    int `json:"items"` //当前条数
 	Total    int `json:"total"` //总记录数
 }
+
+func NewPager(value interface{}, page int, pageSize int, itemTotal int) *Pager {
+	item := Pager{Value: value, Page: page, PageSize: pageSize, Total: itemTotal}
+	if item.Total > 0 && item.PageSize > 0 {
+		item.LastPage = item.Total / item.PageSize
+	}
+	if value != nil {
+		if aa := reflect.TypeOf(value); aa != nil {
+			item.Items = reflect.ValueOf(value).Len()
+		}
+	}
+	return &item
+}
+
 type PagerRes struct {
 	Page     int `json:"page"`
 	PageSize int `json:"page_size"`
