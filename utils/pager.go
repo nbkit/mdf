@@ -24,6 +24,15 @@ func NewPager(value interface{}, page int, pageSize int, itemTotal int) *Pager {
 	}
 	return &item
 }
+func (c *Pager) ToResource() Map {
+	rtn := Map{"data": nil}
+	if c == nil {
+		return rtn
+	}
+	rtn["pager"] = ToPagerItem(c)
+	rtn["data"] = c.Value
+	return rtn
+}
 
 type PagerRes struct {
 	Page     int `json:"page"`
@@ -33,17 +42,17 @@ type PagerRes struct {
 	Total    int `json:"total"` //总记录数
 }
 
-func (c *PagerRes) ToResource(obj *Pager) *Map {
+func (c *PagerRes) ToResource(obj *Pager) Map {
 	rtn := Map{"data": nil}
 	if obj == nil {
-		return &rtn
+		return rtn
 	}
 	rtn["pager"] = ToPagerItem(obj)
 	rtn["data"] = obj.Value
-	return &rtn
+	return rtn
 }
 
-func ToPagerRes(obj *Pager) *Map {
+func ToPagerRes(obj *Pager) Map {
 	return ToPagerItem(obj).ToResource(obj)
 }
 func ToPagerItem(obj *Pager) *PagerRes {
