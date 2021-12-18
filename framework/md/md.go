@@ -15,6 +15,7 @@ import (
 
 type MD interface {
 	MD() *Mder
+	GetID() string
 }
 type Mder struct {
 	ID     string

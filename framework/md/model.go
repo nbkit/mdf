@@ -1,6 +1,8 @@
 package md
 
-import "github.com/nbkit/mdf/utils"
+import (
+	"github.com/nbkit/mdf/utils"
+)
 
 type Model struct {
 	ID        string     `gorm:"primary_key;size:50" json:"id"`
@@ -9,5 +11,8 @@ type Model struct {
 }
 
 func (s Model) String() string {
+	return s.ID
+}
+func (s Model) GetID() string {
 	return s.ID
 }
