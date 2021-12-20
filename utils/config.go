@@ -242,10 +242,10 @@ func getConfigViper(name string) *viper.Viper {
 		}
 	}
 	v := viper.New()
-	v.SetConfigType(envType)
+	//v.SetConfigType(envType)
 	v.SetConfigName(name)
 	v.AddConfigPath(JoinCurrentPath(envPath))
-	v.SetConfigFile(envFile)
+	//v.SetConfigFile(envFile)
 
 	if err := v.ReadInConfig(); err != nil {
 		log.ErrorF("Fatal error when reading %s config file:%s", name, err)
