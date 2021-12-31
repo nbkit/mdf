@@ -58,7 +58,7 @@ type MDEntityRelation struct {
 	Name      string     `gorm:"size:100"`
 	ParentID  string     `gorm:"size:50;name:父实体;not null"`
 	ChildID   string     `gorm:"size:50;name:子实体;not null"`
-	Kind      string     `gorm:"name:类型;not null"` //inherit，interface，
+	Kind      string     `gorm:"name:类型;not null"` //inherit:继承，interface:接口，
 	ParentKey string     `gorm:"size:36;name:主键" json:"parent_key"`
 	ChildKey  string     `gorm:"size:36;name:外键" json:"child_key"`
 	Limit     string     `gorm:"size:500;name:限制"`

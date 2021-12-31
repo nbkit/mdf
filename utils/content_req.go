@@ -2,6 +2,7 @@ package utils
 
 import (
 	"github.com/nbkit/mdf/gin"
+	"github.com/nbkit/mdf/gin/binding"
 	"github.com/nbkit/mdf/log"
 	"mime/multipart"
 )
@@ -29,13 +30,22 @@ func NewReqContext() *ReqContext {
 	return &ReqContext{}
 }
 func (s *ReqContext) Bind(c *gin.Context) *ReqContext {
-	if err := c.Bind(&s); err != nil {
+	if err := c.ShouldBind(s); err != nil {
 		log.ErrorD(err)
 	}
-	if form, err := c.MultipartForm(); err != nil {
-		log.ErrorD(err)
-	} else if form != nil && form.File != nil {
-		s.Files = form.File["files"]
+	if s.ID == "" {
+		s.ID = c.Param("id")
+	}
+	if s.ID == "" {
+		s.ID = c.Query("id")
+	}
+	switch c.ContentType() {
+	case binding.MIMEMultipartPOSTForm:
+		if form, err := c.MultipartForm(); err != nil {
+			log.ErrorD(err)
+		} else if form != nil && form.File != nil {
+			s.Files = form.File["files"]
+		}
 	}
 	return s
 }

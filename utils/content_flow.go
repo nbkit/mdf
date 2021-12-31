@@ -2,8 +2,6 @@ package utils
 
 import (
 	"github.com/nbkit/mdf/gin"
-	"github.com/nbkit/mdf/gin/binding"
-	"github.com/nbkit/mdf/log"
 	"net/http"
 )
 
@@ -28,17 +26,7 @@ func (s *FlowContext) Copy() *FlowContext {
 
 func (s *FlowContext) Bind(c *gin.Context) *FlowContext {
 	s.Context = c
-	if err := c.ShouldBind(s.Request); err != nil {
-		log.ErrorD(err)
-	}
-	switch c.ContentType() {
-	case binding.MIMEMultipartPOSTForm:
-		if form, err := c.MultipartForm(); err != nil {
-			log.ErrorD(err)
-		} else if form != nil && form.File != nil {
-			s.Request.Files = form.File["files"]
-		}
-	}
+	s.Request.Bind(c)
 	//bind token
 	if v, ok := s.Context.Get("context"); ok {
 		if vv, is := v.(*TokenContext); is {
