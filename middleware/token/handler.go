@@ -5,6 +5,7 @@ import (
 	"github.com/nbkit/mdf/gin"
 	"github.com/nbkit/mdf/utils"
 	"net/http"
+	"regexp"
 	"strings"
 )
 
@@ -26,44 +27,57 @@ func (g *handler) Handle(c *gin.Context) {
 	var (
 		context *utils.TokenContext
 		isHint  bool
+		ignore  bool
 	)
+	ignorePattern := strings.Split(utils.Config.GetValue("oauth.ignore"), ",")
+	for _, item := range ignorePattern {
+		match := regexp.MustCompile(item)
+		if ok := match.MatchString(c.Request.RequestURI); ok {
+			ignore = true
+			break
+		}
+	}
 	context = Get(c)
 	//authorization
 	if g.isEmptyContext(context) {
 		context, isHint = g.tryFromHeaderAuthorization(c)
-		if isHint && g.isEmptyContext(context) {
+		if isHint && !ignore && g.isEmptyContext(context) {
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
 	}
 	if g.isEmptyContext(context) {
 		context, isHint = g.tryFromCookieAuthorization(c)
-		if isHint && g.isEmptyContext(context) {
+		if isHint && !ignore && g.isEmptyContext(context) {
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
 	}
 	//token
-	if g.isEmptyContext(context) {
+	if !ignore && g.isEmptyContext(context) {
 		context, isHint = g.tryFromHeaderToken(c)
 		if isHint && g.isEmptyContext(context) {
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
 	}
-	if g.isEmptyContext(context) {
+	if !ignore && g.isEmptyContext(context) {
 		context, isHint = g.tryFromURLParamToken(c)
 		if isHint && g.isEmptyContext(context) {
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
 	}
-	if g.isEmptyContext(context) {
+	if !ignore && g.isEmptyContext(context) {
 		context, isHint = g.tryFromCookieToken(c)
 		if isHint && g.isEmptyContext(context) {
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
+	}
+	if g.isEmptyContext(context) && !ignore {
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
 	}
 	if g.isEmptyContext(context) {
 		context = utils.NewTokenContext()
@@ -73,7 +87,7 @@ func (g *handler) Handle(c *gin.Context) {
 	c.Next()
 }
 func (g *handler) tryFromURLParamToken(c *gin.Context) (*utils.TokenContext, bool) {
-	if token := c.Param(AuthTokenKey); token != "" && strings.ToUpper(c.Request.Method) == "GET" {
+	if token := c.Param(AuthTokenKey); token != "" {
 		if ct, err := reg.GetTokenContext(token); ct != nil && err == nil {
 			return ct, true
 		}
@@ -83,7 +97,7 @@ func (g *handler) tryFromURLParamToken(c *gin.Context) (*utils.TokenContext, boo
 }
 
 func (g *handler) tryFromHeaderToken(c *gin.Context) (*utils.TokenContext, bool) {
-	if token := c.GetHeader(AuthTokenKey); token != "" && strings.ToUpper(c.Request.Method) == "GET" {
+	if token := c.GetHeader(AuthTokenKey); token != "" {
 		if ct, err := reg.GetTokenContext(token); ct != nil && err == nil {
 			return ct, true
 		}

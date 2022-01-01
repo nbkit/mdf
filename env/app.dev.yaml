@@ -26,4 +26,10 @@ view:
   path: ./storage/template
   binary: true
 #是否启动调度任务
+oauth:
+  alg: RS256
+  privatekey: storage/oauth-private.key
+  publickey: storage/oauth-public.key
+  ignore: .*\.js$,.*\.css$,^/style/.*
+#是否启动调度任务
 CRON: false
