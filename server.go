@@ -148,12 +148,13 @@ func (s *serverImpl) initContext() {
 	actions.Register()
 	//规则 注册
 	rules.Register()
-	//使用token中间件
-	s.engine.Use(token.Default())
 
 	// 日志输出
 	s.engine.Use(gin.Logger())
 
+	//使用token中间件
+	s.engine.Use(token.Default())
+	
 	if s.option.EnabledFeature {
 		//注册路由
 		routes.Register(s.engine)
