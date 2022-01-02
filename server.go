@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/nbkit/mdf/bootstrap/actions"
 	"github.com/nbkit/mdf/bootstrap/model"
-	"github.com/nbkit/mdf/bootstrap/routes"
 	"github.com/nbkit/mdf/bootstrap/rules"
 	"github.com/nbkit/mdf/bootstrap/services"
 	"github.com/nbkit/mdf/bootstrap/upgrade"
@@ -20,41 +19,28 @@ import (
 	"path/filepath"
 )
 
-type Option struct {
-	EnabledFeature bool
-}
-type Server interface {
-	Upgrade() Server
-	Cache() Server
-	Start()
-	Use(func(server Server)) Server
-	GetEngine() *gin.Engine
-	IsMigrate() bool
-	GetRunArg() []string
-}
-type serverImpl struct {
-	engine    *gin.Engine
-	runArg    string
-	option    Option
-	isMigrate bool
-	entities  []interface{}
+type Config struct {
 }
 
-func NewServer(options ...Option) Server {
-	return newServer(options...)
+type Server struct {
+	runArg  string
+	option  *Option
+	engine  *gin.Engine
+	useDone []func(server *Server)
 }
-func newServer(options ...Option) *serverImpl {
-	option := Option{EnabledFeature: false}
-	if len(options) > 0 {
-		option = options[0]
-	}
-	utils.Config.SetValue("EnabledFeature", option.EnabledFeature)
+
+func NewServer(cfg Config) *Server {
+	s := newServer(cfg)
+	return s
+}
+func newServer(cfg Config) *Server {
+	option := newOption()
 	gin.SetMode(utils.Config.App.Mode)
 	gin.ForceConsoleColor()
-	ser := &serverImpl{
-		engine:   gin.New(),
-		option:   option,
-		entities: make([]interface{}, 0),
+	ser := &Server{
+		engine:  gin.New(),
+		option:  option,
+		useDone: make([]func(server *Server), 0),
 	}
 	if os.Args != nil && len(os.Args) > 0 {
 		if len(os.Args) > 1 {
@@ -62,58 +48,86 @@ func newServer(options ...Option) *serverImpl {
 		}
 	}
 	if ser.runArg == "migrate" || ser.runArg == "upgrade" || ser.runArg == "init" || ser.runArg == "debug" {
-		ser.isMigrate = true
+		ser.option.isMigrate = true
 	}
-	ser.initContext()
+	ser.initHtmlTemplate()
+
 	return ser
 }
 
 var initArgs = []string{"install", "uninstall"}
 
-func (s *serverImpl) Start() {
+func (s *Server) Start(o ...func(*Option)) {
+	//初始启动参数
+	s.initOption(o...)
+	// 日志输出
+	s.engine.Use(gin.Logger())
+	//数据库迁移
+	if s.option.isMigrate {
+		s.initMigrate()
+	}
+	//动作注册,规则 注册
+	if s.option.enableMDF {
+		actions.Register()
+		rules.Register()
+	}
+	// 处理升级
+	if s.option.isUpgrade {
+		s.upgrade()
+	}
+	//使用token中间件
+	if s.option.enableAuthToken {
+		s.engine.Use(token.Default())
+	}
+	// 初始化路由
+	s.initRoute()
+	//执行中间插件
+	s.initDone()
+	//如果是安装或者卸载，则不需要启动和执行后边逻辑
 	if utils.StringsContains(initArgs, s.runArg) > -1 {
 		return
 	}
-	//注册中心
-	s.startReg()
-	//启动 JOB
-	s.startCron()
+	// 初始化缓存
+	s.initCache()
+	// 启动注册中心
+	if s.option.isRegistry {
+		s.startReg()
+	}
+	// 启动JOB
+	if s.option.enableCron {
+		s.startCron()
+	}
 	//启动引擎
 	s.engine.Run(fmt.Sprintf(":%s", utils.Config.App.Port))
 }
-func (s *serverImpl) Cache() Server {
-	if utils.Config.Db.Database != "" {
-		md.MDSv().Cache()
-	}
+
+func (s *Server) Use(done func(server *Server)) *Server {
+	s.useDone = append(s.useDone, done)
 	return s
 }
-func (s *serverImpl) Upgrade() Server {
-	if utils.Config.Db.Database != "" && s.isMigrate {
-		upgrade.Script(upgrade.ScriptOption{Path: "./storage/script/pre"}).Exec()
-
-		upgrade.Script(upgrade.ScriptOption{Path: "./storage/script/seeds"}).Exec()
-
-		upgrade.Script(upgrade.ScriptOption{Path: "./storage/script/post"}).Exec()
-	}
-	return s
-}
-func (s *serverImpl) Use(done func(server Server)) Server {
-	if done != nil {
-		done(s)
-	}
-	return s
-}
-
-func (s *serverImpl) GetEngine() *gin.Engine {
+func (s *Server) GetEngine() *gin.Engine {
 	return s.engine
 }
-func (s *serverImpl) GetRunArg() []string {
+func (s *Server) GetRunArg() []string {
 	return []string{s.runArg}
 }
-func (s *serverImpl) IsMigrate() bool {
-	return s.isMigrate
+func (s *Server) IsMigrate() bool {
+	return s.option.isMigrate
 }
-func (s *serverImpl) initHtmlTemplate() {
+
+func (s *Server) initOption(o ...func(*Option)) {
+	for _, f := range o {
+		f(s.option)
+	}
+}
+func (s *Server) initDone() {
+	for _, f := range s.useDone {
+		if f != nil {
+			f(s)
+		}
+	}
+}
+func (s *Server) initHtmlTemplate() {
 	viewPath := utils.Config.GetValue("view.path")
 	if viewPath == "" {
 		viewPath = "./storage/template"
@@ -132,47 +146,41 @@ func (s *serverImpl) initHtmlTemplate() {
 		}
 	}
 }
-func (s *serverImpl) initContext() {
-	if utils.Config.Db.Database != "" {
+func (s *Server) initMigrate() {
+	if utils.Config.Db.Database != "" && s.option.isMigrate {
 		db.CreateDB(utils.Config.Db.Database)
 		db.Default().DB.DB().SetConnMaxLifetime(0)
 	}
-	s.initHtmlTemplate()
+	md.MDSv().Migrate()
+	initSeedAction()
 
-	if s.isMigrate {
-		md.MDSv().Migrate()
+	if s.option.isBaseDataCenter {
 		model.Register()
-		initSeedAction()
 	}
-	//动作注册
-	actions.Register()
-	//规则 注册
-	rules.Register()
-
-	// 日志输出
-	s.engine.Use(gin.Logger())
-
-	//使用token中间件
-	s.engine.Use(token.Default())
-	
-	if s.option.EnabledFeature {
-		//注册路由
-		routes.Register(s.engine)
-	}
-	// 通用路由
-	s.commonRoute()
-	//缓存
-	s.Cache()
 }
-func (s *serverImpl) startReg() {
-	if s.option.EnabledFeature {
-		go reg.StartServer()
+func (s *Server) initCache() *Server {
+	if utils.Config.Db.Database != "" && s.option.enableMDF {
+		md.MDSv().Cache()
 	}
+	return s
+}
+func (s *Server) upgrade() *Server {
+	if utils.Config.Db.Database != "" && s.option.isMigrate {
+		upgrade.Script(upgrade.ScriptOption{Path: "./storage/script/pre"}).Exec()
+
+		upgrade.Script(upgrade.ScriptOption{Path: "./storage/script/seeds"}).Exec()
+
+		upgrade.Script(upgrade.ScriptOption{Path: "./storage/script/post"}).Exec()
+	}
+	return s
+}
+func (s *Server) startReg() {
+	go reg.StartServer()
+
 }
 
 //启动 JOB
-func (s *serverImpl) startCron() {
-	if utils.Config.GetBool("CRON") {
-		go services.CronSv().Start()
-	}
+func (s *Server) startCron() {
+	go services.CronSv().Start()
+
 }

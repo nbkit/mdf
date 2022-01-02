@@ -2,9 +2,7 @@ package main
 
 import (
 	"github.com/nbkit/mdf"
-	"github.com/nbkit/mdf/bootstrap/rules"
 	"github.com/nbkit/mdf/log"
-	"github.com/nbkit/mdf/middleware/cors"
 	"os"
 )
 
@@ -15,13 +13,12 @@ func runApp() error {
 			os.Exit(0)
 		}
 	}()
-	server := mdf.NewServer()
+	server := mdf.NewServer(mdf.Config{})
 
-	server.Use(func(s mdf.Server) {
-		s.GetEngine().Use(cors.AllCross())
-		rules.Register()
+	server.Use(func(s *mdf.Server) {
+		//s.GetEngine().Use(cors.AllCross())
+		//rules.Register()
 	})
-	server.Cache().Upgrade()
 	server.Start()
 	return nil
 }
