@@ -29,6 +29,10 @@ type Server struct {
 	useDone []func(server *Server)
 }
 
+func DefaultServer() *Server {
+	s := NewServer(Config{})
+	return s
+}
 func NewServer(cfg Config) *Server {
 	s := newServer(cfg)
 	return s

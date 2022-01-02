@@ -13,7 +13,7 @@ func runApp() error {
 			os.Exit(0)
 		}
 	}()
-	server := mdf.NewServer(mdf.Config{})
+	server := mdf.DefaultServer()
 
 	server.Use(func(s *mdf.Server) {
 		//s.GetEngine().Use(cors.AllCross())
