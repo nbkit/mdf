@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"encoding/base64"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/nbkit/mdf/log"
 	"io/ioutil"
@@ -115,6 +116,13 @@ func (s TokenContext) FromTokenString(token string) (*TokenContext, error) {
 	tokenParts := strings.Split(token, " ")
 	if len(tokenParts) == 2 && strings.ToLower(tokenParts[0]) == "bearer" {
 		token = tokenParts[1]
+	}
+	if strings.Count(token, ".") != 2 {
+		decodeBytes, err := base64.StdEncoding.DecodeString(token)
+		if err != nil {
+			return ctx, err
+		}
+		token = string(decodeBytes)
 	}
 	parsedToken, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
 		return s.getPublicKey(), nil

@@ -7,6 +7,7 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"fmt"
+	"strings"
 
 	"github.com/dgrijalva/jwt-go"
 
@@ -81,11 +82,13 @@ func CreateJWTToken(dic map[string]interface{}, SIGNED_KEY string) string {
 
 //解析签名算法为HS256的token
 func ParseJWTToken(tokenString string, SIGNED_KEY string) (jwt.MapClaims, error) {
-	decodeBytes, err := base64.StdEncoding.DecodeString(tokenString)
-	if err != nil {
-		return nil, err
+	if strings.Count(tokenString, ".") != 2 {
+		decodeBytes, err := base64.StdEncoding.DecodeString(tokenString)
+		if err != nil {
+			return nil, err
+		}
+		tokenString = string(decodeBytes)
 	}
-	tokenString = string(decodeBytes)
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		return []byte(SIGNED_KEY), nil
 	})
@@ -102,16 +105,17 @@ func ParseJWTToken(tokenString string, SIGNED_KEY string) (jwt.MapClaims, error)
 
 //解析签名算法为HS256的token
 func ParseJWTTokenNotValidation(tokenString string, SIGNED_KEY string) (jwt.MapClaims, error) {
-	decodeBytes, err := base64.StdEncoding.DecodeString(tokenString)
-	if err != nil {
-		return nil, err
+	if strings.Count(tokenString, ".") != 2 {
+		decodeBytes, err := base64.StdEncoding.DecodeString(tokenString)
+		if err != nil {
+			return nil, err
+		}
+		tokenString = string(decodeBytes)
 	}
-	tokenString = string(decodeBytes)
-
 	claims := jwt.MapClaims{}
 	parse := new(jwt.Parser)
 	parse.SkipClaimsValidation = true
-	_, _, err = parse.ParseUnverified(tokenString, claims)
+	_, _, err := parse.ParseUnverified(tokenString, claims)
 	if err != nil {
 		return nil, err
 	}
