@@ -22,7 +22,10 @@ func (s *TokenContext) UserID() string {
 	//sub jwt 的所有者，可以是用户 ID、唯一标识。
 	return s.GetString("sub")
 }
-
+func (s *TokenContext) SetUserID(value string) {
+	//sub jwt 的所有者，可以是用户 ID、唯一标识。
+	s.Set("sub", value)
+}
 func (s *TokenContext) EntID() string {
 	//aud jwt 的适用对象，其值应为大小写敏感的字符串或 Uri。一般可以为特定的 App、服务或模块。
 	return s.GetString("aud")
@@ -31,7 +34,10 @@ func (s *TokenContext) EntID() string {
 func (s *TokenContext) OrgID() string {
 	return s.GetString("org")
 }
-
+func (s *TokenContext) SetOrgID(value string) {
+	//sub jwt 的所有者，可以是用户 ID、唯一标识。
+	s.Set("org", value)
+}
 func (s *TokenContext) ID() string {
 	return s.GetString("id")
 }
@@ -82,7 +88,7 @@ func (s TokenContext) getPrivateKey() interface{} {
 		}
 		break
 	default:
-		Config.SetValue(valueKey, Config.GetValue(key))
+		Config.SetValue(valueKey, []byte(Config.GetValue(key)))
 	}
 	return Config.GetObject(valueKey)
 }
@@ -107,7 +113,7 @@ func (s TokenContext) getPublicKey() interface{} {
 		}
 		break
 	default:
-		Config.SetValue(valueKey, Config.GetValue(key))
+		Config.SetValue(valueKey, []byte(Config.GetValue(key)))
 	}
 	return Config.GetObject(valueKey)
 }
