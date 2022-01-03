@@ -55,6 +55,20 @@ func (s TokenContext) ToTokenString() string {
 	}
 	return "bearer " + tokenString
 }
+func (s TokenContext) ToTokenStringEncode() string {
+	claim := jwt.MapClaims{}
+	data := s.Data()
+	for k, v := range data {
+		claim[k] = v
+	}
+	token := jwt.NewWithClaims(s.getSigningMethod(), claim)
+	tokenString, err := token.SignedString(s.getPrivateKey())
+	if err != nil {
+		return ""
+	}
+	tokenString = base64.StdEncoding.EncodeToString([]byte(tokenString))
+	return "bearer " + tokenString
+}
 func (s TokenContext) getSigningMethod() jwt.SigningMethod {
 	v := Config.GetValue("oauth.alg")
 	switch v {
