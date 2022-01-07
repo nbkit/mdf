@@ -46,13 +46,8 @@ func readConfig() *logConfig {
 	v.SetConfigName("app")
 	v.AddConfigPath(joinCurrentPath("env"))
 	if err := v.ReadInConfig(); err != nil {
-		//Errorf("Fatal error when reading %s config file:%s", "app", err)
 	}
 	if err := v.UnmarshalKey("log", config); err != nil {
-		//Errorf("Fatal error when reading %s config file:%s", "app", err)
-	}
-	if aa := v.Get("log.level.aaa"); aa != "" {
-		aa = "33"
 	}
 	if config.Path == "" {
 		config.Path = "./storage/logs"
@@ -66,8 +61,12 @@ func getLevelByTag(tag string) zapcore.Level {
 		return zap.DebugLevel
 	case zap.InfoLevel.String():
 		return zap.InfoLevel
+	case zap.WarnLevel.String():
+		return zap.WarnLevel
 	case zap.ErrorLevel.String():
 		return zap.ErrorLevel
+	case zap.FatalLevel.String():
+		return zap.FatalLevel
 	default:
 		return zap.InfoLevel
 	}
