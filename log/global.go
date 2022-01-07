@@ -37,23 +37,27 @@ type logConfig struct {
 	Path  string `mapstructure:"path"`
 	Stack bool   `mapstructure:"stack"`
 	debug bool   `mapstructure:"debug"`
+	v     *viper.Viper
 }
 
 func readConfig() *logConfig {
 	config := &logConfig{}
-	viper.SetConfigType("yaml")
-
-	viper.SetConfigName("app")
-	viper.AddConfigPath(joinCurrentPath("env"))
-	if err := viper.ReadInConfig(); err != nil {
+	v := viper.New()
+	v.SetConfigName("app")
+	v.AddConfigPath(joinCurrentPath("env"))
+	if err := v.ReadInConfig(); err != nil {
 		//Errorf("Fatal error when reading %s config file:%s", "app", err)
 	}
-	if err := viper.UnmarshalKey("output", config); err != nil {
+	if err := v.UnmarshalKey("log", config); err != nil {
 		//Errorf("Fatal error when reading %s config file:%s", "app", err)
+	}
+	if aa := v.Get("log.level.aaa"); aa != "" {
+		aa = "33"
 	}
 	if config.Path == "" {
 		config.Path = "./storage/logs"
 	}
+	config.v = v
 	return config
 }
 func getLevelByTag(tag string) zapcore.Level {

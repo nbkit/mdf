@@ -14,7 +14,6 @@ func runApp() error {
 		}
 	}()
 	server := mdf.DefaultServer()
-
 	server.Use(func(s *mdf.Server) {
 		//s.GetEngine().Use(cors.AllCross())
 		//rules.Register()

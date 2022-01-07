@@ -22,6 +22,8 @@ log:
   #Level such as fatal,error, warn, info, debug, or disable,Level defaults to "info"
   level: info
   path: ./storage/logs
+  debug: true
+  stack: true
 view:
   path: ./storage/template
   binary: true

@@ -56,9 +56,16 @@ func createDefaultOutput(args ...string) IOutput {
 		LocalTime:  true,
 		Compress:   true,
 	}
+	levelPath := "log.level"
 	logLevel := zap.NewAtomicLevel()
-	logLevel.SetLevel(getLevelByTag(envConfig.Level))
-
+	if len(args) > 0 && args[0] != "" {
+		levelPath = levelPath + args[0]
+	}
+	if l := envConfig.v.GetString(levelPath); l != "" {
+		logLevel.SetLevel(getLevelByTag(l))
+	} else {
+		logLevel.SetLevel(getLevelByTag(envConfig.Level))
+	}
 	encodeTime := func(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
 		enc.AppendString(t.Format("2006-01-02 15:04:05.000"))
 	}
@@ -76,7 +83,13 @@ func createDefaultOutput(args ...string) IOutput {
 		zapcore.NewCore(encoderConsole, zapcore.AddSync(os.Stdout), logLevel), //打印到控制台
 		zapcore.NewCore(encoderFile, zapcore.AddSync(&fileLogger), logLevel),
 	)
-	log := zap.New(core, zap.AddCaller(), zap.AddCallerSkip(3))
+	opts := make([]zap.Option, 0)
+	if envConfig.Stack {
+		zap.AddStacktrace(logLevel)
+		opts = append(opts, zap.AddCaller())
+		opts = append(opts, zap.AddCallerSkip(3))
+	}
+	log := zap.New(core, opts...)
 	l := &DefaultOutput{
 		level: logLevel,
 		log:   log,
