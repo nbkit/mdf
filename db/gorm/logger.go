@@ -129,8 +129,18 @@ type Logger struct {
 
 // Print format & print log
 func (logger Logger) Print(values ...interface{}) {
-	log.Info().CallerSkip(7).Output(LogFormatter(values...)...)
-
+	level := values[0]
+	var l *log.Flow
+	if level == "sql" || level == "info" {
+		l = log.Get("db").Info().CallerSkip(7)
+	} else if level == "log" || level == "error" {
+		l = log.Get("db").Error().CallerSkip(7)
+	} else if level == "warn" {
+		l = log.Get("db").Warn().CallerSkip(7)
+	} else {
+		l = log.Get("db").Error().CallerSkip(7)
+	}
+	l.Output(LogFormatter(values...)...)
 }
 
 type nopLogger struct{}

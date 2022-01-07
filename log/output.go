@@ -59,7 +59,7 @@ func createDefaultOutput(args ...string) IOutput {
 	levelPath := "log.level"
 	logLevel := zap.NewAtomicLevel()
 	if len(args) > 0 && args[0] != "" {
-		levelPath = levelPath + args[0]
+		levelPath = levelPath + "." + args[0]
 	}
 	if l := envConfig.v.GetString(levelPath); l != "" {
 		logLevel.SetLevel(getLevelByTag(l))
