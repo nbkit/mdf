@@ -44,7 +44,7 @@ func debugPrintLoadTemplate(tmpl *template.Template) {
 }
 
 func debugPrint(format string, values ...interface{}) {
-	log.Info().CallerSkip(1).Msgf(format, values...)
+	log.Info().WithForceOutput().CallerSkip(1).Msgf(format, values...)
 }
 
 func getMinVer(v string) (uint64, error) {

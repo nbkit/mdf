@@ -10,43 +10,19 @@ import (
 	"time"
 )
 
-type IOutput interface {
-	SetLevel(tag string)
-	GetLevel() Level
-	Clone(opts ...zap.Option) IOutput
-	Debug(msg string, fields ...Field)
-	Info(msg string, fields ...Field)
-	Warn(msg string, fields ...Field)
-	Error(msg interface{}, fields ...Field) error
-	Fatal(msg string, fields ...Field)
-}
-
-var outputMap map[string]IOutput = make(map[string]IOutput)
+var outputMap map[string]*zap.Logger = make(map[string]*zap.Logger)
 var mu sync.Mutex
 
-type DefaultOutput struct {
-	level      zap.AtomicLevel
-	log        *zap.Logger
-	callerSkip int
-}
-
-func getOutputInstance(key string) IOutput {
+func (f *Flow) getWriter() *zap.Logger {
 	mu.Lock()
 	defer mu.Unlock()
+	key := fmt.Sprintf("%v:%v:%v:%v", f.name, f.forceOutput, f.level.String(),f.callerSkip)
 	if outputMap[key] == nil {
-		outputMap[key] = createDefaultOutput(key)
+		outputMap[key] = f.createWriter(f.name)
 	}
 	return outputMap[key]
 }
-func GetOutput(key string) IOutput {
-	return getOutputInstance(key)
-}
-func SetOutput(key string, log IOutput) {
-	mu.Lock()
-	defer mu.Unlock()
-	outputMap[key] = log
-}
-func createDefaultOutput(args ...string) IOutput {
+func (f *Flow) createWriter(args ...string) *zap.Logger {
 	envConfig := readConfig()
 	fileLogger := lumberjack.Logger{
 		Filename:   getFilePath(envConfig, args...),
@@ -56,15 +32,24 @@ func createDefaultOutput(args ...string) IOutput {
 		LocalTime:  true,
 		Compress:   true,
 	}
-	levelPath := "log.level"
 	logLevel := zap.NewAtomicLevel()
+
+	levelPath := "log.level"
 	if len(args) > 0 && args[0] != "" {
-		levelPath = levelPath + "." + args[0]
+		levelPath = "log.level." + args[0]
 	}
+	//log.level.xxx -> log.level.root -> log.level
 	if l := envConfig.v.GetString(levelPath); l != "" {
 		logLevel.SetLevel(getLevelByTag(l))
+	} else if l := envConfig.v.GetString("log.level.root"); l != "" {
+		logLevel.SetLevel(getLevelByTag(l))
+	} else if l := envConfig.v.GetString("log.level"); l != "" {
+		logLevel.SetLevel(getLevelByTag(l))
 	} else {
-		logLevel.SetLevel(getLevelByTag(envConfig.Level))
+		logLevel.SetLevel(zapcore.ErrorLevel)
+	}
+	if f.forceOutput {
+		logLevel.SetLevel(zapcore.InfoLevel)
 	}
 	encodeTime := func(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
 		enc.AppendString(t.Format("2006-01-02 15:04:05.000"))
@@ -84,63 +69,15 @@ func createDefaultOutput(args ...string) IOutput {
 		zapcore.NewCore(encoderFile, zapcore.AddSync(&fileLogger), logLevel),
 	)
 	opts := make([]zap.Option, 0)
+	opts = append(opts, zap.AddCallerSkip(2))
 	if envConfig.Stack {
 		zap.AddStacktrace(logLevel)
 		opts = append(opts, zap.AddCaller())
-		opts = append(opts, zap.AddCallerSkip(3))
 	}
+	if f.callerSkip > 0 {
+		opts = append(opts, zap.AddCallerSkip(f.callerSkip))
+	}
+
 	log := zap.New(core, opts...)
-	l := &DefaultOutput{
-		level: logLevel,
-		log:   log,
-	}
-	return l
-}
-
-func (s *DefaultOutput) Clone(opts ...zap.Option) IOutput {
-	copy := *s
-	copy.log = copy.log.WithOptions(opts...)
-	return &copy
-}
-func (s *DefaultOutput) SetLevel(tag string) {
-	s.level.SetLevel(getLevelByTag(tag))
-}
-
-func (s *DefaultOutput) GetLevel() Level {
-	return s.level
-}
-
-// Debug logs a message at DebugLevel. The message includes any fields passed
-// at the output site, as well as any fields accumulated on the DefaultOutput.
-func (s *DefaultOutput) Debug(msg string, fields ...Field) {
-	s.log.Debug(msg, fields...)
-}
-
-// Info logs a message at InfoLevel. The message includes any fields passed
-// at the output site, as well as any fields accumulated on the DefaultOutput.
-func (s *DefaultOutput) Info(msg string, fields ...Field) {
-	s.log.Info(msg, fields...)
-}
-
-// Warn logs a message at WarnLevel. The message includes any fields passed
-// at the output site, as well as any fields accumulated on the DefaultOutput.
-func (s *DefaultOutput) Warn(msg string, fields ...Field) {
-	s.log.Warn(msg, fields...)
-}
-
-// Error logs a message at ErrorLevel. The message includes any fields passed
-// at the output site, as well as any fields accumulated on the DefaultOutput.
-func (s *DefaultOutput) Error(msg interface{}, fields ...Field) error {
-	if ev, ok := msg.(error); ok {
-		s.log.Error(ev.Error(), fields...)
-		return ev
-	} else if ev, ok := msg.(string); ok {
-		s.log.Error(ev, fields...)
-		return fmt.Errorf(ev)
-	}
-	s.log.Error(fmt.Sprint(msg), fields...)
-	return fmt.Errorf(fmt.Sprint(msg))
-}
-func (s *DefaultOutput) Fatal(msg string, fields ...Field) {
-	s.log.Fatal(msg, fields...)
+	return log
 }

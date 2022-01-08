@@ -9,11 +9,12 @@ import (
 )
 
 type Flow struct {
-	buf        []Field
-	output     IOutput
-	level      zapcore.Level
-	time       time.Time
-	callerSkip int
+	name        string
+	buf         []Field
+	level       zapcore.Level
+	time        time.Time
+	callerSkip  int
+	forceOutput bool
 }
 
 var eventPool = &sync.Pool{
@@ -31,13 +32,14 @@ func putEvent(e *Flow) {
 	}
 	eventPool.Put(e)
 }
-func newFlow(level zapcore.Level, output IOutput) *Flow {
+func newFlow(name string, level zapcore.Level) *Flow {
 	e := eventPool.Get().(*Flow)
+	e.name = name
 	e.buf = e.buf[:0]
-	e.output = output
 	e.level = level
 	e.time = time.Now()
 	e.callerSkip = 0
+	e.forceOutput=false
 	return e
 }
 
@@ -45,31 +47,28 @@ func (f *Flow) write(msg string, fields ...Field) {
 	if len(fields) > 0 {
 		f.buf = append(f.buf, fields...)
 	}
+	output := f.getWriter()
 	switch f.level {
 	case zap.InfoLevel:
-		f.output.Clone(callerSkip(f.callerSkip)).Info(msg, f.buf...)
+		output.Info(msg, f.buf...)
 		break
 	case zap.WarnLevel:
-		f.output.Clone(callerSkip(f.callerSkip)).Warn(msg, f.buf...)
+		output.Warn(msg, f.buf...)
 		break
 	case zap.DebugLevel:
-		f.output.Clone(callerSkip(f.callerSkip)).Debug(msg, f.buf...)
+		output.Debug(msg, f.buf...)
 		break
 	case zap.FatalLevel:
-		f.output.Clone(callerSkip(f.callerSkip)).Fatal(msg, f.buf...)
+		output.Fatal(msg, f.buf...)
 		break
 	case zap.ErrorLevel:
-		f.output.Clone(callerSkip(f.callerSkip)).Error(msg, f.buf...)
+		output.Error(msg, f.buf...)
 		break
 	default:
-		f.output.Clone(callerSkip(f.callerSkip)).Error(msg, f.buf...)
+		output.Error(msg, f.buf...)
 		break
 	}
 	putEvent(f)
-}
-
-func (f *Flow) Enabled() bool {
-	return f != nil && f.output.GetLevel().Enabled(f.level)
 }
 func (f *Flow) Output(msg ...interface{}) {
 	if f == nil {
@@ -101,6 +100,10 @@ func (f *Flow) Msgf(format string, v ...interface{}) {
 
 func (f *Flow) CallerSkip(skip int) *Flow {
 	f.callerSkip = skip
+	return f
+}
+func (f *Flow) WithForceOutput() *Flow {
+	f.forceOutput = true
 	return f
 }
 

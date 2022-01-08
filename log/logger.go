@@ -29,7 +29,7 @@ var logMap map[string]ILog = make(map[string]ILog)
 var logmu sync.Mutex
 
 type logImpl struct {
-	output IOutput
+	name string
 }
 
 func Get(key string) ILog {
@@ -42,24 +42,24 @@ func Get(key string) ILog {
 }
 func createLogger(key string) ILog {
 	item := &logImpl{
-		output: getOutputInstance(key),
+		name: key,
 	}
 	return item
 }
 func (f *logImpl) Warn() *Flow {
-	return newFlow(WarnLevel, f.output)
+	return newFlow(f.name,WarnLevel)
 }
 func (f *logImpl) Info() *Flow {
-	return newFlow(InfoLevel, f.output)
+	return newFlow(f.name,InfoLevel)
 }
 func (f *logImpl) Error() *Flow {
-	return newFlow(ErrorLevel, f.output)
+	return newFlow(f.name,ErrorLevel)
 }
 func (f *logImpl) Debug() *Flow {
-	return newFlow(DebugLevel, f.output)
+	return newFlow(f.name,DebugLevel)
 }
 func (f *logImpl) Fatal() *Flow {
-	return newFlow(FatalLevel, f.output)
+	return newFlow(f.name,FatalLevel)
 }
 func (f *logImpl) FatalF(format string, args ...interface{}) {
 	f.Fatal().CallerSkip(1).Msgf(format, args...)

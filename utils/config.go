@@ -120,11 +120,6 @@ func (s DbConfig) GetDsnString(useDB bool) string {
 	return str
 }
 
-type LogConfig struct {
-	Level string `mapstructure:"level" json:"level"`
-	Path  string `mapstructure:"path" json:"path"`
-	Stack bool   `mapstructure:"stack" json:"stack"`
-}
 type AuthConfig struct {
 	//权限中心地址
 	Address string `mapstructure:"address" json:"address"`
@@ -140,7 +135,6 @@ var _ENVMaps = gmap.New()
 type jsonConfig struct {
 	App  AppConfig              `mapstructure:"app" json:"app"`
 	Db   DbConfig               `mapstructure:"db" json:"db"`
-	Log  LogConfig              `mapstructure:"log" json:"log"`
 	Auth AuthConfig             `mapstructure:"auth" json:"auth"`
 	Data map[string]interface{} `json:"data"`
 }
@@ -148,7 +142,6 @@ type jsonConfig struct {
 type EnvConfig struct {
 	App  AppConfig  `mapstructure:"app" json:"app"`
 	Db   DbConfig   `mapstructure:"db" json:"db"`
-	Log  LogConfig  `mapstructure:"log" json:"log"`
 	Auth AuthConfig `mapstructure:"auth" json:"auth"`
 	data map[string]interface{}
 }
@@ -157,7 +150,6 @@ func (c EnvConfig) MarshalJSON() ([]byte, error) {
 	jsonMap := jsonConfig{}
 	jsonMap.App = c.App
 	jsonMap.Db = c.Db
-	jsonMap.Log = c.Log
 	jsonMap.Auth = c.Auth
 	jsonMap.Data = c.data
 	return json.Marshal(jsonMap)
@@ -168,7 +160,6 @@ func (c *EnvConfig) UnmarshalJSON(b []byte) error {
 	json.Unmarshal(b, &jsonMap)
 	c.App = jsonMap.App
 	c.Db = jsonMap.Db
-	c.Log = jsonMap.Log
 	c.Auth = jsonMap.Auth
 	c.data = jsonMap.Data
 	return nil

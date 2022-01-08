@@ -33,7 +33,6 @@ const (
 )
 
 type logConfig struct {
-	Level string `mapstructure:"level"`
 	Path  string `mapstructure:"path"`
 	Stack bool   `mapstructure:"stack"`
 	debug bool   `mapstructure:"debug"`
