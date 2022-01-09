@@ -227,6 +227,10 @@ func setWithProperType(val string, value reflect.Value, field reflect.StructFiel
 		return json.Unmarshal(bytesconv.StringToBytes(val), value.Addr().Interface())
 	case reflect.Map:
 		return json.Unmarshal(bytesconv.StringToBytes(val), value.Addr().Interface())
+	case reflect.Interface:
+		if value.CanSet() {
+			value.Set(reflect.ValueOf(val))
+		}
 	default:
 		return errUnknownType
 	}

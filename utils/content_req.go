@@ -2,7 +2,6 @@ package utils
 
 import (
 	"github.com/nbkit/mdf/gin"
-	"github.com/nbkit/mdf/gin/binding"
 	"github.com/nbkit/mdf/log"
 	"mime/multipart"
 )
@@ -11,6 +10,10 @@ type ReqContext struct {
 	Domain   string                  `json:"domain" form:"domain"`
 	Widget   string                  `json:"widget"  form:"widget"`
 	ID       string                  `json:"id" form:"id"`
+	Type     string                  `json:"type" form:"type"`
+	Code     string                  `json:"code" form:"code"`
+	Name     string                  `json:"name" form:"name"`
+	Tag      string                  `json:"tag" form:"tag"`
 	IDS      []string                `json:"ids" form:"ids"`
 	Page     int                     `json:"page" form:"page"`
 	PageSize int                     `json:"page_size" form:"page_size"`
@@ -19,7 +22,6 @@ type ReqContext struct {
 	Q        string                  `json:"q" form:"q"`           //模糊查询条件
 	Entity   string                  `json:"entity" form:"entity"`
 	Data     interface{}             `json:"data" form:"data"` //数据
-	Tag      string                  `json:"tag" form:"tag"`
 	Files    []*multipart.FileHeader `json:"-" form:"files"`
 	canceled bool                    `json:"-" form:"-"`
 }
@@ -36,12 +38,6 @@ func (s *ReqContext) Bind(c *gin.Context) *ReqContext {
 	}
 	if s.ID == "" {
 		s.ID = c.Query("id")
-	}
-	switch c.ContentType() {
-	case binding.MIMEMultipartPOSTForm:
-		if v, ok := c.GetPostForm("data"); ok {
-			s.Data = v
-		}
 	}
 	return s
 }
