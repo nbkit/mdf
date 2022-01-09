@@ -6,6 +6,7 @@ package binding
 
 import (
 	"net/http"
+	"reflect"
 )
 
 const defaultMemory = 32 << 20
@@ -55,9 +56,18 @@ func (formMultipartBinding) Bind(req *http.Request, obj interface{}) error {
 	if err := req.ParseMultipartForm(defaultMemory); err != nil {
 		return err
 	}
-	if err := mappingByPtr(obj, (*multipartRequest)(req), "form"); err != nil {
-		return err
+	ptrVal := reflect.ValueOf(obj)
+	if ptrVal.Kind() == reflect.Ptr {
+		ptrVal = ptrVal.Elem()
 	}
-
+	if ptrVal.Kind() == reflect.Map {
+		if err := mapForm(obj, req.PostForm); err != nil {
+			return err
+		}
+	} else {
+		if err := mappingByPtr(obj, (*multipartRequest)(req), "form"); err != nil {
+			return err
+		}
+	}
 	return validate(obj)
 }
