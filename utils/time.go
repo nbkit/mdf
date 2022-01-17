@@ -98,6 +98,28 @@ func TimeNow() Time {
 func TimeNowPtr() *Time {
 	return ToTimePtr(time.Now())
 }
+func _stringToTimeString(timestr string) string {
+	var ret = ""
+	timestr = strings.Replace(timestr, `"`, "", -1)
+	timestr = strings.Replace(timestr, "/", "-", -1)
+	arr := strings.Split(timestr, " ")
+	if len(arr) <= 1 {
+		ret = strings.Join([]string{arr[0], "00:00:00"}, " ")
+	} else {
+		switch strings.Count(arr[1], ":") {
+		case 0:
+			ret = strings.Join([]string{arr[0], strings.Join([]string{arr[1], ":00:00"}, "")}, " ")
+			break
+		case 1:
+			ret = strings.Join([]string{arr[0], strings.Join([]string{arr[1], ":00"}, "")}, " ")
+			break
+		default:
+			ret = timestr
+			break
+		}
+	}
+	return ret
+}
 func ToTime(value interface{}) Time {
 	if value == "" || value == nil {
 		return Time{}
@@ -105,30 +127,20 @@ func ToTime(value interface{}) Time {
 	if v, ok := value.(time.Time); ok {
 		return Time{v}
 	}
+	if v, ok := value.(Time); ok {
+		return v
+	}
 	if v, ok := value.(string); ok {
-		v = strings.Replace(v, `"`, "", -1)
-		layout := Layout_YYYYMMDDHHIISS
+		v = _stringToTimeString(v)
+		layout := "2006-1-2 15:4:5"
 		data := []rune(v)
-		if len(data) >= len(Layout_YYYYMMDDHHIISST) && strings.Contains(v, "T") {
-			layout = Layout_YYYYMMDDHHIISST
-			data = data[:len(Layout_YYYYMMDDHHIISST)]
-		} else if len(data) >= len(Layout_YYYYMMDDHHIISS) {
-			layout = Layout_YYYYMMDDHHIISS
-			data = data[:len(Layout_YYYYMMDDHHIISS)]
-		} else if len(data) >= len(Layout_YYYYMMDD) {
-			layout = Layout_YYYYMMDD
-			data = data[:len(Layout_YYYYMMDD)]
-		} else if len(data) >= len(Layout_YYYYMM) {
-			layout = Layout_YYYYMM
-			data = data[:len(Layout_YYYYMM)]
-		}
 		now, err := time.ParseInLocation(layout, string(data), time.Local)
 		if err != nil {
 			log.Print("string to ToTime failed", err)
 		}
 		return Time{now}
 	}
-	return Time{time.Now()}
+	return Time{}
 }
 func ToTimePtr(value interface{}) *Time {
 	t := ToTime(value)
@@ -148,28 +160,7 @@ func (t *Time) UnmarshalJSON(data []byte) error {
 		*t = Time{}
 		return nil
 	}
-	ds := strings.Replace(string(data), `"`, "", -1)
-	layout := Layout_YYYYMMDDHHIISS
-	data = []byte(ds)
-	if len(data) >= len(Layout_YYYYMMDDHHIISST) && strings.Contains(ds, "T") {
-		layout = Layout_YYYYMMDDHHIISST
-		data = data[:len(Layout_YYYYMMDDHHIISST)]
-	} else if len(data) >= len(Layout_YYYYMMDDHHIISS) {
-		layout = Layout_YYYYMMDDHHIISS
-		data = data[:len(Layout_YYYYMMDDHHIISS)]
-	} else if len(data) >= len(Layout_YYYYMMDD) {
-		layout = Layout_YYYYMMDD
-		data = data[:len(Layout_YYYYMMDD)]
-	} else if len(data) >= len(Layout_YYYYMM) {
-		layout = Layout_YYYYMM
-		data = data[:len(Layout_YYYYMM)]
-	}
-	now, _ := time.ParseInLocation(layout, string(data), time.Local)
-	if now.UnixNano() < 0 || now.Unix() <= 0 {
-		*t = Time{}
-	} else {
-		*t = Time{now}
-	}
+	*t = ToTime(string(data))
 	return nil
 }
 

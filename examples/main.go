@@ -16,8 +16,16 @@ func main() {
 	log.WarnF("启动参数：%v", os.Args)
 	log.WarnF("环境变量：%v", os.Environ())
 
+	t := utils.ToTime("2022-01-02")
+	log.ErrorD(t)
 
-	if err := runApp(); err != nil {
-		os.Exit(1)
-	}
+	t = utils.ToTime("2022-1-02 09:34")
+	log.ErrorD(t)
+
+	t = utils.ToTime("2022/1-02")
+	log.ErrorD(t)
+
+	//if err := runApp(); err != nil {
+	//	os.Exit(1)
+	//}
 }
