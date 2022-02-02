@@ -102,6 +102,11 @@ func _stringToTimeString(timestr string) string {
 	var ret = ""
 	timestr = strings.Replace(timestr, `"`, "", -1)
 	timestr = strings.Replace(timestr, "/", "-", -1)
+	//2022-01-26T16:33:18.000+0800
+	if len(timestr) >= len(Layout_YYYYMMDDHHIISST) && strings.Contains(timestr, "T") {
+		timestr = strings.Replace(timestr, "T", " ", -1)
+		timestr = timestr[:len(Layout_YYYYMMDDHHIISST)]
+	}
 	arr := strings.Split(timestr, " ")
 	if len(arr) <= 1 {
 		ret = strings.Join([]string{arr[0], "00:00:00"}, " ")
