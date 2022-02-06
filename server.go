@@ -11,12 +11,14 @@ import (
 	"github.com/nbkit/mdf/framework/md"
 	"github.com/nbkit/mdf/framework/reg"
 	"github.com/nbkit/mdf/gin"
-	"github.com/nbkit/mdf/log"
 	"github.com/nbkit/mdf/middleware/token"
 	"github.com/nbkit/mdf/utils"
+	"html/template"
+	"io/fs"
 	"os"
-	"path"
 	"path/filepath"
+	"regexp"
+	"strings"
 )
 
 type Config struct {
@@ -136,19 +138,22 @@ func (s *Server) initHtmlTemplate() {
 	if viewPath == "" {
 		viewPath = "./storage/template"
 	}
-	isBinary := utils.Config.GetBool("view.binary")
-	//设置模板
-	if utils.PathExists(viewPath) {
-		if isBinary {
-
+	pattern := utils.JoinCurrentPath(viewPath)
+	reg, _ := regexp.Compile(`\.html$`)
+	templ := template.New("").Delims("{{", "}}").Funcs(s.engine.FuncMap)
+	filepath.Walk(pattern, func(path string, info fs.FileInfo, err error) error {
+		if !info.IsDir() && reg.MatchString(path) {
+			r, _ := filepath.Rel(pattern, path)
+			if r != "" && r != "." {
+				r = strings.Replace(r, "\\", "/", -1)
+				if b, err := os.ReadFile(path); err == nil {
+					templ.New(r).Parse(string(b))
+				}
+			}
 		}
-		pattern := utils.JoinCurrentPath(path.Join(viewPath, "*.html"))
-		if filenames, err := filepath.Glob(pattern); err != nil {
-			log.Error().Error(err)
-		} else if len(filenames) > 0 {
-			s.engine.LoadHTMLGlob(pattern)
-		}
-	}
+		return nil
+	})
+	s.engine.SetHTMLTemplate(templ)
 }
 func (s *Server) initMigrate() {
 	if utils.Config.Db.Database != "" && s.option.isMigrate {
