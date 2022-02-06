@@ -136,13 +136,13 @@ func (s *Server) initDone() {
 func (s *Server) initHtmlTemplate() {
 	viewPath := utils.Config.GetValue("view.path")
 	if viewPath == "" {
-		viewPath = "./storage/template"
+		viewPath = "./static"
 	}
 	pattern := utils.JoinCurrentPath(viewPath)
 	reg, _ := regexp.Compile(`\.html$`)
 	templ := template.New("").Delims("{{", "}}").Funcs(s.engine.FuncMap)
 	filepath.Walk(pattern, func(path string, info fs.FileInfo, err error) error {
-		if !info.IsDir() && reg.MatchString(path) {
+		if err == nil && info != nil && !info.IsDir() && reg.MatchString(path) {
 			r, _ := filepath.Rel(pattern, path)
 			if r != "" && r != "." {
 				r = strings.Replace(r, "\\", "/", -1)
