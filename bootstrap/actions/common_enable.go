@@ -1,22 +1,21 @@
 package actions
 
 import (
+	"github.com/nbkit/mdf/framework/widget"
 	"github.com/nbkit/mdf/utils"
-
-	"github.com/nbkit/mdf/framework/md"
 )
 
 type commonEnable struct {
-	register *md.MDAction
+	register *widget.MDAction
 }
 
 func newCommonEnable() *commonEnable {
 	return &commonEnable{
-		register: &md.MDAction{Code: "enable", Widget: "common", Action: "enable"},
+		register: &widget.MDAction{Code: "enable", Widget: "common", Action: "enable"},
 	}
 }
 
-func (s commonEnable) Register() *md.MDAction {
+func (s commonEnable) Register() *widget.MDAction {
 	return s.register
 }
 

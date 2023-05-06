@@ -3,20 +3,21 @@ package rules
 import (
 	"github.com/nbkit/mdf/framework/files"
 	"github.com/nbkit/mdf/framework/md"
+	"github.com/nbkit/mdf/framework/rule"
 	"github.com/nbkit/mdf/utils"
 	"sort"
 )
 
 type entityImportBefore struct {
-	register *md.MDRule
+	register *rule.MDRule
 }
 
 func newEntityImportBefore() *entityImportBefore {
 	return &entityImportBefore{
-		register: &md.MDRule{Action: "import", Code: "import.before", Widget: "md", Sequence: 20},
+		register: &rule.MDRule{Action: "import", Code: "import.before", Widget: "md", Sequence: 20},
 	}
 }
-func (s *entityImportBefore) Register() *md.MDRule {
+func (s *entityImportBefore) Register() *rule.MDRule {
 	return s.register
 }
 func (s *entityImportBefore) Exec(flow *utils.FlowContext) {

@@ -33,5 +33,5 @@ func (t MDEnum) TableName() string {
 	return "md_enums"
 }
 func (s *MDEnum) MD() *Mder {
-	return &Mder{ID: "md.enum", Domain: md_domain, Name: "枚举", Type: utils.TYPE_ENUM}
+	return &Mder{ID: "md.enum", Domain: MD_domain, Name: "枚举", Type: utils.TYPE_ENUM}
 }

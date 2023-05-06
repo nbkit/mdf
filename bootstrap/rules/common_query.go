@@ -3,20 +3,21 @@ package rules
 import (
 	"fmt"
 	"github.com/nbkit/mdf/framework/md"
+	"github.com/nbkit/mdf/framework/rule"
 	"github.com/nbkit/mdf/log"
 	"github.com/nbkit/mdf/utils"
 )
 
 type commonQuery struct {
-	register *md.MDRule
+	register *rule.MDRule
 }
 
 func newCommonQuery() *commonQuery {
 	return &commonQuery{
-		register: &md.MDRule{Action: "query", Code: "query", Widget: "common", Sequence: 50},
+		register: &rule.MDRule{Action: "query", Code: "query", Widget: "common", Sequence: 50},
 	}
 }
-func (s *commonQuery) Register() *md.MDRule {
+func (s *commonQuery) Register() *rule.MDRule {
 	return s.register
 }
 

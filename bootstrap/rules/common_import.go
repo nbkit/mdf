@@ -3,6 +3,7 @@ package rules
 import (
 	"fmt"
 	"github.com/nbkit/mdf/db"
+	"github.com/nbkit/mdf/framework/rule"
 	"strings"
 
 	"github.com/nbkit/mdf/framework/files"
@@ -11,15 +12,15 @@ import (
 )
 
 type commonImport struct {
-	register *md.MDRule
+	register *rule.MDRule
 }
 
 func newCommonImport() *commonImport {
 	return &commonImport{
-		register: &md.MDRule{Action: "import", Code: "import", Widget: "common", Sequence: 50},
+		register: &rule.MDRule{Action: "import", Code: "import", Widget: "common", Sequence: 50},
 	}
 }
-func (s *commonImport) Register() *md.MDRule {
+func (s *commonImport) Register() *rule.MDRule {
 	return s.register
 }
 func (s *commonImport) Exec(flow *utils.FlowContext) {

@@ -3,22 +3,23 @@ package rules
 import (
 	"fmt"
 	"github.com/nbkit/mdf/db"
+	"github.com/nbkit/mdf/framework/rule"
 	"github.com/nbkit/mdf/utils"
 
 	"github.com/nbkit/mdf/framework/md"
 )
 
 type commonDisable struct {
-	register *md.MDRule
+	register *rule.MDRule
 }
 
 func newCommonDisable() *commonDisable {
 	return &commonDisable{
-		register: &md.MDRule{Action: "disable", Code: "disable", Widget: "common", Sequence: 50},
+		register: &rule.MDRule{Action: "disable", Code: "disable", Widget: "common", Sequence: 50},
 	}
 }
 
-func (s commonDisable) Register() *md.MDRule {
+func (s commonDisable) Register() *rule.MDRule {
 	return s.register
 }
 
