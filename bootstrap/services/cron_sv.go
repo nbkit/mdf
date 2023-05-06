@@ -3,10 +3,8 @@ package services
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"github.com/nbkit/mdf/bootstrap/errors"
 	"github.com/nbkit/mdf/db"
-	"github.com/nbkit/mdf/framework/md"
 	"github.com/nbkit/mdf/log"
 	"github.com/robfig/cron"
 	"io/ioutil"
@@ -73,8 +71,6 @@ func (s *cronSvImpl) jobHandle(item *model.CronTask) {
 	}()
 	item.NumRun = item.NumRun + 1
 	db.Default().Model(item).Where("id=?", item.ID).Updates(map[string]interface{}{"StatusID": "running", "NumRun": item.NumRun, "LastStatusID": "running", "LastTime": utils.TimeNow()})
-
-	md.LogSv().Create(&md.MDLog{NodeID: item.ID, NodeType: "Cron", Level: utils.LOG_LEVEL_INFO, Msg: fmt.Sprintf("开始执行计划任务：%s", item.Name)}) //log
 
 	s.createLog(&model.CronLog{EntID: item.EntID, TaskID: item.ID, Title: "开始执行", StatusID: "running"})
 
@@ -145,7 +141,6 @@ func (s *cronSvImpl) runJobItemFailed(item *model.CronTask, err error) {
 
 	s.createLog(&model.CronLog{EntID: item.EntID, TaskID: item.ID, Title: "执行计划出错", StatusID: "failed", Msg: err.Error()})
 
-	md.LogSv().Create(&md.MDLog{NodeID: item.ID, NodeType: "Cron", Level: utils.LOG_LEVEL_INFO, Msg: fmt.Sprintf("执行计划出错：%s", err.Error())}) //log
 	updates := make(map[string]interface{})
 	item.NumPeriod = item.NumPeriod + 1
 	item.NumFailed = item.NumFailed + 1
@@ -156,14 +151,12 @@ func (s *cronSvImpl) runJobItemFailed(item *model.CronTask, err error) {
 	if item.UnitID == "once" {
 		if item.NumPeriod > item.Retry { //大于重试次数，则停止
 			updates["StatusID"] = "completed"
-			md.LogSv().Create(&md.MDLog{NodeID: item.ID, NodeType: "Cron", Level: utils.LOG_LEVEL_INFO, Msg: fmt.Sprintf("执行次数大于重试次数，设置状态为完成!")}) //log
 		} else {
 			updates["StatusID"] = "waiting"
 		}
 	} else {
 		updates["StatusID"] = "waiting"
 		if item.NumPeriod > item.Retry {
-			md.LogSv().Create(&md.MDLog{NodeID: item.ID, NodeType: "Cron", Level: utils.LOG_LEVEL_INFO, Msg: fmt.Sprintf("执行次数大于重试次数，重置下次执行时间!")}) //log
 			currTime := time.Unix(item.NeTime, 0)
 			if item.UnitID == "month" {
 				currTime = currTime.AddDate(0, 1, 0)
@@ -183,7 +176,6 @@ func (s *cronSvImpl) runJobItemFailed(item *model.CronTask, err error) {
 	db.Default().Model(item).Where("id=?", item.ID).Updates(updates)
 }
 func (s *cronSvImpl) runJobItemSucceed(item *model.CronTask) {
-	md.LogSv().Create(&md.MDLog{NodeID: item.ID, NodeType: "Cron", Level: utils.LOG_LEVEL_INFO, Msg: fmt.Sprintf("执行计划成功")})
 	s.createLog(&model.CronLog{EntID: item.EntID, TaskID: item.ID, Title: "执行成功", StatusID: "succeed"})
 
 	updates := make(map[string]interface{})
@@ -197,7 +189,6 @@ func (s *cronSvImpl) runJobItemSucceed(item *model.CronTask) {
 	if item.UnitID == "once" {
 		updates["StatusID"] = "completed"
 	} else {
-		md.LogSv().Create(&md.MDLog{NodeID: item.ID, NodeType: "Cron", Level: utils.LOG_LEVEL_INFO, Msg: fmt.Sprintf("重置下次执行时间!")}) //log
 		updates["StatusID"] = "waiting"
 		currTime := time.Unix(item.NeTime, 0)
 		if item.UnitID == "month" {
@@ -218,8 +209,6 @@ func (s *cronSvImpl) runJobItemSucceed(item *model.CronTask) {
 }
 func (s *cronSvImpl) runJobItemReset(item *model.CronTask) {
 	db.Default().Model(item).Where("id=? and status_id=?", item.ID, "running").Updates(map[string]interface{}{"StatusID": "waiting", "LastMsg": "被异常中断"})
-	md.LogSv().Create(&md.MDLog{NodeID: item.ID, NodeType: "Cron", Level: utils.LOG_LEVEL_INFO, Msg: fmt.Sprintf("被异常中断")}) //log
-
 	s.createLog(&model.CronLog{EntID: item.EntID, TaskID: item.ID, Title: "被异常中断", StatusID: "completed"})
 }
 

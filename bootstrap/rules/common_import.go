@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/nbkit/mdf/db"
 	"github.com/nbkit/mdf/framework/rule"
+	"github.com/nbkit/mdf/log"
 	"strings"
 
 	"github.com/nbkit/mdf/framework/files"
@@ -24,15 +25,12 @@ func (s *commonImport) Register() *rule.MDRule {
 	return s.register
 }
 func (s *commonImport) Exec(flow *utils.FlowContext) {
-	logData := &md.MDLog{EntID: flow.EntID(), UserID: flow.UserID(), NodeType: flow.Request.Widget, NodeID: flow.Request.Widget, DataID: flow.Request.Entity}
-	md.LogSv().CreateLog(logData.Clone().SetMsg("导入开始======begin======"))
-
+	log.InfoD("导入开始======begin======")
 	defer func() {
-		md.LogSv().CreateLog(logData.Clone().SetMsg("导入结束"))
+		log.InfoD("导入结束======end======")
 	}()
 	if flow.Request.Data == nil {
-		err := flow.Error("没有要导入的数据")
-		md.LogSv().CreateLog(logData.Clone().SetMsg(err))
+		log.InfoD("没有要导入的数据")
 		return
 	}
 	data := flow.Request.Data
@@ -45,17 +43,13 @@ func (s *commonImport) Exec(flow *utils.FlowContext) {
 	}
 }
 func (s *commonImport) importMapData(flow *utils.FlowContext, data files.ImportData) {
-
-	log := md.LogSv()
-	logData := &md.MDLog{EntID: flow.EntID(), UserID: flow.UserID(), NodeType: flow.Request.Widget, NodeID: flow.Request.Widget, DataID: flow.Request.Entity}
-	log.CreateLog(logData.Clone().SetMsg(fmt.Sprintf("接收到需要导入的数据-%s：%v条", flow.Request.Entity, len(data.Data))))
-
+	log.InfoD(fmt.Sprintf("接收到需要导入的数据-%s：%v条", flow.Request.Entity, len(data.Data)))
 	entity := md.MDSv().GetEntity(data.EntityCode)
 	if entity == nil {
 		entity = md.MDSv().GetEntity(flow.Request.Entity)
 	}
 	if entity == nil {
-		log.CreateLog(logData.Clone().SetMsg(fmt.Sprintf("没有配置导入实体，请确认是否需要导入,%v", data.SheetName)))
+		log.InfoD(fmt.Sprintf("没有配置导入实体，请确认是否需要导入,%v", data.SheetName))
 		return
 	}
 	dbDatas := make([]map[string]interface{}, 0)
@@ -80,12 +74,12 @@ func (s *commonImport) importMapData(flow *utils.FlowContext, data files.ImportD
 				qreq.Request.Q = kv
 				qreq.Request.Data = item
 				if md.MDSv().TakeDataByQ(flow); flow.Error() != nil {
-					log.CreateLog(logData.Clone().SetMsg(fmt.Sprintf("数据[%s]=[%s],查询失败：%v", qreq.Request.Entity, qreq.Request.Q, flow.Error())))
+					log.InfoD(fmt.Sprintf("数据[%s]=[%s],查询失败：%v", qreq.Request.Entity, qreq.Request.Q, flow.Error()))
 				} else if v := flow.Response.Get("id"); v != nil {
 					dbItem[fieldName] = v
 					quotedMap[fieldName] = fieldName
 				} else {
-					log.CreateLog(logData.Clone().SetMsg(fmt.Sprintf("关联对象[%s],找不到[%s]对应数据!", qreq.Request.Entity, qreq.Request.Q)))
+					log.InfoD(fmt.Sprintf("关联对象[%s],找不到[%s]对应数据!", qreq.Request.Entity, qreq.Request.Q))
 				}
 			} else if field.TypeType == utils.TYPE_ENUM {
 				fieldName = field.DbName + "_id"
@@ -93,7 +87,7 @@ func (s *commonImport) importMapData(flow *utils.FlowContext, data files.ImportD
 					dbItem[fieldName] = vv.ID
 					quotedMap[fieldName] = fieldName
 				} else {
-					log.CreateLog(logData.Clone().SetMsg(fmt.Sprintf("关联枚举[%s],找不到[%s]对应数据!", field.Limit, kv)))
+					log.InfoD(fmt.Sprintf("关联枚举[%s],找不到[%s]对应数据!", field.Limit, kv))
 				}
 			} else if field.TypeType == utils.TYPE_SIMPLE {
 				fieldName = field.DbName
@@ -169,7 +163,7 @@ func (s *commonImport) importMapData(flow *utils.FlowContext, data files.ImportD
 
 		if itemCount >= MaxBatchs {
 			if err := s.batchInsertSave(entity, quoted, placeholdersArr, valueVars...); err != nil {
-				log.CreateLog(logData.Clone().SetMsg(fmt.Sprintf("数据库存储[%v]条记录出错了:%s!", itemCount, err.Error())))
+				log.InfoD(fmt.Sprintf("数据库存储[%v]条记录出错了:%s!", itemCount, err.Error()))
 				flow.Error(err)
 				return
 			}
@@ -180,7 +174,7 @@ func (s *commonImport) importMapData(flow *utils.FlowContext, data files.ImportD
 	}
 	if itemCount > 0 {
 		if err := s.batchInsertSave(entity, quoted, placeholdersArr, valueVars...); err != nil {
-			log.CreateLog(logData.Clone().SetMsg(fmt.Sprintf("数据库存储[%v]条记录出错了:%s!", itemCount, err.Error())))
+			log.InfoD(fmt.Sprintf("数据库存储[%v]条记录出错了:%s!", itemCount, err.Error()))
 			flow.Error(err)
 			return
 		}
