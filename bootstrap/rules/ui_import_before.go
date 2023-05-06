@@ -3,21 +3,21 @@ package rules
 import (
 	"github.com/nbkit/mdf/db"
 	"github.com/nbkit/mdf/framework/files"
-	"github.com/nbkit/mdf/framework/md"
+	"github.com/nbkit/mdf/framework/rule"
 	"github.com/nbkit/mdf/log"
 	"github.com/nbkit/mdf/utils"
 )
 
 type uiImportBefore struct {
-	register *md.MDRule
+	register *rule.MDRule
 }
 
 func newUiImportBefore() *uiImportBefore {
 	return &uiImportBefore{
-		register: &md.MDRule{Action: "import", Code: "import.before", Widget: "ui", Sequence: 20},
+		register: &rule.MDRule{Action: "import", Code: "import.before", Widget: "ui", Sequence: 20},
 	}
 }
-func (s *uiImportBefore) Register() *md.MDRule {
+func (s *uiImportBefore) Register() *rule.MDRule {
 	return s.register
 }
 func (s *uiImportBefore) Exec(flow *utils.FlowContext) {

@@ -16,7 +16,7 @@ var mu sync.Mutex
 func (f *Flow) getWriter() *zap.Logger {
 	mu.Lock()
 	defer mu.Unlock()
-	key := fmt.Sprintf("%v:%v:%v:%v", f.name, f.forceOutput, f.level.String(),f.callerSkip)
+	key := fmt.Sprintf("%v:%v:%v:%v", f.name, f.forceOutput, f.level.String(), f.callerSkip)
 	if outputMap[key] == nil {
 		outputMap[key] = f.createWriter(f.name)
 	}

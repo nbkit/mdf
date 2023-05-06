@@ -3,7 +3,7 @@ package upgrade
 import (
 	"github.com/nbkit/mdf/db"
 	"github.com/nbkit/mdf/framework/files"
-	"github.com/nbkit/mdf/framework/md"
+	"github.com/nbkit/mdf/framework/widget"
 	"github.com/nbkit/mdf/log"
 	"github.com/nbkit/mdf/utils"
 	"io/ioutil"
@@ -96,7 +96,7 @@ func (s *scriptImpl) handExcelData(data []files.ImportData) error {
 		c.Request.Action = "import"
 		c.Request.Widget = k
 		c.Token = utils.NewTokenContext()
-		md.ActionSv().DoAction(c)
+		widget.ActionSv().DoAction(c)
 	}
 	return nil
 }

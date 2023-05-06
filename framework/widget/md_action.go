@@ -1,7 +1,8 @@
-package md
+package widget
 
 import (
 	"fmt"
+	"github.com/nbkit/mdf/framework/md"
 	"github.com/nbkit/mdf/utils"
 )
 
@@ -27,6 +28,6 @@ type MDAction struct {
 func (s MDAction) GetKey() string {
 	return fmt.Sprintf("%s:%s", s.Widget, s.Code)
 }
-func (s *MDAction) MD() *Mder {
-	return &Mder{ID: "md.action", Domain: md_domain, Name: "组件命令"}
+func (s *MDAction) MD() *md.Mder {
+	return &md.Mder{ID: "md.action", Domain: md.MD_domain, Name: "组件命令"}
 }

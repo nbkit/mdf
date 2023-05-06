@@ -3,22 +3,23 @@ package rules
 import (
 	"fmt"
 	"github.com/nbkit/mdf/db"
+	"github.com/nbkit/mdf/framework/rule"
 
 	"github.com/nbkit/mdf/framework/md"
 	"github.com/nbkit/mdf/utils"
 )
 
 type CommonDelete struct {
-	register *md.MDRule
+	register *rule.MDRule
 }
 
 func newCommonDelete() *CommonDelete {
 	return &CommonDelete{
-		register: &md.MDRule{Action: "delete", Code: "delete", Widget: "common", Sequence: 50},
+		register: &rule.MDRule{Action: "delete", Code: "delete", Widget: "common", Sequence: 50},
 	}
 }
 
-func (s CommonDelete) Register() *md.MDRule {
+func (s CommonDelete) Register() *rule.MDRule {
 	return s.register
 }
 

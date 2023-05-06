@@ -1,6 +1,9 @@
-package md
+package widget
 
-import "github.com/nbkit/mdf/utils"
+import (
+	"github.com/nbkit/mdf/framework/md"
+	"github.com/nbkit/mdf/utils"
+)
 
 type MDToolbars struct {
 	ID        string          `gorm:"primary_key;size:36" json:"id"`
@@ -18,8 +21,8 @@ type MDToolbars struct {
 	Items     []MDToolbarItem `gorm:"-" json:"items"`
 }
 
-func (s *MDToolbars) MD() *Mder {
-	return &Mder{ID: "md.toolbars", Domain: md_domain, Name: "组件工具集"}
+func (s *MDToolbars) MD() *md.Mder {
+	return &md.Mder{ID: "md.toolbars", Domain: md.MD_domain, Name: "组件工具集"}
 }
 
 type MDToolbarItem struct {
@@ -44,6 +47,6 @@ type MDToolbarItem struct {
 	Extras     utils.SJson     `gorm:"type:text;name:扩展属性" json:"extras"` //JSON
 }
 
-func (s *MDToolbarItem) MD() *Mder {
-	return &Mder{ID: "md.toolbar.item", Domain: md_domain, Name: "组件工具条"}
+func (s *MDToolbarItem) MD() *md.Mder {
+	return &md.Mder{ID: "md.toolbar.item", Domain: md.MD_domain, Name: "组件工具条"}
 }

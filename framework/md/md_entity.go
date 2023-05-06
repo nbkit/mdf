@@ -29,7 +29,7 @@ func (s MDEntity) String() string {
 	return fmt.Sprintf("%s-%s-%s", s.Domain, s.Code, s.ID)
 }
 func (s *MDEntity) MD() *Mder {
-	return &Mder{ID: "md.entity", Domain: md_domain, Name: "实体"}
+	return &Mder{ID: "md.entity", Domain: MD_domain, Name: "实体"}
 }
 func (s *MDEntity) GetField(code string) *MDField {
 	if s.cache == nil {
@@ -65,7 +65,7 @@ type MDEntityRelation struct {
 }
 
 func (s *MDEntityRelation) MD() *Mder {
-	return &Mder{ID: "md.entity.relation", Domain: md_domain, Name: "实体关系"}
+	return &Mder{ID: "md.entity.relation", Domain: MD_domain, Name: "实体关系"}
 }
 
 type MDField struct {
@@ -130,5 +130,5 @@ func (s MDField) CompileValue(value interface{}) interface{} {
 	return nil
 }
 func (s *MDField) MD() *Mder {
-	return &Mder{ID: "md.field", Domain: md_domain, Name: "属性"}
+	return &Mder{ID: "md.field", Domain: MD_domain, Name: "属性"}
 }

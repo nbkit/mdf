@@ -1,12 +1,12 @@
 package actions
 
 import (
-	"github.com/nbkit/mdf/framework/md"
+	"github.com/nbkit/mdf/framework/widget"
 )
 
 func Register() {
 	//注册到mof框架
-	md.ActionSv().RegisterAction(
+	widget.ActionSv().RegisterAction(
 		newCommonDelete(),
 		newCommonDisable(),
 		newCommonEnable(),

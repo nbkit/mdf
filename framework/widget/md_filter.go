@@ -1,6 +1,9 @@
-package md
+package widget
 
-import "github.com/nbkit/mdf/utils"
+import (
+	"github.com/nbkit/mdf/framework/md"
+	"github.com/nbkit/mdf/utils"
+)
 
 type MDFilters struct {
 	ID        string      `gorm:"primary_key;size:36" json:"id"`
@@ -17,8 +20,8 @@ type MDFilters struct {
 	Context   utils.SJson `gorm:"type:text;name:上下文" json:"context"`
 }
 
-func (s *MDFilters) MD() *Mder {
-	return &Mder{ID: "md.filters", Domain: md_domain, Name: "过滤器"}
+func (s *MDFilters) MD() *md.Mder {
+	return &md.Mder{ID: "md.filters", Domain: md.MD_domain, Name: "过滤器"}
 }
 
 type MDFilterSolution struct {
@@ -34,8 +37,8 @@ type MDFilterSolution struct {
 	Context   utils.SJson `gorm:"type:text;name:上下文" json:"context"`
 }
 
-func (s *MDFilterSolution) MD() *Mder {
-	return &Mder{ID: "md.filter.solution", Domain: md_domain, Name: "过滤方案"}
+func (s *MDFilterSolution) MD() *md.Mder {
+	return &md.Mder{ID: "md.filter.solution", Domain: md.MD_domain, Name: "过滤方案"}
 }
 
 type MDFilterItem struct {
@@ -74,6 +77,6 @@ type MDFilterItem struct {
 	Extras      utils.SJson `gorm:"type:text;name:扩展属性" json:"extras"` //JSON
 }
 
-func (s *MDFilterItem) MD() *Mder {
-	return &Mder{ID: "md.filter.item", Domain: md_domain, Name: "过滤项"}
+func (s *MDFilterItem) MD() *md.Mder {
+	return &md.Mder{ID: "md.filter.item", Domain: md.MD_domain, Name: "过滤项"}
 }

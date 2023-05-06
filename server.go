@@ -10,6 +10,8 @@ import (
 	"github.com/nbkit/mdf/db"
 	"github.com/nbkit/mdf/framework/md"
 	"github.com/nbkit/mdf/framework/reg"
+	"github.com/nbkit/mdf/framework/rule"
+	"github.com/nbkit/mdf/framework/widget"
 	"github.com/nbkit/mdf/gin"
 	"github.com/nbkit/mdf/middleware/token"
 	"github.com/nbkit/mdf/utils"
@@ -161,8 +163,14 @@ func (s *Server) initMigrate() {
 		db.Default().DB.DB().SetConnMaxLifetime(0)
 	}
 	md.MDSv().Migrate()
-	initSeedAction()
-
+	if s.option.enableMDF {
+		md.MDSv().Migrate(&widget.MDAction{}, &rule.MDRule{},
+			&widget.MDWidget{}, &widget.MDWidgetDs{}, &widget.MDWidgetLayout{}, &widget.MDWidgetItem{},
+			&widget.MDToolbars{}, &widget.MDToolbarItem{},
+			&widget.MDAction{}, &rule.MDRule{},
+			&widget.MDFilters{}, &widget.MDFilterSolution{}, &widget.MDFilterItem{})
+		initSeedAction()
+	}
 	if s.option.isBaseDataCenter {
 		model.Register()
 	}

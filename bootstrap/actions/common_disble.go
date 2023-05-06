@@ -1,21 +1,21 @@
 package actions
 
 import (
-	"github.com/nbkit/mdf/framework/md"
+	"github.com/nbkit/mdf/framework/widget"
 	"github.com/nbkit/mdf/utils"
 )
 
 type commonDisable struct {
-	register *md.MDAction
+	register *widget.MDAction
 }
 
 func newCommonDisable() *commonDisable {
 	return &commonDisable{
-		register: &md.MDAction{Code: "disable", Widget: "common", Action: "disable"},
+		register: &widget.MDAction{Code: "disable", Widget: "common", Action: "disable"},
 	}
 }
 
-func (s commonDisable) Register() *md.MDAction {
+func (s commonDisable) Register() *widget.MDAction {
 	return s.register
 }
 

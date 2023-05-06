@@ -80,12 +80,6 @@ func (s *mdSvImpl) Migrate(values ...interface{}) {
 		s.initMDCompleted = true
 		mds := []interface{}{
 			&MDEntity{}, &MDEntityRelation{}, &MDField{}, &MDEnum{},
-			&MDAction{}, &MDRule{},
-			&MDWidget{}, &MDWidgetDs{}, &MDWidgetLayout{}, &MDWidgetItem{},
-			&MDToolbars{}, &MDToolbarItem{},
-			&MDAction{}, &MDRule{},
-			&MDFilters{}, &MDFilterSolution{}, &MDFilterItem{},
-			&MDLog{},
 		}
 		needDb := make([]interface{}, 0)
 		for _, v := range mds {

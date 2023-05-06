@@ -1,7 +1,8 @@
-package md
+package widget
 
 import (
 	"fmt"
+	"github.com/nbkit/mdf/framework/rule"
 	"github.com/nbkit/mdf/log"
 	"github.com/nbkit/mdf/utils"
 	"sort"
@@ -17,7 +18,7 @@ type IAction interface {
 }
 type IRule interface {
 	Exec(flow *utils.FlowContext)
-	Register() *MDRule
+	Register() *rule.MDRule
 }
 type IActionSv interface {
 	DoAction(flow *utils.FlowContext) *utils.FlowContext

@@ -3,6 +3,8 @@ package rules
 import (
 	"fmt"
 	"github.com/nbkit/mdf/db"
+	"github.com/nbkit/mdf/framework/rule"
+	"github.com/nbkit/mdf/framework/widget"
 	"strings"
 
 	"github.com/nbkit/mdf/framework/md"
@@ -11,16 +13,16 @@ import (
 )
 
 type commonSave struct {
-	register *md.MDRule
+	register *rule.MDRule
 }
 
 func newCommonSave() *commonSave {
 	return &commonSave{
-		register: &md.MDRule{Action: "save", Code: "save", Widget: "common", Sequence: 50},
+		register: &rule.MDRule{Action: "save", Code: "save", Widget: "common", Sequence: 50},
 	}
 }
 
-func (s *commonSave) Register() *md.MDRule {
+func (s *commonSave) Register() *rule.MDRule {
 	return s.register
 }
 
@@ -359,7 +361,7 @@ func (s *commonSave) saveRelationData(flow *utils.FlowContext, entity *md.MDEnti
 						newFlow.Request.Entity = refEntity.ID
 						newFlow.Request.Rule = ruleID
 
-						if md.ActionSv().DoAction(newFlow); newFlow.Error() != nil {
+						if widget.ActionSv().DoAction(newFlow); newFlow.Error() != nil {
 							flow.Error(newFlow.Error())
 							return
 						}

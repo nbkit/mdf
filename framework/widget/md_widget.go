@@ -1,6 +1,9 @@
-package md
+package widget
 
-import "github.com/nbkit/mdf/utils"
+import (
+	"github.com/nbkit/mdf/framework/md"
+	"github.com/nbkit/mdf/utils"
+)
 
 type MDWidget struct {
 	ID         string      `gorm:"primary_key;size:36" json:"id"`
@@ -18,8 +21,8 @@ type MDWidget struct {
 	Extras     utils.SJson `gorm:"type:text" json:"extras"` //JSON
 }
 
-func (s *MDWidget) MD() *Mder {
-	return &Mder{ID: "md.widget", Domain: md_domain, Name: "组件"}
+func (s *MDWidget) MD() *md.Mder {
+	return &md.Mder{ID: "md.widget", Domain: md.MD_domain, Name: "组件"}
 }
 
 type MDWidgetDs struct {
@@ -40,8 +43,8 @@ type MDWidgetDs struct {
 	Limit      string      `gorm:"type:text;name:条件限制" json:"limit"`
 }
 
-func (s *MDWidgetDs) MD() *Mder {
-	return &Mder{ID: "md.widget.ds", Domain: md_domain, Name: "组件数据源"}
+func (s *MDWidgetDs) MD() *md.Mder {
+	return &md.Mder{ID: "md.widget.ds", Domain: md.MD_domain, Name: "组件数据源"}
 }
 
 type MDWidgetLayout struct {
@@ -62,8 +65,8 @@ type MDWidgetLayout struct {
 	Items     []MDWidgetItem   `gorm:"-" json:"items"`
 }
 
-func (s *MDWidgetLayout) MD() *Mder {
-	return &Mder{ID: "md.widget.layout", Domain: md_domain, Name: "组件布局"}
+func (s *MDWidgetLayout) MD() *md.Mder {
+	return &md.Mder{ID: "md.widget.layout", Domain: md.MD_domain, Name: "组件布局"}
 }
 
 type MDWidgetItem struct {
@@ -104,6 +107,6 @@ type MDWidgetItem struct {
 	Extras      utils.SJson    `gorm:"type:text;name:扩展属性" json:"extras"` //JSON
 }
 
-func (s *MDWidgetItem) MD() *Mder {
-	return &Mder{ID: "md.widget.item", Domain: md_domain, Name: "组件元素"}
+func (s *MDWidgetItem) MD() *md.Mder {
+	return &md.Mder{ID: "md.widget.item", Domain: md.MD_domain, Name: "组件元素"}
 }

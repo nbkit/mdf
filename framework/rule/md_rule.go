@@ -1,7 +1,8 @@
-package md
+package rule
 
 import (
 	"fmt"
+	"github.com/nbkit/mdf/framework/md"
 	"github.com/nbkit/mdf/utils"
 )
 
@@ -24,6 +25,6 @@ type MDRule struct {
 func (s MDRule) GetKey() string {
 	return fmt.Sprintf("%s:%s", s.Widget, s.Code)
 }
-func (s *MDRule) MD() *Mder {
-	return &Mder{ID: "md.rule", Domain: md_domain, Name: "动作规则"}
+func (s *MDRule) MD() *md.Mder {
+	return &md.Mder{ID: "md.rule", Domain: md.MD_domain, Name: "动作规则"}
 }

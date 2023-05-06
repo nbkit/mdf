@@ -9,5 +9,5 @@ const (
 )
 
 const (
-	md_domain string = "md"
+	MD_domain string = "md"
 )
