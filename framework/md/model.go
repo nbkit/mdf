@@ -13,6 +13,7 @@ type Model struct {
 func (s Model) String() string {
 	return s.ID
 }
-func (s Model) GetID() string {
+
+func (s Model) GetKey() string {
 	return s.ID
 }

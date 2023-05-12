@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/nbkit/mdf/db"
 	"github.com/nbkit/mdf/framework/rule"
-	"github.com/nbkit/mdf/framework/widget"
 	"strings"
 
 	"github.com/nbkit/mdf/framework/md"
@@ -361,7 +360,7 @@ func (s *commonSave) saveRelationData(flow *utils.FlowContext, entity *md.MDEnti
 						newFlow.Request.Entity = refEntity.ID
 						newFlow.Request.Rule = ruleID
 
-						if widget.ActionSv().DoAction(newFlow); newFlow.Error() != nil {
+						if rule.ActionSv().DoAction(newFlow); newFlow.Error() != nil {
 							flow.Error(newFlow.Error())
 							return
 						}

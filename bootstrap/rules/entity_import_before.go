@@ -6,6 +6,7 @@ import (
 	"github.com/nbkit/mdf/framework/rule"
 	"github.com/nbkit/mdf/utils"
 	"sort"
+	"strings"
 )
 
 type entityImportBefore struct {
@@ -43,19 +44,19 @@ func (s *entityImportBefore) batchImport(datas []files.ImportData) error {
 		nameList["Entity"] = 1
 		nameList["Props"] = 2
 
-		sort.Slice(datas, func(i, j int) bool { return nameList[datas[i].SheetName] < nameList[datas[j].SheetName] })
+		sort.Slice(datas, func(i, j int) bool { return nameList[datas[i].EntityCode] < nameList[datas[j].EntityCode] })
 
 		entities := make([]md.MDEntity, 0)
 		fields := make([]md.MDField, 0)
 		for _, item := range datas {
-			if item.SheetName == "Entity" {
+			if strings.ToLower(item.EntityCode) == "md.entity" {
 				if d, err := s.toEntities(item); err != nil {
 					return err
 				} else if len(d) > 0 {
 					entities = append(entities, d...)
 				}
 			}
-			if item.SheetName == "Props" {
+			if item.EntityCode == "md.field" {
 				if d, err := s.toFields(item); err != nil {
 					return err
 				} else if len(d) > 0 {
@@ -123,9 +124,6 @@ func (s *entityImportBefore) toFields(data files.ImportData) ([]md.MDField, erro
 		}
 		if cValue := files.GetCellValue("AssociationKey", row); cValue != "" {
 			item.AssociationKey = cValue
-		}
-		if cValue := files.GetCellValue("DbName", row); cValue != "" {
-			item.DbName = cValue
 		}
 		if cValue := files.GetCellValue("DbName", row); cValue != "" {
 			item.DbName = cValue

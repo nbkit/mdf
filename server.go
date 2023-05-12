@@ -75,7 +75,7 @@ func (s *Server) Start(o ...func(*Option)) {
 		s.initMigrate()
 	}
 	//动作注册,规则 注册
-	if s.option.enableMDF {
+	if s.option.enableRule {
 		actions.Register()
 		rules.Register()
 	}
@@ -91,6 +91,7 @@ func (s *Server) Start(o ...func(*Option)) {
 	s.initRoute()
 	//执行中间插件
 	s.initDone()
+
 	//如果是安装或者卸载，则不需要启动和执行后边逻辑
 	if utils.StringsContains(initArgs, s.runArg) > -1 {
 		return
@@ -163,12 +164,18 @@ func (s *Server) initMigrate() {
 		db.Default().DB.DB().SetConnMaxLifetime(0)
 	}
 	md.MDSv().Migrate()
-	if s.option.enableMDF {
-		md.MDSv().Migrate(&widget.MDAction{}, &rule.MDRule{},
+	initSeed := false
+	if s.option.enableRule {
+		md.MDSv().Migrate(&rule.MDAction{}, &rule.MDRule{})
+		initSeed = true
+	}
+	if s.option.enableWidget {
+		md.MDSv().Migrate(
 			&widget.MDWidget{}, &widget.MDWidgetDs{}, &widget.MDWidgetLayout{}, &widget.MDWidgetItem{},
-			&widget.MDToolbars{}, &widget.MDToolbarItem{},
-			&widget.MDAction{}, &rule.MDRule{},
-			&widget.MDFilters{}, &widget.MDFilterSolution{}, &widget.MDFilterItem{})
+			&widget.MDToolbars{}, &widget.MDToolbarItem{}, &widget.MDFilters{}, &widget.MDFilterSolution{}, &widget.MDFilterItem{})
+		initSeed = true
+	}
+	if initSeed {
 		initSeedAction()
 	}
 	if s.option.isBaseDataCenter {
@@ -176,7 +183,7 @@ func (s *Server) initMigrate() {
 	}
 }
 func (s *Server) initCache() *Server {
-	if utils.Config.Db.Database != "" && s.option.enableMDF {
+	if utils.Config.Db.Database != "" {
 		md.MDSv().Cache()
 	}
 	return s
@@ -196,7 +203,7 @@ func (s *Server) startReg() {
 
 }
 
-//启动 JOB
+// 启动 JOB
 func (s *Server) startCron() {
 	go services.CronSv().Start()
 

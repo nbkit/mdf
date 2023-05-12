@@ -159,6 +159,9 @@ func (s *mdSvImpl) createTable(item MDEntity) {
 		primaryKeyStr = fmt.Sprintf(", PRIMARY KEY (%v)", strings.Join(primaryKeys, ","))
 	}
 	var tableOptions string
+	if item.Name != "" {
+		tableOptions = fmt.Sprintf("COMMENT='%v'", item.Name)
+	}
 	if err := db.Default().Exec(fmt.Sprintf("CREATE TABLE %v (%v %v)%s", s.quote(item.TableName), strings.Join(tags, ","), primaryKeyStr, tableOptions)).Error; err != nil {
 		log.ErrorD(err)
 	}
@@ -332,10 +335,10 @@ func (s *mdSvImpl) AddEntities(items []MDEntity) error {
 						datas["DefaultValue"] = field.DefaultValue
 					}
 					if oldField.TypeID != field.TypeID {
-						datas["TypeID"] = field.TypeID
+						datas["TypeID"] = strings.ToLower(field.TypeID)
 					}
 					if oldField.TypeType != field.TypeType {
-						datas["TypeType"] = field.TypeType
+						datas["TypeType"] = strings.ToLower(field.TypeType)
 					}
 					if oldField.Limit != field.Limit {
 						datas["Limit"] = field.Limit

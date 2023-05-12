@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/nbkit/mdf/db"
 	"github.com/nbkit/mdf/log"
+	"strings"
 
 	"github.com/nbkit/mdf/utils"
 )
@@ -219,6 +220,10 @@ func (s *mdSvImpl) buildColumnNameString4Mysql(item MDField) string {
 		fieldStr += " TIMESTAMP"
 		if item.DefaultValue != "" {
 			fieldStr += " DEFAULT " + item.DefaultValue
+		} else if strings.ToUpper(item.Code) == "CREATEDAT" {
+			fieldStr += " DEFAULT CURRENT_TIMESTAMP"
+		} else if strings.ToUpper(item.Code) == "UPDATEDAT" {
+			fieldStr += " DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"
 		}
 	} else if item.TypeID == utils.FIELD_TYPE_DECIMAL {
 		fieldStr += " DECIMAL(24,9)"

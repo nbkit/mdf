@@ -25,7 +25,7 @@ func main() {
 	t = utils.ToTime("2022/1-02")
 	log.ErrorD(t)
 
-	//if err := runApp(); err != nil {
-	//	os.Exit(1)
-	//}
+	if err := runApp(); err != nil {
+		os.Exit(1)
+	}
 }

@@ -2,9 +2,8 @@ package main
 
 import (
 	"github.com/nbkit/mdf"
-	"github.com/nbkit/mdf/gin"
 	"github.com/nbkit/mdf/log"
-	"github.com/nbkit/mdf/utils"
+	"github.com/nbkit/mdf/middleware/cors"
 	"os"
 )
 
@@ -17,10 +16,8 @@ func runApp() error {
 	}()
 	server := mdf.DefaultServer()
 	server.Use(func(s *mdf.Server) {
-		s.GetEngine().POST("id", func(context *gin.Context) {
-			utils.NewFlowContext().Bind(context)
-		})
+		s.GetEngine().Use(cors.AllCross())
 	})
-	server.Start(server.WithOptionMDF())
+	server.Start(server.WithOptionMigrate(), server.WithOptionAuthToken(false), server.WithOptionRule())
 	return nil
 }

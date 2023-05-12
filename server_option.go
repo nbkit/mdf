@@ -3,7 +3,8 @@ package mdf
 type Option struct {
 	isMigrate        bool //默认为false，依据启动参数设置
 	isUpgrade        bool //默认为false，依据启动参数设置
-	enableMDF        bool //默认为false
+	enableRule       bool //默认为false
+	enableWidget     bool //默认为false
 	isBaseDataCenter bool //默认为false
 	enableCron       bool //默认为false
 	isRegistry       bool //默认为false
@@ -13,9 +14,19 @@ type Option struct {
 func newOption() *Option {
 	return &Option{enableAuthToken: true}
 }
-func (s *Server) WithOptionMDF() func(*Option) {
+func (s *Server) WithOptionRule() func(*Option) {
 	return func(r *Option) {
-		r.enableMDF = true
+		r.enableRule = true
+	}
+}
+func (s *Server) WithOptionWidget() func(*Option) {
+	return func(r *Option) {
+		r.enableWidget = true
+	}
+}
+func (s *Server) WithOptionMigrate() func(*Option) {
+	return func(r *Option) {
+		r.isMigrate = true
 	}
 }
 func (s *Server) WithOptionAuthToken(enable bool) func(*Option) {

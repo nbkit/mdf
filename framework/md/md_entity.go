@@ -13,13 +13,13 @@ type MDEntity struct {
 	ID        string     `gorm:"primary_key;size:50" json:"id"`
 	CreatedAt utils.Time `gorm:"name:创建时间" json:"created_at"`
 	UpdatedAt utils.Time `gorm:"name:更新时间" json:"updated_at"`
-	Type      string     `gorm:"size:50;not null"` // simple，entity，enum，interface，dto,view
+	Type      string     `gorm:"size:50;not null;name:类型"` // simple，entity，enum，interface，dto,view
 	Domain    string     `gorm:"size:50;name:领域" json:"domain"`
-	Code      string     `gorm:"size:100;index:code_idx;not null"`
-	Name      string     `gorm:"size:100"`
-	TableName string     `gorm:"size:50"`
-	Memo      string     `gorm:"size:500"`
-	Tags      string     `gorm:"size:500"`
+	Code      string     `gorm:"size:100;index:code_idx;not null;name:编码"`
+	Name      string     `gorm:"size:100;name:实体名称"`
+	TableName string     `gorm:"size:50;name:表名"`
+	Memo      string     `gorm:"size:500;name:备注"`
+	Tags      string     `gorm:"size:500;name:标签"`
 	System    utils.SBool
 	Fields    []MDField `gorm:"association_autoupdate:false;association_autocreate:false;association_save_reference:false;foreignkey:EntityID"`
 	cache     map[string]MDField
@@ -69,25 +69,25 @@ func (s *MDEntityRelation) MD() *Mder {
 }
 
 type MDField struct {
-	ID             string     `gorm:"primary_key;size:50" json:"id"`
-	CreatedAt      utils.Time `gorm:"name:创建时间" json:"created_at"`
-	UpdatedAt      utils.Time `gorm:"name:更新时间" json:"updated_at"`
-	EntityID       string     `gorm:"size:50;unique_index:uix_code;not null"`
-	Entity         *MDEntity  `gorm:"association_autoupdate:false;association_autocreate:false;association_save_reference:false"`
-	Code           string     `gorm:"size:50;unique_index:uix_code;not null"`
-	Name           string     `gorm:"size:50"`
-	DbName         string     `gorm:"size:50"`
-	IsNormal       utils.SBool
-	IsPrimaryKey   utils.SBool
-	ForeignKey     string    `gorm:"size:50"` //外键
-	AssociationKey string    `gorm:"size:50"` //Association
-	Kind           string    `gorm:"size:50"`
-	TypeID         string    `gorm:"size:50"`
-	TypeType       string    `gorm:"size:50"`
-	Type           *MDEntity `gorm:"association_autoupdate:false;association_autocreate:false;association_save_reference:false"`
-	Limit          string    `gorm:"size:500;name:限制"`
-	Memo           string    `gorm:"size:500"`
-	Tags           string    `gorm:"size:500"` // code,name,ent,import
+	ID             string      `gorm:"primary_key;size:50" json:"id"`
+	CreatedAt      utils.Time  `gorm:"name:创建时间" json:"created_at"`
+	UpdatedAt      utils.Time  `gorm:"name:更新时间" json:"updated_at"`
+	EntityID       string      `gorm:"size:50;unique_index:uix_code;not null;name:实体ID"`
+	Entity         *MDEntity   `gorm:"association_autoupdate:false;association_autocreate:false;association_save_reference:false"`
+	Code           string      `gorm:"size:50;unique_index:uix_code;not null;name:编码"`
+	Name           string      `gorm:"size:50;name:名称"`
+	DbName         string      `gorm:"size:50;name:数据列名"`
+	IsNormal       utils.SBool `gorm:"name:是否数据库字段"`
+	IsPrimaryKey   utils.SBool `gorm:"name:是否主键"`        //外键
+	ForeignKey     string      `gorm:"size:50;name:外键"`  //外键
+	AssociationKey string      `gorm:"size:50;name:关联键"` //Association
+	Kind           string      `gorm:"size:50;name:关系"`
+	TypeID         string      `gorm:"size:50;name:数据类型"`
+	TypeType       string      `gorm:"size:50;name:数据类别"`
+	Type           *MDEntity   `gorm:"association_autoupdate:false;association_autocreate:false;association_save_reference:false"`
+	Limit          string      `gorm:"size:500;name:限制"`
+	Memo           string      `gorm:"size:500"`
+	Tags           string      `gorm:"size:500"` // code,name,ent,import
 	Sequence       int
 	Nullable       utils.SBool
 	Length         int

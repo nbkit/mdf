@@ -1,21 +1,21 @@
 package actions
 
 import (
-	"github.com/nbkit/mdf/framework/widget"
+	"github.com/nbkit/mdf/framework/rule"
 	"github.com/nbkit/mdf/utils"
 )
 
 type commonSave struct {
-	register *widget.MDAction
+	register *rule.MDAction
 }
 
 func newCommonSave() *commonSave {
 	return &commonSave{
-		register: &widget.MDAction{Code: "save", Widget: "common", Action: "save"},
+		register: &rule.MDAction{Code: "save", Widget: "common", Action: "save"},
 	}
 }
 
-func (s *commonSave) Register() *widget.MDAction {
+func (s *commonSave) Register() *rule.MDAction {
 	return s.register
 }
 

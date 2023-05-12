@@ -2,20 +2,20 @@ package actions
 
 import (
 	"github.com/nbkit/mdf/framework/files"
-	"github.com/nbkit/mdf/framework/widget"
+	"github.com/nbkit/mdf/framework/rule"
 	"github.com/nbkit/mdf/utils"
 )
 
 type commonImport struct {
-	register *widget.MDAction
+	register *rule.MDAction
 }
 
 func newCommonImport() *commonImport {
 	return &commonImport{
-		register: &widget.MDAction{Code: "import", Widget: "common", Action: "import"},
+		register: &rule.MDAction{Code: "import", Widget: "common", Action: "import"},
 	}
 }
-func (s *commonImport) Register() *widget.MDAction {
+func (s *commonImport) Register() *rule.MDAction {
 	return s.register
 }
 

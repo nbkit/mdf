@@ -1,20 +1,20 @@
 package actions
 
 import (
-	"github.com/nbkit/mdf/framework/widget"
+	"github.com/nbkit/mdf/framework/rule"
 	"github.com/nbkit/mdf/utils"
 )
 
 type CommonDelete struct {
-	register *widget.MDAction
+	register *rule.MDAction
 }
 
 func newCommonDelete() *CommonDelete {
 	return &CommonDelete{
-		register: &widget.MDAction{Code: "delete", Widget: "common", Action: "delete"},
+		register: &rule.MDAction{Code: "delete", Widget: "common", Action: "delete"},
 	}
 }
-func (s CommonDelete) Register() *widget.MDAction {
+func (s CommonDelete) Register() *rule.MDAction {
 	return s.register
 }
 

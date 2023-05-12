@@ -1,12 +1,12 @@
 package rules
 
 import (
-	"github.com/nbkit/mdf/framework/widget"
+	"github.com/nbkit/mdf/framework/rule"
 )
 
 func Register() {
 	//注册到mof框架
-	widget.ActionSv().RegisterRule(
+	rule.ActionSv().RegisterRule(
 		newCommonQuery(),
 		newCommonSave(),
 		newCommonDelete(),

@@ -1,20 +1,20 @@
 package actions
 
 import (
-	"github.com/nbkit/mdf/framework/widget"
+	"github.com/nbkit/mdf/framework/rule"
 	"github.com/nbkit/mdf/utils"
 )
 
 type commonQuery struct {
-	register *widget.MDAction
+	register *rule.MDAction
 }
 
 func newCommonQuery() *commonQuery {
 	return &commonQuery{
-		register: &widget.MDAction{Code: "query", Widget: "common", Action: "query"},
+		register: &rule.MDAction{Code: "query", Widget: "common", Action: "query"},
 	}
 }
-func (s *commonQuery) Register() *widget.MDAction {
+func (s *commonQuery) Register() *rule.MDAction {
 	return s.register
 }
 
