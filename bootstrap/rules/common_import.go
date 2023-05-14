@@ -154,8 +154,7 @@ func (s commonImport) importMapData(flow *utils.FlowContext, data files.ImportDa
 	var MaxBatchs uint = 100
 	// 如果指定了id，则先删除
 	if len(oldIds)>0{
-		sql:=fmt.Sprintf("delete from  %s where id in (?)", db.Default().Dialect().Quote(entity.TableName))
-		db.Default().Table(entity.TableName).Exec(sql,oldIds)
+
 	}
 
 	for _, data := range dbDatas {
@@ -188,7 +187,7 @@ func (s commonImport) importMapData(flow *utils.FlowContext, data files.ImportDa
 }
 
 func (s commonImport) batchInsertSave(entity *md.MDEntity, quoted []string, placeholders []string, valueVars ...interface{}) error {
-	var sql = fmt.Sprintf("INSERT INTO %s (%s) VALUES %s", db.Default().Dialect().Quote(entity.TableName), strings.Join(quoted, ", "), strings.Join(placeholders, ", "))
+	var sql = fmt.Sprintf("REPLACE INTO %s (%s) VALUES %s", db.Default().Dialect().Quote(entity.TableName), strings.Join(quoted, ", "), strings.Join(placeholders, ", "))
 
 	if err := db.Default().Exec(sql, valueVars...).Error; err != nil {
 		return err
