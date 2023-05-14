@@ -33,16 +33,16 @@ type oqlFrom struct {
 	expr  string
 }
 
-func (m *oqlFrom) Query() string {
+func (m oqlFrom) Query() string {
 	return m.query
 }
-func (m *oqlFrom) Alias() string {
+func (m oqlFrom) Alias() string {
 	return m.alias
 }
-func (m *oqlFrom) Args() []interface{} {
+func (m oqlFrom) Args() []interface{} {
 	return m.args
 }
-func (m *oqlFrom) Expr() string {
+func (m oqlFrom) Expr() string {
 	return m.expr
 }
 

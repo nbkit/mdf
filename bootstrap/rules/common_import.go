@@ -52,6 +52,8 @@ func (s commonImport) importMapData(flow *utils.FlowContext, data files.ImportDa
 	dbDatas := make([]map[string]interface{}, 0)
 	quotedMap := make(map[string]string)
 
+	oldIds:=make([]string,0)
+
 	for _, item := range data.Data {
 		dbItem := make(map[string]interface{})
 		if v, ok := item[utils.STATE_FIELD]; ok && (v == utils.STATE_TEMP || v == utils.STATE_NORMAL || v == utils.STATE_IGNORED) {
@@ -105,8 +107,10 @@ func (s commonImport) importMapData(flow *utils.FlowContext, data files.ImportDa
 		}
 		if field := entity.GetField("ID"); field != nil {
 			fieldName := field.DbName
-			if _, ok := dbItem[fieldName]; !ok {
+			if idValue, ok := dbItem[fieldName]; !ok {
 				dbItem[fieldName] = utils.GUID()
+			}else{
+				oldIds= append(oldIds,idValue.(string))
 			}
 			quotedMap[fieldName] = fieldName
 		}
@@ -148,6 +152,11 @@ func (s commonImport) importMapData(flow *utils.FlowContext, data files.ImportDa
 	valueVars := make([]interface{}, 0)
 	var itemCount uint = 0
 	var MaxBatchs uint = 100
+	// 如果指定了id，则先删除
+	if len(oldIds)>0{
+		sql:=fmt.Sprintf("delete from  %s where id in (?)", db.Default().Dialect().Quote(entity.TableName))
+		db.Default().Table(entity.TableName).Exec(sql,oldIds)
+	}
 
 	for _, data := range dbDatas {
 		itemCount = itemCount + 1

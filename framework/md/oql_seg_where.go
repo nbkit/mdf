@@ -52,7 +52,7 @@ func (m oqlWhere) Expr() string {
 	return m.expr
 }
 
-func (m oqlWhere) setExpr(expr string) {
+func (m *oqlWhere) setExpr(expr string) {
 	m.expr = expr
 }
 func (m oqlWhere) String() string {
