@@ -13,18 +13,15 @@ import (
 )
 
 type commonImport struct {
-	register *rule.MDRule
 }
 
-func newCommonImport() *commonImport {
-	return &commonImport{
-		register: &rule.MDRule{Action: "import", Code: "import", Widget: "common", Sequence: 50},
-	}
+func newCommonImport() commonImport {
+	return commonImport{}
 }
-func (s *commonImport) Register() *rule.MDRule {
-	return s.register
+func (s commonImport) Register() rule.MDRule {
+	return rule.MDRule{Action: "import", Widget: "common", Sequence: 50}
 }
-func (s *commonImport) Exec(flow *utils.FlowContext) {
+func (s commonImport) Exec(flow *utils.FlowContext) {
 	log.InfoD("导入开始======begin======")
 	defer func() {
 		log.InfoD("导入结束======end======")
@@ -42,7 +39,7 @@ func (s *commonImport) Exec(flow *utils.FlowContext) {
 		s.importMapData(flow, items)
 	}
 }
-func (s *commonImport) importMapData(flow *utils.FlowContext, data files.ImportData) {
+func (s commonImport) importMapData(flow *utils.FlowContext, data files.ImportData) {
 	log.InfoD(fmt.Sprintf("接收到需要导入的数据-%s：%v条", flow.Request.Entity, len(data.Data)))
 	entity := md.MDSv().GetEntity(data.EntityCode)
 	if entity == nil {
@@ -181,7 +178,7 @@ func (s *commonImport) importMapData(flow *utils.FlowContext, data files.ImportD
 	}
 }
 
-func (s *commonImport) batchInsertSave(entity *md.MDEntity, quoted []string, placeholders []string, valueVars ...interface{}) error {
+func (s commonImport) batchInsertSave(entity *md.MDEntity, quoted []string, placeholders []string, valueVars ...interface{}) error {
 	var sql = fmt.Sprintf("INSERT INTO %s (%s) VALUES %s", db.Default().Dialect().Quote(entity.TableName), strings.Join(quoted, ", "), strings.Join(placeholders, ", "))
 
 	if err := db.Default().Exec(sql, valueVars...).Error; err != nil {

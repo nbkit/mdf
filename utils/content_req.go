@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"encoding/json"
 	"github.com/nbkit/mdf/gin"
 	"github.com/nbkit/mdf/log"
 	"mime/multipart"
@@ -42,6 +43,22 @@ func (s *ReqContext) Bind(c *gin.Context) *ReqContext {
 	return s
 }
 
+func (s *ReqContext) DataBind(obj interface{}) error {
+	if b, err := s.dataMarshalJSON(); err != nil {
+		return err
+	} else {
+		return json.Unmarshal(b, obj)
+	}
+}
+
+// MarshalJSON implements the json.Marshaler interface.
+func (s ReqContext) dataMarshalJSON() ([]byte, error) {
+	if s.Data == nil {
+		return []byte(""), nil
+	}
+	bytes, err := json.Marshal(s.Data)
+	return bytes, err
+}
 func (s *ReqContext) SetCancel(isCanceled bool) *ReqContext {
 	s.canceled = isCanceled
 	return s

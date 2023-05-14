@@ -9,16 +9,13 @@ import (
 )
 
 type commonQuery struct {
-	register *rule.MDRule
 }
 
-func newCommonQuery() *commonQuery {
-	return &commonQuery{
-		register: &rule.MDRule{Action: "query", Code: "query", Widget: "common", Sequence: 50},
-	}
+func newCommonQuery() commonQuery {
+	return commonQuery{}
 }
-func (s *commonQuery) Register() *rule.MDRule {
-	return s.register
+func (s commonQuery) Register() rule.MDRule {
+	return rule.MDRule{Action: "query", Widget: "common", Sequence: 50}
 }
 
 func (s commonQuery) Exec(flow *utils.FlowContext) {
@@ -32,10 +29,10 @@ func (s commonQuery) Exec(flow *utils.FlowContext) {
 		flow.Error("找不到实体！")
 		return
 	}
-	exector := md.NewOQL().From(entity.TableName)
+	exector := md.NewOQL().From(flow.Request.Entity)
 	for _, f := range entity.Fields {
 		if f.TypeType == utils.TYPE_SIMPLE {
-			exector.Select(fmt.Sprintf("$$%s as \"%s\"", f.Code, f.DbName))
+			exector.Select(fmt.Sprintf("%s as \"%s\"", f.Code, f.DbName))
 		}
 	}
 	if flow.Request.ID != "" {
@@ -49,13 +46,13 @@ func (s commonQuery) Exec(flow *utils.FlowContext) {
 		flow.Error(err)
 		return
 	}
-	datas := make([]map[string]interface{}, 0)
-	if err := exector.Find(datas).Error(); err != nil {
+	datas := make([]interface{}, 0)
+	if err := exector.Find(&datas).Error(); err != nil {
 		flow.Error(err)
 		return
 	} else if len(datas) > 0 {
-		s.loadEnums(datas, entity)
-		s.loadEntities(datas, entity)
+		//s.loadEnums(datas, entity)
+		//s.loadEntities(datas, entity)
 		flow.Set("data", datas)
 		flow.Set("pager", utils.Pager{Total: count, PageSize: flow.Request.PageSize, Page: flow.Request.Page})
 	}

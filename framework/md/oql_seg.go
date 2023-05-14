@@ -1,7 +1,6 @@
 package md
 
 import (
-	"fmt"
 	"github.com/nbkit/mdf/utils"
 	"regexp"
 	"strings"
@@ -38,12 +37,12 @@ func (s *oqlImpl) From(query interface{}, args ...interface{}) OQL {
 		seg := &oqlFrom{query: v, args: args}
 		r := regexp.MustCompile(regexp_OQL_FROM)
 		matches := r.FindStringSubmatch(v)
-		if matches != nil && len(matches) == 4 {
+		if matches != nil && len(matches) >= 2 {
+			seg.query = matches[1]
 			if matches[2] != "" {
-				seg.query = matches[1]
 				seg.alias = matches[2]
-			} else {
-				seg.query = matches[3]
+			} else if matches[3] != "" {
+				seg.alias = matches[3]
 			}
 		}
 		s.froms = append(s.froms, seg)
@@ -188,26 +187,7 @@ func (s *oqlImpl) Having(query interface{}, args ...interface{}) OQLWhere {
 
 //============= exec
 func (s *oqlImpl) Count(value interface{}) OQL {
-	s.parse()
-	queries := make([]string, 0)
-	args := make([]interface{}, 0)
-	queries = append(queries, "select count(*)")
-	if statement := s.buildFroms(); statement.Affected > 0 {
-		queries = append(queries, fmt.Sprintf("from %s", statement.Query))
-		args = append(args, statement.Args...)
-	}
-	if statement := s.buildWheres(); statement.Affected > 0 {
-		queries = append(queries, fmt.Sprintf("where %s", statement.Query))
-		args = append(args, statement.Args...)
-	}
-	if statement := s.buildGroups(); statement.Affected > 0 {
-		queries = append(queries, fmt.Sprintf("group by %s", statement.Query))
-		args = append(args, statement.Args...)
-	}
-	if statement := s.buildHaving(); statement.Affected > 0 {
-		queries = append(queries, fmt.Sprintf("having %s", statement.Query))
-		args = append(args, statement.Args...)
-	}
+
 	return s.GetActuator().Count(s, value)
 }
 func (s *oqlImpl) Pluck(column string, value interface{}) OQL {

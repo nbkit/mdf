@@ -46,7 +46,7 @@ func (m *oqlFrom) Expr() string {
 	return m.expr
 }
 
-func (m oqlFrom) setExpr(expr string) {
+func (m *oqlFrom) setExpr(expr string) {
 	m.expr = expr
 }
 

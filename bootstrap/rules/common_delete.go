@@ -9,21 +9,18 @@ import (
 	"github.com/nbkit/mdf/utils"
 )
 
-type CommonDelete struct {
-	register *rule.MDRule
+type commonDelete struct {
 }
 
-func newCommonDelete() *CommonDelete {
-	return &CommonDelete{
-		register: &rule.MDRule{Action: "delete", Code: "delete", Widget: "common", Sequence: 50},
-	}
+func newCommonDelete() commonDelete {
+	return commonDelete{}
 }
 
-func (s CommonDelete) Register() *rule.MDRule {
-	return s.register
+func (s commonDelete) Register() rule.MDRule {
+	return rule.MDRule{Action: "delete", Widget: "common", Sequence: 50}
 }
 
-func (s CommonDelete) Exec(flow *utils.FlowContext) {
+func (s commonDelete) Exec(flow *utils.FlowContext) {
 	if flow.Request.ID == "" {
 		flow.Error("缺少 ID 参数！")
 		return

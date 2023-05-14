@@ -6,17 +6,14 @@ import (
 )
 
 type commonDisable struct {
-	register *rule.MDAction
 }
 
-func newCommonDisable() *commonDisable {
-	return &commonDisable{
-		register: &rule.MDAction{Code: "disable", Widget: "common", Action: "disable"},
-	}
+func newCommonDisable() commonDisable {
+	return commonDisable{}
 }
 
-func (s commonDisable) Register() *rule.MDAction {
-	return s.register
+func (s commonDisable) Register() rule.MDAction {
+	return rule.MDAction{Code: "disable", Widget: "common", Action: "disable"}
 }
 
 func (s commonDisable) Exec(flow *utils.FlowContext) {

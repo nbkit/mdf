@@ -401,7 +401,6 @@ func (s *DB) Pluck(column string, value interface{}) *DB {
 func (s *DB) Count(value interface{}) *DB {
 	return s.NewScope(s.Value).count(value).db
 }
-
 // Related get related associations
 func (s *DB) Related(value interface{}, foreignKeys ...string) *DB {
 	return s.NewScope(s.Value).related(value, foreignKeys...).db

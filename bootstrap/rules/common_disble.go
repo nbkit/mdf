@@ -10,19 +10,22 @@ import (
 )
 
 type commonDisable struct {
-	register *rule.MDRule
 }
 
-func newCommonDisable() *commonDisable {
-	return &commonDisable{
-		register: &rule.MDRule{Action: "disable", Code: "disable", Widget: "common", Sequence: 50},
+func newCommonDisable() commonDisable {
+	return commonDisable{}
+}
+
+func (s commonDisable) Register() rule.MDRule {
+	//return rule.MDRule{Action: "disable", Widget: "common", Sequence: 50}
+	return rule.MDRule{Action: "*", Widget: "aa", Sequence: 50}
+}
+func (s commonDisable) query(flow *utils.FlowContext) {
+	if flow.Request.ID == "" {
+		flow.Error("缺少 ID 参数！")
+		return
 	}
 }
-
-func (s commonDisable) Register() *rule.MDRule {
-	return s.register
-}
-
 func (s commonDisable) Exec(flow *utils.FlowContext) {
 	if flow.Request.ID == "" {
 		flow.Error("缺少 ID 参数！")

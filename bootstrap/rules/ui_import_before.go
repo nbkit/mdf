@@ -9,18 +9,15 @@ import (
 )
 
 type uiImportBefore struct {
-	register *rule.MDRule
 }
 
-func newUiImportBefore() *uiImportBefore {
-	return &uiImportBefore{
-		register: &rule.MDRule{Action: "import", Code: "import.before", Widget: "ui", Sequence: 20},
-	}
+func newUiImportBefore() uiImportBefore {
+	return uiImportBefore{}
 }
-func (s *uiImportBefore) Register() *rule.MDRule {
-	return s.register
+func (s uiImportBefore) Register() rule.MDRule {
+	return rule.MDRule{Action: "import", Widget: "ui", Sequence: 20}
 }
-func (s *uiImportBefore) Exec(flow *utils.FlowContext) {
+func (s uiImportBefore) Exec(flow *utils.FlowContext) {
 	if flow.Request.Data == nil {
 		flow.Error("没有要导入的数据")
 		return
@@ -33,7 +30,7 @@ func (s *uiImportBefore) Exec(flow *utils.FlowContext) {
 		s.doProcess(flow, items)
 	}
 }
-func (s *uiImportBefore) deleteData(flow *utils.FlowContext, data []files.ImportData) {
+func (s uiImportBefore) deleteData(flow *utils.FlowContext, data []files.ImportData) {
 	widgetCodes := make([]string, 0)
 	filterCodes := make([]string, 0)
 	for i, _ := range data {
@@ -127,6 +124,6 @@ func (s *uiImportBefore) deleteData(flow *utils.FlowContext, data []files.Import
 
 }
 
-func (s *uiImportBefore) doProcess(flow *utils.FlowContext, data []files.ImportData) {
+func (s uiImportBefore) doProcess(flow *utils.FlowContext, data []files.ImportData) {
 
 }

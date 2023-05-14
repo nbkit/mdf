@@ -5,19 +5,16 @@ import (
 	"github.com/nbkit/mdf/utils"
 )
 
-type CommonDelete struct {
-	register *rule.MDAction
+type commonDelete struct {
 }
 
-func newCommonDelete() *CommonDelete {
-	return &CommonDelete{
-		register: &rule.MDAction{Code: "delete", Widget: "common", Action: "delete"},
-	}
+func newCommonDelete() commonDelete {
+	return commonDelete{}
 }
-func (s CommonDelete) Register() *rule.MDAction {
-	return s.register
+func (s commonDelete) Register() rule.MDAction {
+	return rule.MDAction{Code: "delete", Widget: "common", Action: "delete"}
 }
 
-func (s CommonDelete) Exec(flow *utils.FlowContext) {
+func (s commonDelete) Exec(flow *utils.FlowContext) {
 
 }

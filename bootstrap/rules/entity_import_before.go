@@ -10,18 +10,15 @@ import (
 )
 
 type entityImportBefore struct {
-	register *rule.MDRule
 }
 
-func newEntityImportBefore() *entityImportBefore {
-	return &entityImportBefore{
-		register: &rule.MDRule{Action: "import", Code: "import.before", Widget: "md", Sequence: 20},
-	}
+func newEntityImportBefore() entityImportBefore {
+	return entityImportBefore{}
 }
-func (s *entityImportBefore) Register() *rule.MDRule {
-	return s.register
+func (s entityImportBefore) Register() rule.MDRule {
+	return rule.MDRule{Action: "import", Widget: "md", Sequence: 20}
 }
-func (s *entityImportBefore) Exec(flow *utils.FlowContext) {
+func (s entityImportBefore) Exec(flow *utils.FlowContext) {
 	if flow.Request.Data == nil {
 		flow.Error("没有要导入的数据")
 		return
@@ -38,7 +35,7 @@ func (s *entityImportBefore) Exec(flow *utils.FlowContext) {
 	flow.Request.SetCancel(true)
 }
 
-func (s *entityImportBefore) batchImport(datas []files.ImportData) error {
+func (s entityImportBefore) batchImport(datas []files.ImportData) error {
 	if len(datas) > 0 {
 		nameList := make(map[string]int)
 		nameList["Entity"] = 1
@@ -80,7 +77,7 @@ func (s *entityImportBefore) batchImport(datas []files.ImportData) error {
 	}
 	return nil
 }
-func (s *entityImportBefore) toEntities(data files.ImportData) ([]md.MDEntity, error) {
+func (s entityImportBefore) toEntities(data files.ImportData) ([]md.MDEntity, error) {
 	if len(data.Data) == 0 {
 		return nil, nil
 	}
@@ -97,7 +94,7 @@ func (s *entityImportBefore) toEntities(data files.ImportData) ([]md.MDEntity, e
 	}
 	return items, nil
 }
-func (s *entityImportBefore) toFields(data files.ImportData) ([]md.MDField, error) {
+func (s entityImportBefore) toFields(data files.ImportData) ([]md.MDField, error) {
 	if len(data.Data) == 0 {
 		return nil, nil
 	}

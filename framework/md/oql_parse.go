@@ -10,7 +10,7 @@ import (
 	"github.com/nbkit/mdf/utils"
 )
 
-func (s *oqlImpl) parse() error {
+func (s *oqlImpl) Parse() error {
 	for _, v := range s.froms {
 		s.parseFromField(v)
 	}
@@ -35,8 +35,8 @@ func (s *oqlImpl) parse() error {
 	return s.error
 }
 
-//=============== build
-func (s *oqlImpl) buildFroms() *OQLStatement {
+// =============== build
+func (s *oqlImpl) BuildFrom() *OQLStatement {
 	statement := &OQLStatement{}
 	queries := make([]string, 0)
 	args := make([]interface{}, 0)
@@ -50,7 +50,7 @@ func (s *oqlImpl) buildFroms() *OQLStatement {
 	return statement
 }
 
-func (s *oqlImpl) buildJoins() *OQLStatement {
+func (s *oqlImpl) BuildJoins() *OQLStatement {
 	statement := &OQLStatement{}
 	queries := make([]string, 0)
 	args := make([]interface{}, 0)
@@ -101,7 +101,7 @@ func (s *oqlImpl) buildJoins() *OQLStatement {
 	}
 	return statement
 }
-func (s *oqlImpl) buildSelects() *OQLStatement {
+func (s *oqlImpl) BuildSelects() *OQLStatement {
 	statement := &OQLStatement{}
 	queries := make([]string, 0)
 	args := make([]interface{}, 0)
@@ -116,11 +116,11 @@ func (s *oqlImpl) buildSelects() *OQLStatement {
 	statement.Args = args
 	return statement
 }
-func (s *oqlImpl) buildWheres() *OQLStatement {
+func (s *oqlImpl) BuildWheres() *OQLStatement {
 	return s.buildWheresItem(s.wheres)
 }
 
-func (s *oqlImpl) buildHaving() *OQLStatement {
+func (s *oqlImpl) BuildHaving() *OQLStatement {
 	return s.buildWheresItem(s.having)
 }
 func (s *oqlImpl) buildWheresItem(wheres []OQLWhere) *OQLStatement {
@@ -193,7 +193,7 @@ func (s *oqlImpl) getWhereArgs(where OQLWhere) []interface{} {
 	return args
 }
 
-func (s *oqlImpl) buildGroups() *OQLStatement {
+func (s *oqlImpl) BuildGroups() *OQLStatement {
 	statement := &OQLStatement{}
 	queries := make([]string, 0)
 	args := make([]interface{}, 0)
@@ -208,7 +208,7 @@ func (s *oqlImpl) buildGroups() *OQLStatement {
 	statement.Args = args
 	return statement
 }
-func (s *oqlImpl) buildOrders() *OQLStatement {
+func (s *oqlImpl) BuildOrders() *OQLStatement {
 	statement := &OQLStatement{}
 	queries := make([]string, 0)
 	args := make([]interface{}, 0)
@@ -224,7 +224,7 @@ func (s *oqlImpl) buildOrders() *OQLStatement {
 	return statement
 }
 
-//=============== parse
+// =============== parse
 func (s *oqlImpl) parseFromField(value OQLFrom) {
 	//主表，使用别名作路径
 	form := s.parseEntity(value.Query(), value.Alias())
@@ -311,8 +311,10 @@ func (s *oqlImpl) parseOrderField(value *oqlOrder) {
 }
 
 // 解析字段表达式，如
+//
 //	a.fieldA+fieldB+sum(b.fieldA)   =>a.fieldA ,fieldB, b.fieldA
 //	$$a.fieldA + sum( c.fieldA )	=>$$a.fieldA, c.fieldA
+//
 // 函数与左括号之间不能有空格
 // 多级字段.号不能有空格
 func (s *oqlImpl) parseFieldExpr(expr string) string {

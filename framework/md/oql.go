@@ -3,7 +3,7 @@ package md
 import "github.com/nbkit/mdf/utils"
 
 const (
-	regexp_OQL_FROM    = "([\\S]+)(?i:(?:as|[\\s])+)([\\S]+)|([\\S]+)"
+	regexp_OQL_FROM    = `^\s*(\w+)(?:\s+AS\s+(\w+)|\s+(\w+))?\s*$`
 	regexp_OQL_SELECT  = "([\\S]+.*\\S)(?i:\\s+as+\\s)([\\S]+)|([\\S]+.*[\\S]+)"
 	regexp_OQL_ORDER   = "(?i)([\\S]+.*\\S)(?:\\s)(desc|asc)|([\\S]+.*[\\S]+)"
 	regexp_OQL_VAR_EXP = `{([A-Za-z._]+[0-9A-Za-z]*)}`
@@ -52,6 +52,15 @@ type OQL interface {
 	Create(data interface{}) OQL
 	Update(data interface{}) OQL
 	Delete() OQL
+
+	Parse() error
+	BuildFrom() *OQLStatement
+	BuildJoins() *OQLStatement
+	BuildSelects() *OQLStatement
+	BuildWheres() *OQLStatement
+	BuildHaving() *OQLStatement
+	BuildGroups() *OQLStatement
+	BuildOrders() *OQLStatement
 }
 
 func NewOQL(names ...OQLOption) OQL {
@@ -69,7 +78,7 @@ func NewOQL(names ...OQLOption) OQL {
 	return oql
 }
 
-//公共查询
+// 公共查询
 type oqlImpl struct {
 	error    error
 	errors   []error

@@ -7,19 +7,16 @@ import (
 )
 
 type commonImport struct {
-	register *rule.MDAction
 }
 
-func newCommonImport() *commonImport {
-	return &commonImport{
-		register: &rule.MDAction{Code: "import", Widget: "common", Action: "import"},
-	}
+func newCommonImport() commonImport {
+	return commonImport{}
 }
-func (s *commonImport) Register() *rule.MDAction {
-	return s.register
+func (s commonImport) Register() rule.MDAction {
+	return rule.MDAction{Code: "import", Widget: "common", Action: "import"}
 }
 
-func (s *commonImport) Exec(flow *utils.FlowContext) {
+func (s commonImport) Exec(flow *utils.FlowContext) {
 	if len(flow.Request.Files) > 0 {
 		datas := make([]files.ImportData, 0)
 		for _, file := range flow.Request.Files {

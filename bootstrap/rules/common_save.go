@@ -12,20 +12,17 @@ import (
 )
 
 type commonSave struct {
-	register *rule.MDRule
 }
 
-func newCommonSave() *commonSave {
-	return &commonSave{
-		register: &rule.MDRule{Action: "save", Code: "save", Widget: "common", Sequence: 50},
-	}
+func newCommonSave() commonSave {
+	return commonSave{}
 }
 
-func (s *commonSave) Register() *rule.MDRule {
-	return s.register
+func (s commonSave) Register() rule.MDRule {
+	return rule.MDRule{Action: "save", Widget: "common", Sequence: 50}
 }
 
-func (s *commonSave) Exec(flow *utils.FlowContext) {
+func (s commonSave) Exec(flow *utils.FlowContext) {
 	reqData := make(map[string]interface{})
 	if data, ok := flow.Request.Data.(map[string]interface{}); !ok {
 		flow.Error("data数据格式不正确")
@@ -77,7 +74,7 @@ func (s *commonSave) Exec(flow *utils.FlowContext) {
 	}
 }
 
-func (s *commonSave) fillEntityDefaultValue(entity *md.MDEntity, data map[string]interface{}) map[string]interface{} {
+func (s commonSave) fillEntityDefaultValue(entity *md.MDEntity, data map[string]interface{}) map[string]interface{} {
 	for _, field := range entity.Fields {
 		//如果字段设置了默认值，且没有传入字段值时，取默认值
 		if field.DbName != "" && field.DefaultValue != "" {
@@ -88,7 +85,7 @@ func (s *commonSave) fillEntityDefaultValue(entity *md.MDEntity, data map[string
 	}
 	return data
 }
-func (s *commonSave) dataToEntityData(entity *md.MDEntity, data map[string]interface{}) map[string]interface{} {
+func (s commonSave) dataToEntityData(entity *md.MDEntity, data map[string]interface{}) map[string]interface{} {
 	changeData := make(map[string]interface{})
 	for di, dv := range data {
 		field := entity.GetField(di)
@@ -123,7 +120,7 @@ func (s *commonSave) dataToEntityData(entity *md.MDEntity, data map[string]inter
 	}
 	return changeData
 }
-func (s *commonSave) doActionCreate(flow *utils.FlowContext, entity *md.MDEntity, reqData map[string]interface{}) {
+func (s commonSave) doActionCreate(flow *utils.FlowContext, entity *md.MDEntity, reqData map[string]interface{}) {
 	reqData["id"] = utils.GUID()
 	if sysField := entity.GetField("EntID"); sysField != nil && flow.EntID() != "" {
 		reqData[sysField.DbName] = flow.EntID()
@@ -210,7 +207,7 @@ func (s *commonSave) doActionCreate(flow *utils.FlowContext, entity *md.MDEntity
 	}
 	flow.Set("data", changeData)
 }
-func (s *commonSave) doActionUpdate(flow *utils.FlowContext, entity *md.MDEntity, reqData map[string]interface{}, oldData map[string]interface{}) {
+func (s commonSave) doActionUpdate(flow *utils.FlowContext, entity *md.MDEntity, reqData map[string]interface{}, oldData map[string]interface{}) {
 	fieldUpdatedAt := entity.GetField("UpdatedAt")
 	if fieldUpdatedAt != nil && fieldUpdatedAt.DbName != "" {
 		reqData[fieldUpdatedAt.DbName] = utils.TimeNow()
@@ -320,7 +317,7 @@ func (s *commonSave) doActionUpdate(flow *utils.FlowContext, entity *md.MDEntity
 	return
 }
 
-func (s *commonSave) saveRelationData(flow *utils.FlowContext, entity *md.MDEntity, reqData map[string]interface{}) {
+func (s commonSave) saveRelationData(flow *utils.FlowContext, entity *md.MDEntity, reqData map[string]interface{}) {
 	for _, nv := range entity.Fields {
 		if nv.Kind == md.KIND_TYPE_HAS_MANT {
 			if do, ok := reqData[nv.DbName].([]interface{}); ok && len(do) > 0 {
@@ -371,6 +368,6 @@ func (s *commonSave) saveRelationData(flow *utils.FlowContext, entity *md.MDEnti
 		}
 	}
 }
-func (s *commonSave) dataCheck(flow *utils.FlowContext, entity *md.MDEntity, data map[string]interface{}) error {
+func (s commonSave) dataCheck(flow *utils.FlowContext, entity *md.MDEntity, data map[string]interface{}) error {
 	return nil
 }
