@@ -206,7 +206,7 @@ func (s *mdSvImpl) buildColumnNameString4Mysql(item MDField) string {
 		}
 
 		if item.DefaultValue != "" {
-			fieldStr += " DEFAULT " + item.DefaultValue
+			fieldStr += fmt.Sprintf(" DEFAULT '%v'", item.DefaultValue)
 		}
 	} else if item.TypeID == utils.FIELD_TYPE_BOOL {
 		fieldStr += " TINYINT"
