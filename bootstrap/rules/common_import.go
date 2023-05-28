@@ -52,7 +52,7 @@ func (s commonImport) importMapData(flow *utils.FlowContext, data files.ImportDa
 	dbDatas := make([]map[string]interface{}, 0)
 	quotedMap := make(map[string]string)
 
-	oldIds:=make([]string,0)
+	oldIds := make([]string, 0)
 
 	for _, item := range data.Data {
 		dbItem := make(map[string]interface{})
@@ -109,8 +109,8 @@ func (s commonImport) importMapData(flow *utils.FlowContext, data files.ImportDa
 			fieldName := field.DbName
 			if idValue, ok := dbItem[fieldName]; !ok {
 				dbItem[fieldName] = utils.GUID()
-			}else{
-				oldIds= append(oldIds,idValue.(string))
+			} else {
+				oldIds = append(oldIds, idValue.(string))
 			}
 			quotedMap[fieldName] = fieldName
 		}
@@ -153,7 +153,7 @@ func (s commonImport) importMapData(flow *utils.FlowContext, data files.ImportDa
 	var itemCount uint = 0
 	var MaxBatchs uint = 100
 	// 如果指定了id，则先删除
-	if len(oldIds)>0{
+	if len(oldIds) > 0 {
 
 	}
 
@@ -187,7 +187,11 @@ func (s commonImport) importMapData(flow *utils.FlowContext, data files.ImportDa
 }
 
 func (s commonImport) batchInsertSave(entity *md.MDEntity, quoted []string, placeholders []string, valueVars ...interface{}) error {
-	var sql = fmt.Sprintf("REPLACE INTO %s (%s) VALUES %s", db.Default().Dialect().Quote(entity.TableName), strings.Join(quoted, ", "), strings.Join(placeholders, ", "))
+	fieldQuoted := make([]string, 0)
+	for _, s := range quoted {
+		fieldQuoted = append(fieldQuoted, db.Default().Dialect().Quote(s))
+	}
+	var sql = fmt.Sprintf("REPLACE INTO %s (%s) VALUES %s", db.Default().Dialect().Quote(entity.TableName), strings.Join(fieldQuoted, ", "), strings.Join(placeholders, ", "))
 
 	if err := db.Default().Exec(sql, valueVars...).Error; err != nil {
 		return err

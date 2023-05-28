@@ -25,11 +25,14 @@ type MDEntity struct {
 	cache     map[string]MDField
 }
 
+func (s MDEntity) TableComment() string {
+	return "实体"
+}
 func (s MDEntity) String() string {
 	return fmt.Sprintf("%s-%s-%s", s.Domain, s.Code, s.ID)
 }
 func (s *MDEntity) MD() *Mder {
-	return &Mder{ID: "md.entity", Domain: MD_domain, Name: "实体"}
+	return &Mder{ID: "md.entity", Domain: MD_domain, Name: s.TableComment()}
 }
 func (s *MDEntity) GetField(code string) *MDField {
 	if s.cache == nil {
@@ -64,8 +67,11 @@ type MDEntityRelation struct {
 	Limit     string     `gorm:"size:500;name:限制"`
 }
 
+func (s MDEntityRelation) TableComment() string {
+	return "实体关系"
+}
 func (s *MDEntityRelation) MD() *Mder {
-	return &Mder{ID: "md.entity.relation", Domain: MD_domain, Name: "实体关系"}
+	return &Mder{ID: "md.entity.relation", Domain: MD_domain, Name: s.TableComment()}
 }
 
 type MDField struct {
@@ -101,6 +107,9 @@ type MDField struct {
 func (s MDField) String() string {
 	return fmt.Sprintf("%s-%s-%s", s.Code, s.Name, s.TypeType)
 }
+func (s MDField) TableComment() string {
+	return "属性"
+}
 func (s MDField) CompileValue(value interface{}) interface{} {
 	if value == nil || value == "" || s.TypeID == "" {
 		return nil
@@ -130,5 +139,5 @@ func (s MDField) CompileValue(value interface{}) interface{} {
 	return nil
 }
 func (s *MDField) MD() *Mder {
-	return &Mder{ID: "md.field", Domain: MD_domain, Name: "属性"}
+	return &Mder{ID: "md.field", Domain: MD_domain, Name: s.TableComment()}
 }

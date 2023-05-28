@@ -18,9 +18,12 @@ type MDRule struct {
 	Enabled   utils.SBool `gorm:"default:true;not null" json:"enabled"`
 }
 
+func (s MDRule) TableComment() string {
+	return "动作规则"
+}
 func (s MDRule) GetKey() string {
 	return fmt.Sprintf("%s:%s", s.Widget, s.Action)
 }
 func (s *MDRule) MD() *md.Mder {
-	return &md.Mder{ID: "md.rule", Domain: md.MD_domain, Name: "动作规则"}
+	return &md.Mder{ID: "md.rule", Domain: md.MD_domain, Name: s.TableComment()}
 }

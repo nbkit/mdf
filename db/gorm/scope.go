@@ -307,7 +307,9 @@ func (scope *Scope) OmitAttrs() []string {
 type tabler interface {
 	TableName() string
 }
-
+type tableCommenter interface {
+	TableComment() string
+}
 type dbTabler interface {
 	TableName(*DB) string
 }
@@ -327,6 +329,12 @@ func (scope *Scope) TableName() string {
 	}
 
 	return scope.GetModelStruct().TableName(scope.db.Model(scope.Value))
+}
+func (scope *Scope) TableComment() string {
+	if tableCommenter, ok := scope.Value.(tableCommenter); ok {
+		return tableCommenter.TableComment()
+	}
+	return ""
 }
 
 // QuotedTableName return quoted table name
@@ -1136,11 +1144,18 @@ func (scope *Scope) related(value interface{}, foreignKeys ...string) *Scope {
 
 // getTableOptions return the table options string or an empty string if the table options does not exist
 func (scope *Scope) getTableOptions() string {
+	items := make([]string, 0)
 	tableOptions, ok := scope.Get("gorm:table_options")
-	if !ok {
-		return ""
+	if ok {
+		items = append(items, tableOptions.(string))
 	}
-	return " " + tableOptions.(string)
+	if s := scope.TableComment(); s != "" {
+		items = append(items, fmt.Sprintf("COMMENT='%v'", s))
+	}
+	if len(items) > 0 {
+		return " " + strings.Join(items, " ")
+	}
+	return ""
 }
 
 func (scope *Scope) createJoinTable(field *StructField) {

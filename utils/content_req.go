@@ -23,8 +23,8 @@ type ReqContext struct {
 	Q        string                  `json:"q" form:"q"`           //模糊查询条件
 	Entity   string                  `json:"entity" form:"entity"`
 	Data     interface{}             `json:"data" form:"data"`     //数据
-	Extend   interface{}             `json:"extend" form:"extend"` //数据
-	Param    interface{}             `json:"param" form:"param"`   //数据
+	Extend   map[string]interface{}  `json:"extend" form:"extend"` //数据
+	Param    map[string]interface{}  `json:"param" form:"param"`   //数据
 	Files    []*multipart.FileHeader `json:"-" form:"files"`
 	canceled bool                    `json:"-" form:"-"`
 }

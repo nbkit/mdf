@@ -4,7 +4,8 @@ import (
 	"github.com/nbkit/mdf/utils"
 )
 
-/**
+/*
+*
 枚举类型
 */
 type MDEnumType struct {
@@ -16,7 +17,8 @@ type MDEnumType struct {
 	Enums     []MDEnum   `gorm:"association_autoupdate:false;association_autocreate:false;association_save_reference:false;foreignkey:EntityID"`
 }
 
-/**
+/*
+*
 枚举值
 */
 type MDEnum struct {
@@ -29,9 +31,12 @@ type MDEnum struct {
 	SrcID     string     `gorm:"size:50" json:"src_id"`
 }
 
+func (s MDEnum) TableComment() string {
+	return "枚举"
+}
 func (t MDEnum) TableName() string {
 	return "md_enums"
 }
 func (s *MDEnum) MD() *Mder {
-	return &Mder{ID: "md.enum", Domain: MD_domain, Name: "枚举", Type: utils.TYPE_ENUM}
+	return &Mder{ID: "md.enum", Domain: MD_domain, Name: s.TableComment(), Type: utils.TYPE_ENUM}
 }

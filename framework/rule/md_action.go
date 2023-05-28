@@ -25,9 +25,12 @@ type MDAction struct {
 	Enabled    utils.SBool `gorm:"default:true;not null" json:"enabled"`
 }
 
+func (s MDAction) TableComment() string {
+	return "组件命令"
+}
 func (s MDAction) GetKey() string {
 	return fmt.Sprintf("%s:%s", s.Widget, s.Code)
 }
 func (s *MDAction) MD() *md.Mder {
-	return &md.Mder{ID: "md.action", Domain: md.MD_domain, Name: "组件命令"}
+	return &md.Mder{ID: "md.action", Domain: md.MD_domain, Name: s.TableComment()}
 }

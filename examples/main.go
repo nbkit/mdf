@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/nbkit/mdf/framework/md"
 	"github.com/nbkit/mdf/framework/rule"
 	"github.com/nbkit/mdf/log"
 	"github.com/nbkit/mdf/utils"
@@ -27,6 +28,7 @@ func main() {
 
 	t = utils.ToTime("2022/1-02")
 	log.ErrorD(t)
+	md.MDSv().Migrate()
 	//flow := utils.NewFlowContext()
 	//flow.Request.Action = "query"
 	//execCommonRule(newCommonDisable(), flow)
