@@ -42,7 +42,6 @@ func (s *ResContext) Set(name string, value interface{}) *ResContext {
 	s.data[name] = value
 	return s
 }
-
 func (s *ResContext) SetData(value Map) *ResContext {
 	s.data = value
 	return s

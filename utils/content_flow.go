@@ -67,7 +67,10 @@ func (s *FlowContext) OrgID() string {
 func (s *FlowContext) Canceled() bool {
 	return s.Request.Canceled()
 }
-
+func (s *FlowContext) Cancel() *FlowContext {
+	 s.Request.SetCancel(true)
+	 return s
+}
 // Response
 func (s FlowContext) Has(name string) bool {
 	return s.Response.Has(name)
@@ -76,7 +79,10 @@ func (s *FlowContext) Set(name string, value interface{}) *FlowContext {
 	s.Response.Set(name, value)
 	return s
 }
-
+func (s *FlowContext) SetMsg(msg string) *FlowContext {
+	s.Response.Set("msg", msg)
+	return s
+}
 func (s *FlowContext) Get(name string) interface{} {
 	return s.Response.Get(name)
 }

@@ -106,9 +106,9 @@ func (t SBool) _ToBoolValue(value interface{}) string {
 	bValue := ""
 
 	sb := ToString(value)
-	if sb == "true" || sb == "1" || sb == "t" || sb == "是" || sb == "y" || sb == "Y" {
+	if sb == "true" || sb == "1" || sb == "t" || sb == "是" || sb == "y" || sb == "Y" || sb == "YES" {
 		bValue = "1"
-	} else if sb == "false" || sb == "0" || sb == "f" || sb == "否" || sb == "n" || sb == "N" {
+	} else if sb == "false" || sb == "0" || sb == "f" || sb == "否" || sb == "n" || sb == "N"||sb=="NO" {
 		bValue = "0"
 	}
 	return bValue

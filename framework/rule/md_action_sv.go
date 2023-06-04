@@ -124,7 +124,7 @@ func (s actionSvImpl) DoAction(flow *utils.FlowContext) *utils.FlowContext {
 }
 func (s actionSvImpl) execCommonRule(rule IRule, flow *utils.FlowContext) {
 	reflectValue := reflect.ValueOf(rule)
-	methodName := utils.FirstCaseToUpper(flow.Request.Action, true)
+	methodName := utils.CamelString(flow.Request.Action)
 	if reflectValue.CanAddr() && reflectValue.Kind() != reflect.Ptr {
 		reflectValue = reflectValue.Addr()
 	}
