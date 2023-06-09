@@ -33,9 +33,9 @@ func main() {
 	//flow.Request.Action = "query"
 	//execCommonRule(newCommonDisable(), flow)
 
-	//if err := runApp(); err != nil {
-	//	os.Exit(1)
-	//}
+	if err := runApp(); err != nil {
+		os.Exit(1)
+	}
 }
 func execCommonRule(rule rule.IRule, flow *utils.FlowContext) {
 	reflectValue := reflect.ValueOf(rule)
