@@ -14,7 +14,7 @@ func (s *DB) BatchInsert(objArr []interface{}) error {
 		return nil
 	}
 	var itemCount uint = 0
-	var MaxBatchs uint = 100
+	var MaxBatchs uint = 1000
 
 	mainObj := objArr[0]
 	mainScope := s.NewScope(mainObj)
