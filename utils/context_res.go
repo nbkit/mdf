@@ -22,6 +22,9 @@ func (s ResContext) Data() Map {
 	}
 	return s.data
 }
+func (s ResContext) Errors() []error {
+	return s.errors
+}
 func (s ResContext) Has(name string) bool {
 	if _, ok := s.data[name]; ok {
 		return true

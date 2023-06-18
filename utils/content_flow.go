@@ -111,3 +111,6 @@ func (s *FlowContext) Output() {
 func (s *FlowContext) Error(err ...interface{}) error {
 	return s.Response.Error(err...)
 }
+func (s *FlowContext) Errors() []error {
+	return s.Response.Errors()
+}
