@@ -11,6 +11,7 @@ type SJson struct {
 	value      interface{}
 	jsonString string
 	valid      bool // Valid is true if jsonString is not NULL
+	isMap      bool
 }
 
 var SJson_Null = SJson{value: nil, jsonString: "", valid: false}
@@ -30,7 +31,22 @@ func (t *SJson) Parse(val interface{}) SJson {
 		t.jsonString = string(v)
 		t.valid = true
 	}
+	t.formatMapValue()
 	return *t
+}
+
+func (t *SJson) formatMapValue() {
+	if t.valid && len(t.jsonString) >= 2 && t.jsonString[0] == '{' && t.jsonString[len(t.jsonString)-1] == '}' {
+		mapValue := make(map[string]interface{})
+		if err := json.Unmarshal([]byte(t.jsonString), &mapValue); err != nil {
+			t.isMap = false
+		}
+		t.value = mapValue
+		t.isMap = true
+	} else {
+		t.isMap = false
+	}
+
 }
 func (t SJson) String() string {
 	return t.jsonString
@@ -81,11 +97,8 @@ func (t *SJson) UnmarshalJSON(data []byte) error {
 		t.value = vv
 		t.jsonString = strData
 		t.valid = t.jsonString != ""
-
-		//v := SJson{value: vv, jsonString: string(data)}
-		//v.valid = v.jsonString != ""
-		//*t = v
 	}
+	t.formatMapValue()
 	return nil
 }
 
@@ -124,6 +137,7 @@ func (t *SJson) Scan(v interface{}) error {
 		t.jsonString = jsonStr
 		t.valid = t.jsonString != ""
 	}
+	t.formatMapValue()
 	return nil
 }
 func (t SJson) OrmDataType(driver string) string {
@@ -140,4 +154,38 @@ func (t SJson) GetValue() interface{} {
 }
 func (t SJson) GetInterfaceSlice() []interface{} {
 	return ToInterfaceSlice(t.value)
+}
+func (t SJson) GetMapValueBy(key string) (interface{}) {
+	if t.isMap && t.value != nil {
+		if mapValue, isMapValue := t.value.(map[string]interface{}); isMapValue {
+			if mv, ok := mapValue[key]; ok {
+				return mv
+			}
+		}
+	}
+	return nil
+}
+func (t SJson) GetMapStringValueBy(key string) string {
+	if t.isMap && t.value != nil {
+		if mapValue, isMapValue := t.value.(map[string]interface{}); isMapValue {
+			if mv, ok := mapValue[key]; ok {
+				return ToString(mv)
+			}
+		}
+	}
+	return ""
+}
+func (t *SJson) SetMapValueBy(key string, value interface{}) bool {
+	if t.isMap {
+		if t.value == nil {
+			t.value = make(map[string]interface{})
+		}
+		if mapValue, isMapValue := t.value.(map[string]interface{}); isMapValue {
+			mapValue[key] = value
+			t.value = mapValue
+			t.Parse(t.value)
+			return true
+		}
+	}
+	return false
 }
