@@ -126,7 +126,7 @@ func _stringToTimeString(timestr string) string {
 	return ret
 }
 func ToTime(value interface{}) Time {
-	if value == "" || value == nil {
+	if value == "" || value == "null" || value == nil {
 		return Time{}
 	}
 	if v, ok := value.(time.Time); ok {
