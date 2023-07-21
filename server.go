@@ -160,7 +160,6 @@ func (s *Server) initHtmlTemplate() {
 }
 func (s *Server) initMigrate() {
 	if utils.Config.Db.Database != "" && s.option.isMigrate {
-		db.CreateDB(utils.Config.Db.Database)
 		db.Default().DB.DB().SetConnMaxLifetime(0)
 	}
 	md.MDSv().Migrate()
