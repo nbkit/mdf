@@ -31,15 +31,18 @@ type AppConfig struct {
 	PublicAddress string `mapstructure:"public_address" json:"public_address"`
 }
 type DbConfig struct {
-	Driver    string `mapstructure:"driver" json:"driver"`
-	Host      string `mapstructure:"host" json:"host"`
-	Port      string `mapstructure:"port" json:"port"`
-	Database  string `mapstructure:"database" json:"database"`
-	Username  string `mapstructure:"username" json:"username"`
-	Password  string `mapstructure:"password" json:"password"`
-	Charset   string `mapstructure:"charset" json:"charset"`
-	Collation string `mapstructure:"collation" json:"collation"`
-	Mode      string `mapstructure:"mode" json:"mode"`
+	Driver       string        `mapstructure:"driver" json:"driver"`
+	Host         string        `mapstructure:"host" json:"host"`
+	Port         string        `mapstructure:"port" json:"port"`
+	Database     string        `mapstructure:"database" json:"database"`
+	Username     string        `mapstructure:"username" json:"username"`
+	Password     string        `mapstructure:"password" json:"password"`
+	Charset      string        `mapstructure:"charset" json:"charset"`
+	Collation    string        `mapstructure:"collation" json:"collation"`
+	Mode         string        `mapstructure:"mode" json:"mode"`
+	Timeout      time.Duration `mapstructure:"timeout" json:"timeout"`             // Dial timeout
+	ReadTimeout  time.Duration `mapstructure:"read_timeout" json:"read_timeout"`   // I/O read timeout
+	WriteTimeout time.Duration `mapstructure:"write_timeout" json:"write_timeout"` // I/O write timeout
 }
 
 func (s *DbConfig) fill() {
@@ -108,6 +111,9 @@ func (s DbConfig) GetDsnString(useDB bool) string {
 			AllowNativePasswords: true,
 			ParseTime:            true,
 			Loc:                  time.Local,
+			Timeout:              s.Timeout,
+			ReadTimeout:          s.ReadTimeout,
+			WriteTimeout:         s.WriteTimeout,
 		}
 		if useDB {
 			config.DBName = s.Database
